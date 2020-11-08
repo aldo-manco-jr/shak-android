@@ -1,40 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".authentication.SignUpActivity">
-
-    <pl.droidsonroids.gif.GifImageView
-        android:id="@+id/animatedBackground"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:src="@drawable/animated_background_teal2"
-        android:scaleType="fitXY"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageView
-        android:id="@+id/logo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="142dp"
-        android:layout_marginBottom="589dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/shak_logo_shadow" />
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".authentication.controllers.SignupFragment">
 
     <EditText
         android:id="@+id/emailField"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="230dp"
+        android:layout_marginTop="0dp"
         android:layout_marginEnd="16dp"
         android:background="@drawable/field_wrap"
         android:ems="10"
@@ -42,7 +19,9 @@
         android:textColor="#FFFFFF"
         android:textColorHint="#FFFFFF"
         android:inputType="textEmailAddress"
-        android:padding="5dip"
+        android:paddingLeft="8dip"
+        android:drawableLeft="@drawable/email_drawable_left"
+        android:drawablePadding="6dp"
         android:singleLine="true"
         android:textSize="14dip"
         app:layout_constraintEnd_toEndOf="parent"
@@ -62,7 +41,9 @@
         android:textColor="#FFFFFF"
         android:textColorHint="#FFFFFF"
         android:inputType="textPersonName"
-        android:padding="5dip"
+        android:paddingLeft="8dip"
+        android:drawableLeft="@drawable/username_drawable_left"
+        android:drawablePadding="6dp"
         android:singleLine="true"
         android:textSize="14dip"
         app:layout_constraintEnd_toEndOf="parent"
@@ -80,7 +61,11 @@
         android:ems="10"
         android:hint="Password"
         android:inputType="textPassword"
-        android:padding="5dip"
+        android:paddingLeft="8dip"
+        android:drawableLeft="@drawable/password_drawable_left"
+        android:drawablePadding="6dp"
+        android:paddingRight="8dip"
+        android:drawableRight="@drawable/eye_open_drawable_right"
         android:singleLine="true"
         android:textColor="#FFFFFF"
         android:textColorHint="#FFFFFF"
@@ -102,19 +87,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/passwordField" />
-
-    <TextView
-        android:id="@+id/switchToLogin"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="60dp"
-        android:layout_marginRight="16dp"
-        android:text="Already registered, loginRequest now."
-        android:textColor="#FFFFFF"
-        android:onClick="switchToLogin"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="@id/signUpButton" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
