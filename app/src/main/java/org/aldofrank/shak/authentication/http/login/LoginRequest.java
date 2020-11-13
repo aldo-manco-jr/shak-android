@@ -1,4 +1,4 @@
-package org.aldofrank.shak.authentication.models;
+package org.aldofrank.shak.authentication.http.login;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -19,15 +19,7 @@ public class LoginRequest {
         return username;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
     public String getPassword() {
         return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 }

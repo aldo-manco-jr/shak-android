@@ -1,7 +1,4 @@
 <resources>
     <string name="app_name">SHAK</string>
-    <string name="title_activity_sign_up">SignUpActivity</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="base_url">http://ec2-15-237-74-79.eu-west-3.compute.amazonaws.com/api/shak/</string>
 </resources>

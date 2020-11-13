@@ -1,11 +1,10 @@
-package org.aldofrank.shak.authentication.models;
+package org.aldofrank.shak.authentication.http.login;
 
 import com.google.gson.annotations.SerializedName;
 
-public class LoginResponse {
+import org.aldofrank.shak.authentication.models.User;
 
-    @SerializedName("statusCode")
-    int statusCode;
+public class LoginResponse {
 
     @SerializedName("userFound")
     User userFound;

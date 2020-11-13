@@ -11,13 +11,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import org.aldofrank.shak.R;
-import org.aldofrank.shak.authentication.models.LoginRequest;
-import org.aldofrank.shak.authentication.models.LoginResponse;
-import org.aldofrank.shak.authentication.models.User;
-import org.aldofrank.shak.authentication.services.AuthenticationService;
+import org.aldofrank.shak.authentication.http.login.LoginRequest;
+import org.aldofrank.shak.authentication.http.login.LoginResponse;
+import org.aldofrank.shak.services.AuthenticationService;
+import org.aldofrank.shak.services.ServiceGenerator;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -32,10 +33,14 @@ public class LoginFragment extends Fragment {
             .addConverterFactory(GsonConverterFactory.create());
 
     Retrofit retrofit = builder.build();
-    AuthenticationService userClient = retrofit.create(AuthenticationService.class);
+
+    // AuthenticationService authService = retrofit.create(AuthenticationService.class);
+    AuthenticationService authService = ServiceGenerator.createService(AuthenticationService.class);
 
     EditText usernameField;
     EditText passwordField;
+
+    ProgressBar loadingBar;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -49,22 +54,30 @@ public class LoginFragment extends Fragment {
         LoginRequest loginRequest = new LoginRequest(usernameField.getText().toString().trim(), passwordField.getText().toString().trim());
         Toast.makeText(getActivity(), loginRequest.getUsername() + " " + loginRequest.getPassword(), Toast.LENGTH_LONG).show();
 
-        Call<LoginResponse> call = userClient.login(loginRequest);
+        Call<LoginResponse> call = authService.login(loginRequest);
+
+        loadingBar.setVisibility(View.VISIBLE);
 
         call.enqueue(new Callback<LoginResponse>() {
+
             @Override
             public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+
                 if (response.isSuccessful()) {
                     Toast.makeText(getActivity(), response.body().getUserFound().getEmail(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), response.body().getToken(), Toast.LENGTH_LONG).show();
                     token = response.body().getToken();
+                    loadingBar.setVisibility(View.GONE);
                 } else {
                     Toast.makeText(getActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
+                    loadingBar.setVisibility(View.GONE);
                 }
             }
 
             @Override
             public void onFailure(Call<LoginResponse> call, Throwable t) {
                 Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
+                loadingBar.setVisibility(View.GONE);
             }
         });
     }
@@ -78,6 +91,7 @@ public class LoginFragment extends Fragment {
         Button loginButton = view.findViewById(R.id.loginButton);
         usernameField = view.findViewById(R.id.usernameField);
         passwordField = view.findViewById(R.id.passwordField);
+        loadingBar = getActivity().findViewById(R.id.loadingBar);
 
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
