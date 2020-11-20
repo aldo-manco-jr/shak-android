@@ -12,12 +12,8 @@ import retrofit2.http.POST;
 public interface AuthenticationService {
 
     @POST("login")
-    Call<LoginResponse> login(
-            @Body LoginRequest loginRequest
-    );
+    Call<LoginResponse> login(@Body LoginRequest loginRequest);
 
     @POST("register")
-    Call<SignupResponse> register(
-            @Body SignupRequest signupRequest
-    );
+    Call<SignupResponse> register(@Body SignupRequest signupRequest);
 }

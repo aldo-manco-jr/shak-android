@@ -16,5 +16,5 @@ public interface PeopleService {
         return this.http.get(`${BASE_URL}/username/${username}`);
     }*/
 
-    @GET("users")
+    // @GET("users")
 }

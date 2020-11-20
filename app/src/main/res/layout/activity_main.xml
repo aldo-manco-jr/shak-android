@@ -70,7 +70,7 @@
         android:layout_marginRight="0dp"
         android:layout_marginBottom="0dp"
         android:background="@drawable/switch_authentication"
-        android:text="SIGN UP"
+        android:text="Switch to Sign Up"
         android:onClick="switchButton"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

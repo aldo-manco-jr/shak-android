@@ -2,7 +2,7 @@ package org.aldofrank.shak.authentication.http.login;
 
 import com.google.gson.annotations.SerializedName;
 
-import org.aldofrank.shak.authentication.models.User;
+import org.aldofrank.shak.models.User;
 
 public class LoginResponse {
 

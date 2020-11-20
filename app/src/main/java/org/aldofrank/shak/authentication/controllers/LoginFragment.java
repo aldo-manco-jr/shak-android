@@ -19,22 +19,15 @@ import org.aldofrank.shak.authentication.http.login.LoginRequest;
 import org.aldofrank.shak.authentication.http.login.LoginResponse;
 import org.aldofrank.shak.services.AuthenticationService;
 import org.aldofrank.shak.services.ServiceGenerator;
+import org.aldofrank.shak.services.StreamsService;
+import org.aldofrank.shak.streams.http.posts.PostsListResponse;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class LoginFragment extends Fragment {
 
-    Retrofit.Builder builder = new Retrofit.Builder()
-            .baseUrl("http://ec2-15-237-74-79.eu-west-3.compute.amazonaws.com/api/shak/")
-            .addConverterFactory(GsonConverterFactory.create());
-
-    Retrofit retrofit = builder.build();
-
-    // AuthenticationService authService = retrofit.create(AuthenticationService.class);
     AuthenticationService authService = ServiceGenerator.createService(AuthenticationService.class);
 
     EditText usernameField;
@@ -61,14 +54,40 @@ public class LoginFragment extends Fragment {
         call.enqueue(new Callback<LoginResponse>() {
 
             @Override
-            public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+            public void onResponse(Call<LoginResponse> call, final Response<LoginResponse> response) {
 
                 if (response.isSuccessful()) {
                     Toast.makeText(getActivity(), response.body().getUserFound().getEmail(), Toast.LENGTH_LONG).show();
-                    Toast.makeText(getActivity(), response.body().getToken(), Toast.LENGTH_LONG).show();
-                    token = response.body().getToken();
+                    token = "bearer " + response.body().getToken();
                     loadingBar.setVisibility(View.GONE);
+
+                    StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, token);
+
+                    Toast.makeText(getActivity(), token, Toast.LENGTH_LONG).show();
+
+                    Call<PostsListResponse> httpRequest = streamsService.getAllPosts();
+
+                    httpRequest.enqueue(new Callback<PostsListResponse>() {
+
+                        @Override
+                        public void onResponse(Call<PostsListResponse> call, Response<PostsListResponse> response) {
+
+                            if (response.isSuccessful()){
+                                Toast.makeText(getActivity(), response.body().getArrayPosts().get(0).getPostContent(), Toast.LENGTH_LONG).show();
+                            }else {
+                                Toast.makeText(getActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<PostsListResponse> call, Throwable t) {
+                            Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
+                        }
+                    });
+
                 } else {
+                    // errore a livello di applicazione
+                    // response.code() == (401) -> token expired
                     Toast.makeText(getActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                     loadingBar.setVisibility(View.GONE);
                 }
@@ -76,6 +95,9 @@ public class LoginFragment extends Fragment {
 
             @Override
             public void onFailure(Call<LoginResponse> call, Throwable t) {
+                // errore a livello di rete
+                // network error, establishing connection with server, error creating http request, response
+                // when there is an exception
                 Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
                 loadingBar.setVisibility(View.GONE);
             }

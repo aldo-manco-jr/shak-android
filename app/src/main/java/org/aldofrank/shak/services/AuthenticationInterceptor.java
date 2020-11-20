@@ -1,5 +1,7 @@
 package org.aldofrank.shak.services;
 
+import android.widget.Toast;
+
 import java.io.IOException;
 
 import okhttp3.Interceptor;
@@ -16,12 +18,14 @@ public class AuthenticationInterceptor implements Interceptor {
 
     @Override
     public Response intercept(Chain chain) throws IOException {
-        Request original = chain.request();
 
-        Request.Builder builder = original.newBuilder()
-                .header("Authorization", authToken);
+        Request httpRequest = chain.request();
 
-        Request request = builder.build();
-        return chain.proceed(request);
+        Request.Builder builder = httpRequest.newBuilder()
+                .header("authorization", authToken);
+
+        Request httpRequestPlusToken = builder.build();
+
+        return chain.proceed(httpRequestPlusToken);
     }
 }

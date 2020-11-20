@@ -36,6 +36,9 @@ dependencies {
     // RX-Java
     implementation 'com.rengwuxian.materialedittext:library:2.1.4'
 
+    // Logging Interceptor
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.9.0'
+
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.3.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'

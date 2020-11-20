@@ -1,6 +1,8 @@
-package org.aldofrank.shak.authentication.models;
+package org.aldofrank.shak.models;
 
 import com.google.gson.annotations.SerializedName;
+
+import org.aldofrank.shak.models.Post;
 
 import java.util.ArrayList;
 
@@ -15,9 +17,14 @@ public class User {
     @SerializedName("password")
     private String password;
 
-    //private ArrayList<Post> arrayPosts;
-    private ArrayList<User> arrayFollowing;
-    private ArrayList<User> arrayFollowers;
+    @SerializedName("posts")
+    private ArrayList<Post> arrayPosts;
+
+    @SerializedName("following")
+    private ArrayList<Following> arrayFollowing;
+
+    @SerializedName("followers")
+    private ArrayList<Follower> arrayFollowers;
 
     @SerializedName("profileImageId")
     private String profileImageId;
@@ -37,11 +44,15 @@ public class User {
         return password;
     }
 
-    public ArrayList<User> getArrayFollowing() {
+    public ArrayList<Post> getArrayPosts() {
+        return arrayPosts;
+    }
+
+    public ArrayList<Following> getArrayFollowing() {
         return arrayFollowing;
     }
 
-    public ArrayList<User> getArrayFollowers() {
+    public ArrayList<Follower> getArrayFollowers() {
         return arrayFollowers;
     }
 
@@ -51,5 +62,25 @@ public class User {
 
     public String getProfileImageVersion() {
         return profileImageVersion;
+    }
+
+    class Following{
+
+        @SerializedName("userFollowed")
+        private String followingId;
+
+        public String getFollowingId() {
+            return followingId;
+        }
+    }
+
+    class Follower{
+
+        @SerializedName("follower")
+        private String followerId;
+
+        public String getFollowerId() {
+            return followerId;
+        }
     }
 }
