@@ -1,13 +1,19 @@
 package org.aldofrank.shak.models;
 
+import com.google.gson.JsonParser;
 import com.google.gson.annotations.SerializedName;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Post {
 
     @SerializedName("user_id")
-    private String userId;
+    private Object userId;
 
     @SerializedName("username")
     private String usernamePublisher;
@@ -22,19 +28,32 @@ public class Post {
     private String imageId;
 
     @SerializedName("comments")
-    private ArrayList<Comment> arrayComments;
+    private List<Comment> arrayComments;
 
     @SerializedName("total_likes")
     private int totalLikes;
 
     @SerializedName("likes")
-    private ArrayList<Like> arrayLikes;
+    private List<Like> arrayLikes;
 
     @SerializedName("created_at")
     private String createdAt;
 
     public String getUserId() {
-        return userId;
+
+        String jsonUser = userId.toString();
+
+        //using a regex to decipher a _id object from DB
+
+        Pattern regularExpression = Pattern.compile("_id=(.*?),");
+        Matcher m = regularExpression.matcher(jsonUser);
+        String objectId = "";
+
+        if (m.find()){
+             objectId = m.group(1);
+        }
+
+        return objectId;
     }
 
     public String getUsernamePublisher() {
@@ -53,7 +72,7 @@ public class Post {
         return imageId;
     }
 
-    public ArrayList<Comment> getArrayComments() {
+    public List getArrayComments() {
         return arrayComments;
     }
 
@@ -61,7 +80,7 @@ public class Post {
         return totalLikes;
     }
 
-    public ArrayList<Like> getArrayLikes() {
+    public List getArrayLikes() {
         return arrayLikes;
     }
 
@@ -72,7 +91,7 @@ public class Post {
     class Comment{
 
         @SerializedName("user_id")
-        private String userId;
+        private Object userId;
 
         @SerializedName("username")
         private String usernamePublisher;
@@ -84,7 +103,20 @@ public class Post {
         private String createdAt;
 
         public String getUserId() {
-            return userId;
+
+            String jsonUser = userId.toString();
+
+            //using a regex to decipher a _id object from DB
+
+            Pattern regularExpression = Pattern.compile("_id=(.*?),");
+            Matcher m = regularExpression.matcher(jsonUser);
+            String objectId = "";
+
+            if (m.find()){
+                objectId = m.group(1);
+            }
+
+            return objectId;
         }
 
         public String getUsernamePublisher() {

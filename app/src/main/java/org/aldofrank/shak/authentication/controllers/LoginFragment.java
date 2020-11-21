@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 
 import android.text.method.PasswordTransformationMethod;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -73,7 +74,8 @@ public class LoginFragment extends Fragment {
                         public void onResponse(Call<PostsListResponse> call, Response<PostsListResponse> response) {
 
                             if (response.isSuccessful()){
-                                Toast.makeText(getActivity(), response.body().getArrayPosts().get(0).getPostContent(), Toast.LENGTH_LONG).show();
+                                Toast.makeText(getActivity(), response.body().getArrayPosts().get(0).getUserId(), Toast.LENGTH_LONG).show();
+                                //Log.i("list", response.body().getArrayPosts().get(0).getPostContent());
                             }else {
                                 Toast.makeText(getActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                             }

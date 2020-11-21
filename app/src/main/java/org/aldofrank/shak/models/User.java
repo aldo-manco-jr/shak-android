@@ -5,6 +5,9 @@ import com.google.gson.annotations.SerializedName;
 import org.aldofrank.shak.models.Post;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class User {
 
@@ -18,13 +21,13 @@ public class User {
     private String password;
 
     @SerializedName("posts")
-    private ArrayList<Post> arrayPosts;
+    private List<Post> arrayPosts;
 
     @SerializedName("following")
-    private ArrayList<Following> arrayFollowing;
+    private List<Following> arrayFollowing;
 
     @SerializedName("followers")
-    private ArrayList<Follower> arrayFollowers;
+    private List<Follower> arrayFollowers;
 
     @SerializedName("profileImageId")
     private String profileImageId;
@@ -44,15 +47,15 @@ public class User {
         return password;
     }
 
-    public ArrayList<Post> getArrayPosts() {
+    public List<Post> getArrayPosts() {
         return arrayPosts;
     }
 
-    public ArrayList<Following> getArrayFollowing() {
+    public List<Following> getArrayFollowing() {
         return arrayFollowing;
     }
 
-    public ArrayList<Follower> getArrayFollowers() {
+    public List<Follower> getArrayFollowers() {
         return arrayFollowers;
     }
 
@@ -67,20 +70,46 @@ public class User {
     class Following{
 
         @SerializedName("userFollowed")
-        private String followingId;
+        private Object followingId;
 
         public String getFollowingId() {
-            return followingId;
+
+            String jsonUser = followingId.toString();
+
+            //using a regex to decipher a _id object from DB
+
+            Pattern regularExpression = Pattern.compile("_id=(.*?),");
+            Matcher m = regularExpression.matcher(jsonUser);
+            String objectId = "";
+
+            if (m.find()){
+                objectId = m.group(1);
+            }
+
+            return objectId;
         }
     }
 
     class Follower{
 
         @SerializedName("follower")
-        private String followerId;
+        private Object followerId;
 
         public String getFollowerId() {
-            return followerId;
+
+            String jsonUser = followerId.toString();
+
+            //using a regex to decipher a _id object from DB
+
+            Pattern regularExpression = Pattern.compile("_id=(.*?),");
+            Matcher m = regularExpression.matcher(jsonUser);
+            String objectId = "";
+
+            if (m.find()){
+                objectId = m.group(1);
+            }
+
+            return objectId;
         }
     }
 }

@@ -1,10 +1,14 @@
 package org.aldofrank.shak.streams.http.posts;
 
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import org.aldofrank.shak.models.Post;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.http.POST;
 
 public class PostsListResponse {
 
@@ -12,20 +16,20 @@ public class PostsListResponse {
     String message;
 
     @SerializedName("allPosts")
-    ArrayList<Post> arrayPosts;
+    List<Post> arrayPosts;
 
     @SerializedName("top")
-    ArrayList<Post> favouritePosts;
+    List<Post> favouritePosts;
 
     public String getMessage() {
         return message;
     }
 
-    public ArrayList<Post> getArrayPosts() {
+    public List<Post> getArrayPosts() {
         return arrayPosts;
     }
 
-    public ArrayList<Post> getFavouritePosts() {
+    public List<Post> getFavouritePosts() {
         return favouritePosts;
     }
 }
