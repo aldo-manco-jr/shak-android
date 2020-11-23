@@ -1,5 +1,6 @@
 package org.aldofrank.shak.models;
 
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.annotations.SerializedName;
 
@@ -13,7 +14,7 @@ import java.util.regex.Pattern;
 public class Post {
 
     @SerializedName("user_id")
-    private Object userId;
+    private JsonObject userId;
 
     @SerializedName("username")
     private String usernamePublisher;
@@ -41,7 +42,7 @@ public class Post {
 
     public String getUserId() {
 
-        String jsonUser = userId.toString();
+        /*String jsonUser = userId.toString();
 
         //using a regex to decipher a _id object from DB
 
@@ -53,7 +54,9 @@ public class Post {
              objectId = m.group(1);
         }
 
-        return objectId;
+        return objectId;*/
+
+        return userId.get("_id").getAsString();
     }
 
     public String getUsernamePublisher() {
