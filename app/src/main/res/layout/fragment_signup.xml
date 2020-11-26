@@ -6,86 +6,110 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".authentication.controllers.SignupFragment">
 
-    <EditText
-        android:id="@+id/emailField"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="0dp"
-        android:layout_marginEnd="16dp"
-        android:background="@drawable/field_wrap"
-        android:ems="10"
-        android:hint="E-mail"
-        android:textColor="#FFFFFF"
-        android:textColorHint="#FFFFFF"
-        android:inputType="textEmailAddress"
-        android:paddingLeft="8dip"
-        android:drawableLeft="@drawable/email_drawable_left"
-        android:drawablePadding="6dp"
-        android:singleLine="true"
-        android:textSize="14dip"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/gifImageView"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <EditText
-        android:id="@+id/usernameField"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="60dp"
-        android:layout_marginEnd="16dp"
-        android:background="@drawable/field_wrap"
-        android:ems="10"
-        android:hint="Username"
-        android:textColor="#FFFFFF"
-        android:textColorHint="#FFFFFF"
-        android:inputType="textPersonName"
-        android:paddingLeft="8dip"
-        android:drawableLeft="@drawable/username_drawable_left"
-        android:drawablePadding="6dp"
-        android:singleLine="true"
-        android:textSize="14dip"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/animatedBackground"
-        app:layout_constraintTop_toTopOf="@+id/emailField" />
+        <EditText
+            android:id="@+id/emailField"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/field_wrap"
+            android:drawableLeft="@drawable/email_drawable_left"
+            android:drawablePadding="6dp"
+            android:ems="10"
+            android:hint="E-mail"
+            android:inputType="textEmailAddress"
+            android:paddingLeft="8dip"
+            android:singleLine="true"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#FFFFFF"
+            android:textSize="14dip" />
 
-    <EditText
-        android:id="@+id/passwordField"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="60dp"
-        android:layout_marginEnd="16dp"
-        android:background="@drawable/field_wrap"
-        android:ems="10"
-        android:hint="Password"
-        android:inputType="textPassword"
-        android:paddingLeft="8dip"
-        android:drawableLeft="@drawable/password_drawable_left"
-        android:drawablePadding="6dp"
-        android:paddingRight="8dip"
-        android:drawableRight="@drawable/eye_open_drawable_right"
-        android:singleLine="true"
-        android:textColor="#FFFFFF"
-        android:textColorHint="#FFFFFF"
-        android:textSize="14dip"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/animatedBackground"
-        app:layout_constraintTop_toTopOf="@+id/usernameField" />
+        <TextView
+            android:id="@+id/alert_email_invalid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="24dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginRight="16dp"
+            android:text="Email must be valid."
+            android:visibility="gone"/>
 
-    <Button
-        android:id="@+id/signUpButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="60dp"
-        android:layout_marginEnd="16dp"
-        android:text="SIGN UP"
-        android:backgroundTint="#FFFFFF"
-        android:textColor="#015D17"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/passwordField" />
+        <EditText
+            android:id="@+id/usernameField"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/field_wrap"
+            android:drawableLeft="@drawable/username_drawable_left"
+            android:drawablePadding="6dp"
+            android:ems="10"
+            android:hint="Username"
+            android:inputType="textPersonName"
+            android:paddingLeft="8dip"
+            android:singleLine="true"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#FFFFFF"
+            android:textSize="14dip" />
+
+        <TextView
+            android:id="@+id/alert_username_invalid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="24dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginRight="16dp"
+            android:text="Username should be of 4-16 characters."
+            android:visibility="gone"/>
+
+        <EditText
+            android:id="@+id/passwordField"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/field_wrap"
+            android:drawableLeft="@drawable/password_drawable_left"
+            android:drawableRight="@drawable/eye_open_drawable_right"
+            android:drawablePadding="6dp"
+            android:ems="10"
+            android:hint="Password"
+            android:inputType="textPassword"
+            android:paddingLeft="8dip"
+            android:paddingRight="8dip"
+            android:singleLine="true"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#FFFFFF"
+            android:textSize="14dip" />
+
+        <TextView
+            android:id="@+id/alert_password_invalid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="24dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginRight="16dp"
+            android:text="Password should be of 8-64 characters."
+            android:visibility="gone"/>
+
+        <Button
+            android:id="@+id/signUpButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:backgroundTint="#FFFFFF"
+            android:text="SIGN UP"
+            android:textColor="#015D17" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

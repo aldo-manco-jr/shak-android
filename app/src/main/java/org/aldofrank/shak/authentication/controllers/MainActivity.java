@@ -13,6 +13,8 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import org.aldofrank.shak.R;
+import org.aldofrank.shak.services.AuthenticationService;
+import org.aldofrank.shak.services.ServiceGenerator;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -22,6 +24,8 @@ public class MainActivity extends AppCompatActivity {
     private Fragment loginFragment;
     private Fragment signupFragment;
 
+    private Button switchButton;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,37 +34,38 @@ public class MainActivity extends AppCompatActivity {
 
         loginFragment = new LoginFragment();
 
-        FragmentManager manager = getSupportFragmentManager();
-        FragmentTransaction transaction = manager.beginTransaction();
-        transaction.replace(R.id.fragment, loginFragment);
-        transaction.commit();
+        switchFragment(loginFragment);
+
+        switchButton = findViewById(R.id.switchButton);
+
+        switchButton.setText(getString(R.string.switch_to_signup));
     }
 
-    protected void switchButton(View view){
+    protected void switchButton(View view) {
 
-        Button switchButton = findViewById(R.id.switchButton);
+        if (switchButton.getText().toString().trim().equals(getString(R.string.switch_to_signup))) {
 
-        if (switchButton.getText().toString().equals("SIGN UP")){
+            switchButton.setText(R.string.switch_to_login);
 
-            switchButton.setText("LOG IN");
+            if (signupFragment == null) {
+                signupFragment = new SignupFragment();
+            }
 
-            signupFragment = new SignupFragment();
+            switchFragment(signupFragment);
 
-            FragmentManager manager = getSupportFragmentManager();
-            FragmentTransaction transaction = manager.beginTransaction();
-            transaction.replace(R.id.fragment, signupFragment);
-            transaction.commit();
+        } else {
 
-        }else if (switchButton.getText().toString().equals("LOG IN")){
+            switchButton.setText(R.string.switch_to_signup);
 
-            switchButton.setText("SIGN UP");
-
-            loginFragment = new LoginFragment();
-
-            FragmentManager manager = getSupportFragmentManager();
-            FragmentTransaction transaction = manager.beginTransaction();
-            transaction.replace(R.id.fragment, loginFragment);
-            transaction.commit();
+            switchFragment(loginFragment);
         }
+    }
+
+    private void switchFragment(Fragment fragment){
+
+        FragmentManager manager = getSupportFragmentManager();
+        FragmentTransaction transaction = manager.beginTransaction();
+        transaction.replace(R.id.fragment, fragment);
+        transaction.commit();
     }
 }

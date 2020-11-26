@@ -13,7 +13,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.NoActionBar"
         android:usesCleartextTraffic="true">
-        <activity android:name=".streams.controllers.HomeActivity"></activity>
+        <activity
+            android:name=".streams.controllers.LoggedUserActivity"
+            android:label="@string/title_activity_logged_user"></activity>
         <activity android:name=".authentication.controllers.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
