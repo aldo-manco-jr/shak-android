@@ -45,7 +45,7 @@ public class HomeFragment extends Fragment {
         homeTabs = view.findViewById(R.id.home_tabs);
 
         streamsFragment = new StreamsFragment();
-        favouritesFragment = new PostsListFragment();
+        favouritesFragment = PostsListFragment.newInstance("favourites");
 
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getChildFragmentManager(), 0);
         viewPagerAdapter.addFragment(streamsFragment, "Streams");

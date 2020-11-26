@@ -35,6 +35,12 @@ public class User {
     @SerializedName("profileImageVersion")
     private String profileImageVersion;
 
+    @SerializedName("city")
+    private String city;
+
+    @SerializedName("country")
+    private String country;
+
     public String getEmail() {
         return email;
     }
@@ -67,7 +73,15 @@ public class User {
         return profileImageVersion;
     }
 
-    class Following{
+    public String getCity() {
+        return city;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public class Following{
 
         @SerializedName("userFollowed")
         private Object followingId;
@@ -90,7 +104,7 @@ public class User {
         }
     }
 
-    class Follower{
+    public class Follower{
 
         @SerializedName("follower")
         private Object followerId;

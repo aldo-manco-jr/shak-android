@@ -69,6 +69,7 @@ public class LoginFragment extends Fragment {
 
                     Intent intentLoggedUser = new Intent(getActivity(), LoggedUserActivity.class);
                     intentLoggedUser.putExtra("authToken", token);
+                    intentLoggedUser.putExtra("username", response.body().getUserFound().getUsername());
                     startActivity(intentLoggedUser);
 
                 } else {

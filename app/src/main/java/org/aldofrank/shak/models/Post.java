@@ -13,8 +13,11 @@ import java.util.regex.Pattern;
 
 public class Post {
 
+    @SerializedName("_id")
+    private Object postId;
+
     @SerializedName("user_id")
-    private JsonObject userId;
+    private User userId;
 
     @SerializedName("username")
     private String usernamePublisher;
@@ -40,7 +43,11 @@ public class Post {
     @SerializedName("created_at")
     private String createdAt;
 
-    public String getUserId() {
+    public Object getPostId() {
+        return postId;
+    }
+
+    public User getUserId() {
 
         /*String jsonUser = userId.toString();
 
@@ -56,7 +63,8 @@ public class Post {
 
         return objectId;*/
 
-        return userId.get("_id").getAsString();
+        // return userId.get("_id").getAsString();
+        return userId;
     }
 
     public String getUsernamePublisher() {
@@ -75,7 +83,7 @@ public class Post {
         return imageId;
     }
 
-    public List getArrayComments() {
+    public List<Comment> getArrayComments() {
         return arrayComments;
     }
 
@@ -83,7 +91,7 @@ public class Post {
         return totalLikes;
     }
 
-    public List getArrayLikes() {
+    public List<Like> getArrayLikes() {
         return arrayLikes;
     }
 
@@ -91,7 +99,7 @@ public class Post {
         return createdAt;
     }
 
-    class Comment{
+    public class Comment{
 
         @SerializedName("user_id")
         private Object userId;
@@ -135,7 +143,7 @@ public class Post {
         }
     }
 
-    class Like{
+    public class Like{
 
         @SerializedName("username")
         private String usernamePublisher;

@@ -22,7 +22,7 @@ public class AuthenticationInterceptor implements Interceptor {
         Request httpRequest = chain.request();
 
         Request.Builder builder = httpRequest.newBuilder()
-                .header("authorization", authToken);
+                .header("authorization", "bearer " + authToken);
 
         Request httpRequestPlusToken = builder.build();
 

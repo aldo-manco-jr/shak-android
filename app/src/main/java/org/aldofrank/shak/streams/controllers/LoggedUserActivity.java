@@ -20,7 +20,8 @@ import org.aldofrank.shak.profile.controllers.ProfileFragment;
 
 public class LoggedUserActivity extends AppCompatActivity {
 
-    private String token;
+    private static String token;
+    private static String usernameLoggedUser;
 
     private Fragment homeFragment;
     private Fragment profileFragment;
@@ -40,11 +41,12 @@ public class LoggedUserActivity extends AppCompatActivity {
 
         try {
             token = getIntent().getExtras().getString("authToken");
+            usernameLoggedUser = getIntent().getExtras().getString("username");
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        Toast.makeText(getApplicationContext(), token, Toast.LENGTH_LONG).show();
+        // Toast.makeText(getApplicationContext(), token, Toast.LENGTH_LONG).show();
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener navbarListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -103,7 +105,11 @@ public class LoggedUserActivity extends AppCompatActivity {
         }
     };
 
-    protected String getToken() {
-        return this.token;
+    protected static String getToken() {
+        return LoggedUserActivity.token;
+    }
+
+    protected static String getUsernameLoggedUser(){
+        return LoggedUserActivity.usernameLoggedUser;
     }
 }
