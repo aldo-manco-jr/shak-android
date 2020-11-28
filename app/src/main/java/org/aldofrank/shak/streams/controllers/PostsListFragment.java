@@ -1,15 +1,11 @@
 package org.aldofrank.shak.streams.controllers;
 
-import android.content.Context;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,11 +15,8 @@ import org.aldofrank.shak.R;
 import org.aldofrank.shak.models.Post;
 import org.aldofrank.shak.services.ServiceGenerator;
 import org.aldofrank.shak.services.StreamsService;
-import org.aldofrank.shak.streams.http.posts.PostsListResponse;
+import org.aldofrank.shak.streams.http.PostsListResponse;
 
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -33,8 +26,6 @@ import retrofit2.Response;
 public class PostsListFragment extends Fragment {
 
     private List<Post> listPosts;
-
-    private static String typePostList;
 
     private String token;
 
@@ -50,15 +41,14 @@ public class PostsListFragment extends Fragment {
      * @return A new instance of fragment PostsListFragment.
      */
 
-    public static PostsListFragment newInstance(String typePostList) {
+    public static PostsListFragment newInstance(String type) {
 
         PostsListFragment fragment = new PostsListFragment();
 
         Bundle args = new Bundle();
-        args.putString("type", typePostList);
+        args.putString("type", type);
         fragment.setArguments(args);
 
-        //PostsListFragment.typePostList = typePostList;
         return fragment;
     }
 
@@ -86,6 +76,12 @@ public class PostsListFragment extends Fragment {
 
     private void getAllPosts() {
 
+        if (getArguments() == null) {
+            return;
+        }
+
+        final String type = getArguments().getString("type");
+
         StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, token);
 
         Call<PostsListResponse> httpRequest = streamsService.getAllPosts();
@@ -97,23 +93,19 @@ public class PostsListFragment extends Fragment {
 
                 if (response.isSuccessful()) {
 
-                    if (getArguments() != null) {
-                        PostsListFragment.typePostList = getArguments().getString("type");
-                    }
-
-                    if (typePostList.equals("all")){
+                    if (type.equals("all")) {
 
                         listPosts = response.body().getArrayPosts();
                         initializeRecyclerView();
 
-                    }else if (typePostList.equals("favourites")){
+                    } else if (type.equals("favourites")) {
 
                         listPosts = response.body().getFavouritePosts();
                         initializeRecyclerView();
                     }
 
                 } else {
-                    Toast.makeText(getActivity(), response.code() + " " + response.message() + " " + token, Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                 }
             }
 

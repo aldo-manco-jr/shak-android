@@ -6,7 +6,6 @@ import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 
 import android.text.method.PasswordTransformationMethod;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -16,16 +15,13 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
 import org.aldofrank.shak.R;
 import org.aldofrank.shak.authentication.http.login.LoginRequest;
 import org.aldofrank.shak.authentication.http.login.LoginResponse;
 import org.aldofrank.shak.services.AuthenticationService;
 import org.aldofrank.shak.services.ServiceGenerator;
-import org.aldofrank.shak.services.StreamsService;
 import org.aldofrank.shak.streams.controllers.LoggedUserActivity;
-import org.aldofrank.shak.streams.http.posts.PostsListResponse;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -157,12 +153,16 @@ public class LoginFragment extends Fragment {
 
                     if (fieldLength<4 || fieldLength>16){
                         usernameAlert.setVisibility(View.VISIBLE);
+                    }else {
+                        usernameAlert.setVisibility(View.GONE);
                     }
 
                 }else if (v.getTag()=="password"){
 
                     if (fieldLength<8 || fieldLength>64){
                         passwordAlert.setVisibility(View.VISIBLE);
+                    }else {
+                        passwordAlert.setVisibility(View.GONE);
                     }
                 }
             }

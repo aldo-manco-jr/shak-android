@@ -20,6 +20,7 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.badge.BadgeDrawable;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 
 import org.aldofrank.shak.R;
@@ -29,11 +30,15 @@ import java.util.List;
 
 public class HomeFragment extends Fragment {
 
+    public String TAG = "HomeFragment";
+
     private ViewPager viewPager;
     private TabLayout homeTabs;
 
-    private StreamsFragment streamsFragment;
+    private PostsListFragment streamsFragment;
     private PostsListFragment favouritesFragment;
+
+    private PostFormFragment postFormFragment;
 
     @Nullable
     @Override
@@ -44,8 +49,9 @@ public class HomeFragment extends Fragment {
         viewPager = view.findViewById(R.id.view_pager);
         homeTabs = view.findViewById(R.id.home_tabs);
 
-        streamsFragment = new StreamsFragment();
+        streamsFragment = PostsListFragment.newInstance("all");
         favouritesFragment = PostsListFragment.newInstance("favourites");
+        postFormFragment = new PostFormFragment();
 
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getChildFragmentManager(), 0);
         viewPagerAdapter.addFragment(streamsFragment, "Streams");
@@ -63,7 +69,30 @@ public class HomeFragment extends Fragment {
         unreadPostsBadge.setNumber(12);
          */
 
+        FloatingActionButton fab = view.findViewById(R.id.fab_switch_to_post_form);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
+
+                getChildFragmentManager().beginTransaction().replace(R.id.home_fragment, postFormFragment).commit();
+            }
+        });
+
         return view;
+    }
+
+    public PostsListFragment getStreamsFragment() {
+        return streamsFragment;
+    }
+
+    public PostsListFragment getFavouritesFragment() {
+        return favouritesFragment;
+    }
+
+    public PostFormFragment getPostFormFragment() {
+        return postFormFragment;
     }
 
     private class ViewPagerAdapter extends FragmentPagerAdapter{

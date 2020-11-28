@@ -17,6 +17,7 @@ import org.aldofrank.shak.R;
 import org.aldofrank.shak.notifications.controllers.NotificationsFragment;
 import org.aldofrank.shak.people.controllers.PeopleFragment;
 import org.aldofrank.shak.profile.controllers.ProfileFragment;
+import org.aldofrank.shak.settings.controllers.SettingsFragment;
 
 public class LoggedUserActivity extends AppCompatActivity {
 
@@ -27,6 +28,7 @@ public class LoggedUserActivity extends AppCompatActivity {
     private Fragment profileFragment;
     private Fragment peopleFragment;
     private Fragment notificationsFragment;
+    private Fragment settingsFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +99,16 @@ public class LoggedUserActivity extends AppCompatActivity {
                     selectedFragment = notificationsFragment;
 
                     break;
+
+                case R.id.navigation_settings:
+
+                    if (settingsFragment == null) {
+                        settingsFragment = new SettingsFragment();
+                    }
+
+                    selectedFragment = settingsFragment;
+
+                    break;
             }
 
             getSupportFragmentManager().beginTransaction().replace(R.id.logged_user_fragment, selectedFragment).commit();
@@ -111,5 +123,25 @@ public class LoggedUserActivity extends AppCompatActivity {
 
     protected static String getUsernameLoggedUser(){
         return LoggedUserActivity.usernameLoggedUser;
+    }
+
+    public Fragment getHomeFragment() {
+        return homeFragment;
+    }
+
+    public Fragment getProfileFragment() {
+        return profileFragment;
+    }
+
+    public Fragment getPeopleFragment() {
+        return peopleFragment;
+    }
+
+    public Fragment getNotificationsFragment() {
+        return notificationsFragment;
+    }
+
+    public Fragment getSettingsFragment() {
+        return settingsFragment;
     }
 }

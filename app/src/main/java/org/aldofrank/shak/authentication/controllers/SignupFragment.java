@@ -164,12 +164,16 @@ public class SignupFragment extends Fragment {
 
                     if (fieldLength<4 || fieldLength>16){
                         usernameAlert.setVisibility(View.VISIBLE);
+                    }else {
+                        usernameAlert.setVisibility(View.GONE);
                     }
 
                 }else if (v.getTag()=="password"){
 
                     if (fieldLength<8 || fieldLength>64){
                         passwordAlert.setVisibility(View.VISIBLE);
+                    }else {
+                        passwordAlert.setVisibility(View.GONE);
                     }
 
                 }else if (v.getTag()=="email"){
@@ -180,6 +184,8 @@ public class SignupFragment extends Fragment {
 
                     if (!m.find()){
                         emailAlert.setVisibility(View.VISIBLE);
+                    }else {
+                        emailAlert.setVisibility(View.GONE);
                     }
                 }
             }

@@ -5,11 +5,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -18,17 +18,17 @@ import org.aldofrank.shak.R;
 import org.aldofrank.shak.models.Post;
 import org.aldofrank.shak.services.ServiceGenerator;
 import org.aldofrank.shak.services.StreamsService;
-import org.aldofrank.shak.streams.http.posts.PostsListResponse;
-import org.w3c.dom.Comment;
 
-import java.util.ArrayList;
-import java.util.IllegalFormatCodePointException;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import com.github.nkzawa.socketio.client.IO;
+import com.github.nkzawa.socketio.client.Socket;
 
 public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.PostItemHolder> {
 
@@ -160,8 +160,10 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
                 public void onResponse(Call<Object> call, Response<Object> response) {
 
                     if (response.isSuccessful()) {
+
                         holder.likeButton.setImageResource(R.drawable.ic_favorite_real_black_24dp);
                         Toast.makeText(context, "like", Toast.LENGTH_LONG).show();
+
                     } else {
                         Toast.makeText(context, response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                     }
@@ -227,7 +229,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
 
     public class PostItemHolder extends RecyclerView.ViewHolder {
 
-        RelativeLayout layoutItem;
+        ConstraintLayout layoutItem;
 
         CircleImageView imageProfile;
 
