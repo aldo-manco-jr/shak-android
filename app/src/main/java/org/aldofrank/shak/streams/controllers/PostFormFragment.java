@@ -2,16 +2,21 @@ package org.aldofrank.shak.streams.controllers;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.github.nkzawa.emitter.Emitter;
@@ -151,9 +156,32 @@ public class PostFormFragment extends Fragment implements View.OnClickListener {
         });
     }
 
+    private final int SELECT_PHOTO = 1;
+    private Uri uri;
+    private ImageView chosenImage;
+
     private void uploadImagePost(){
-        //Intent intent = new Intent(Intent.ACTION_PICK);
-        // intent.
+
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setType("image/*");
+        startActivityForResult(intent, SELECT_PHOTO);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == SELECT_PHOTO && resultCode == getActivity().RESULT_OK && data != null && data.getData() != null){
+
+            uri = data.getData();
+
+            try {
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), uri);
+                chosenImage.setImageBitmap(bitmap);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
     }
 
     private Emitter.Listener updatePostsList = new Emitter.Listener() {
