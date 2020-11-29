@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         setFragment(loginFragment);
     }
-xnxnxn
+
     /**
      * Se viene premuto il pulsante con id "switchButton" viene invertita l'interfaccia di login
      * con quella di signup e viceversa
