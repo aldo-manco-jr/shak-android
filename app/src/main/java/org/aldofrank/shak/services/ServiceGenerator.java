@@ -6,6 +6,11 @@ import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+/**
+ * Definisce il modo in cui i service devono essere creati.
+ * Permette di creare un'istanza di retrofit in grado di comunicare con il server tramite
+ * richieste http.
+ */
 public class ServiceGenerator {
 
     // create an instance of an http client

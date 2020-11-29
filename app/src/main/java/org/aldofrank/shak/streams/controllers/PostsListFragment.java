@@ -23,6 +23,9 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+/**
+ * Permette il collegamento tra la struttura dell'oggetto e la recycler view che lo deve rappresentare
+ */
 public class PostsListFragment extends Fragment {
 
     private List<Post> listPosts;
@@ -70,6 +73,12 @@ public class PostsListFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Consente di recuperare tutti i post:
+     *  - streams: lista dei post dell'utente e dei suoi following
+     *  - favorites: sono i post a cui l'utente ha espresso la preferenza
+     * Viene mandata una richiesta http per recuperati i dal server.
+     */
     public void getAllPosts() {
         if (getArguments() == null) {
             return;
@@ -104,6 +113,9 @@ public class PostsListFragment extends Fragment {
         });
     }
 
+    /**
+     * VIene collegata la recycler view con l'adapter
+     */
     private void initializeRecyclerView() {
         RecyclerView recyclerView = view.findViewById(R.id.listPosts);
         PostsListAdapter adapter = new PostsListAdapter(this.listPosts, getActivity());

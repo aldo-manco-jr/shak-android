@@ -8,6 +8,10 @@ import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
 
+/**
+ * L'interceptor prende in input la richiesta http e le allega il token, successicamente lo spedisce
+ * al server
+ */
 public class AuthenticationInterceptor implements Interceptor {
 
     private String authToken;

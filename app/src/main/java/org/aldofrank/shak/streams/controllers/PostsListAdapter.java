@@ -31,6 +31,9 @@ import retrofit2.Response;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 
+/**
+ * Permette il collegamento tra la struttura dell'oggetto e la recycler view che lo deve rappresentare
+ */
 public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.PostItemHolder> {
 
     private List<Post> listPosts;
@@ -56,6 +59,10 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
         return viewHolder;
     }
 
+    /**
+     * Questo metodo viene eseguito per ogni elemento nella lista, ogni elemento quindi viene
+     * processato e aggiunto alla lista.
+     */
     @Override
     public void onBindViewHolder(@NonNull final PostItemHolder holder, final int position) {
         final Post post = listPosts.get(position);
@@ -127,6 +134,10 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
         return listPosts.size();
     }
 
+    /**
+     * @param post un post generico in input
+     * @return true se l'utente ha espresso una preferenza verso il post, false altrimenti
+     */
     private boolean isLiked(Post post) {
         String loggedUser = LoggedUserActivity.getUsernameLoggedUser();
 
@@ -141,6 +152,10 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
         return false;
     }
 
+    /**
+     * In base ai dati ricavati da {{@link #isLiked(Post)}} viene inviata una richiesta http di
+     * "like" o di "unlike" verso il post.
+     */
     private void likeOrUnlike(Post post, final PostItemHolder holder) {
         StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, token);
 
@@ -187,6 +202,10 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
         }
     }
 
+    /**
+     * Questa funzione è accesibile solo per i post dell'utente autenticato e invia una richiesta
+     * http in cui richieste la cancellazione del post.
+     */
     private void deletePost(Post post) {
         StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, token);
         Call<Object> httpRequest = streamsService.deletePost(post);

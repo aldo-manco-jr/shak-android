@@ -13,6 +13,10 @@ import android.widget.Button;
 
 import org.aldofrank.shak.R;
 
+/**
+ * Activity principale dell'applicazione, gestisce la visibilità dei tipi di autenticazione
+ * (login e signup)
+ */
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private Fragment loginFragment;
@@ -35,6 +39,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setFragment(loginFragment);
     }
 
+    /**
+     * Se viene premuto il pulsante con id "switchButton" viene invertita l'interfaccia di login
+     * con quella di signup e viceversa
+     */
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.switchButton){
