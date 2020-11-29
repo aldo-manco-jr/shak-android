@@ -154,6 +154,7 @@ public class PostFormFragment extends Fragment implements View.OnClickListener {
     private void uploadImagePost(){
         //Intent intent = new Intent(Intent.ACTION_PICK);
         // intent.
+        // branzolini mi ha detto che devo SOLO rifare tutto
     }
 
     private Emitter.Listener updatePostsList = new Emitter.Listener() {
