@@ -28,6 +28,11 @@ import org.aldofrank.shak.R;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Contiene al suo interno i frammenti che permettorno di visualizzare gli elementi "streams" e
+ * "favourites", inoltre gestisce un oggetto di tipo TabLayout che consente di scegliere tra le
+ * due voci.
+ */
 public class HomeFragment extends Fragment implements View.OnClickListener {
     private ViewPager viewPager;
 

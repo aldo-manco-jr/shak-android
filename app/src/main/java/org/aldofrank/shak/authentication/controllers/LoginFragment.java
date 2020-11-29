@@ -27,6 +27,10 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+/**
+ * Frammento che consente l'inserimento dei dati inerenti il login e gestisce il contatto iniziale
+ * con il server remoto shak.
+ */
 public class LoginFragment extends Fragment implements View.OnClickListener, View.OnTouchListener {
 
     private final AuthenticationService authService = ServiceGenerator.createService(AuthenticationService.class);
@@ -42,9 +46,9 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
     private ProgressBar loadingBar;
 
     /**
-     * Consente l'autenticazione tramite username e password.
+     * Consente l'accesso tramite l'inserimento di username e password.
      * I dati vengono inseriti in una richiesta http e mandati al server, se i dati sono corretti
-     * l'utente viene autenticato.
+     * l'utente eggettua l'accesso.
      */
     private void login() {
         String username = usernameField.getText().toString().trim();
@@ -118,7 +122,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
     }
 
     /**
-     * Se l'username e la password non sono valide, vengono mostrati degli errori
+     * Gestisce la visibilità dei messaggi di errore
      */
     private View.OnFocusChangeListener focusListener = new View.OnFocusChangeListener() {
         public void onFocusChange(View v, boolean hasFocus) {
@@ -150,9 +154,14 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
         }
     }
 
+    /**
+     * Gestisce la visibilità del campo di testo contentente la password
+     * @return true se è stata eseguita un azione, false altrimenti
+     */
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         boolean isTouched = event.getAction() == MotionEvent.ACTION_DOWN;
+
         if (isTouched) {
             final int eyeIconSize = 32;
             final int passwordFieldWidth = passwordField.getWidth();

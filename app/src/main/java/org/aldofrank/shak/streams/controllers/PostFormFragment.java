@@ -40,6 +40,9 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+/**
+ * Permette all'utente di pubblicare un post con un'immagine collegata.
+ */
 public class PostFormFragment extends Fragment implements View.OnClickListener {
 
     private String token;
@@ -123,6 +126,10 @@ public class PostFormFragment extends Fragment implements View.OnClickListener {
         return postFormFragmentView;
     }
 
+    /**
+     * Consente la pubblicazione di un post ad un'utente autenticato.
+     * I dati vengono inseriti in una richiesta http e mandati al server.
+     */
     private void submitPost(){
         StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, token);
         JsonObject postData = new JsonObject();
@@ -184,6 +191,9 @@ public class PostFormFragment extends Fragment implements View.OnClickListener {
         }
     }
 
+    /**
+     * Quando un post viene pubblicato la home page viene aggiornata.
+     */
     private Emitter.Listener updatePostsList = new Emitter.Listener() {
 
         @Override

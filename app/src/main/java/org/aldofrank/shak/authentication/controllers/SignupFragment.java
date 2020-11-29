@@ -33,6 +33,10 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+/**
+ * Frammento che consente l'inserimento dei dati inerenti la registrazione e gestisce il contatto
+ * iniziale con il server remoto shak.
+ */
 public class SignupFragment extends Fragment implements View.OnClickListener, View.OnTouchListener{
 
     private final AuthenticationService authService = ServiceGenerator.createService(AuthenticationService.class);
@@ -170,6 +174,10 @@ public class SignupFragment extends Fragment implements View.OnClickListener, Vi
         }
     }
 
+    /**
+     * Gestisce la visibilità del campo di testo contentente la password
+     * @return true se è stata eseguita un azione, false altrimenti
+     */
     @Override
     public boolean onTouch(View view, MotionEvent event) {
         boolean isTouched = event.getAction() == MotionEvent.ACTION_DOWN;

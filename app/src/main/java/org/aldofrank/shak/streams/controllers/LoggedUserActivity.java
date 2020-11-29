@@ -21,6 +21,11 @@ import org.aldofrank.shak.people.controllers.PeopleFragment;
 import org.aldofrank.shak.profile.controllers.ProfileFragment;
 import org.aldofrank.shak.settings.controllers.SettingsFragment;
 
+/**
+ * Permette di accedere alle varie funzionalità del programma.
+ * Gestisce la visualizzazione di vari tipi di fragment utilizzati dal programma, consentendo
+ * la navigazione nell'applicazione da parte dell'utente.
+ */
 public class LoggedUserActivity extends AppCompatActivity {
 
     private static String token;
@@ -118,25 +123,5 @@ public class LoggedUserActivity extends AppCompatActivity {
 
     protected static String getUsernameLoggedUser(){
         return LoggedUserActivity.usernameLoggedUser;
-    }
-
-    public Fragment getHomeFragment() {
-        return homeFragment;
-    }
-
-    public Fragment getProfileFragment() {
-        return profileFragment;
-    }
-
-    public Fragment getPeopleFragment() {
-        return peopleFragment;
-    }
-
-    public Fragment getNotificationsFragment() {
-        return notificationsFragment;
-    }
-
-    public Fragment getSettingsFragment() {
-        return settingsFragment;
     }
 }
