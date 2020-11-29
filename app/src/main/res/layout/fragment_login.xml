@@ -25,7 +25,7 @@
             android:inputType="textPersonName"
             android:paddingLeft="8dip"
             android:singleLine="true"
-            android:text="aldo3"
+            android:text="iiii"
             android:textColor="#FFFFFF"
             android:textColorHint="#FFFFFF"
             android:textSize="14dip" />
@@ -57,7 +57,7 @@
             android:paddingLeft="8dip"
             android:paddingRight="8dip"
             android:singleLine="true"
-            android:text="aldo3aldo3"
+            android:text="iiiiiiii"
             android:textColor="#FFFFFF"
             android:textColorHint="#FFFFFF"
             android:textSize="14dip" />

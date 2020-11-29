@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">SHAK</string>
-    <string name="base_url">http://ec2-15-237-74-79.eu-west-3.compute.amazonaws.com/api/shak/</string>
+    <string name="base_url_aws">http://ec2-15-237-74-79.eu-west-3.compute.amazonaws.com/</string>
+    <string name="base_url_aws_api">http://ec2-15-237-74-79.eu-west-3.compute.amazonaws.com/api/shak</string>
+    <string name="base_url_localhost">http://10.0.2.2:3000/</string>
+    <string name="base_url_localhost_api">http://10.0.2.2:3000/api/shak</string>
     <string name="title_activity_logged_user">LoggedUserActivity</string>
 
     <string name="title_home">Home</string>

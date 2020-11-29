@@ -74,7 +74,7 @@ public class PostsListFragment extends Fragment {
         return view;
     }
 
-    private void getAllPosts() {
+    public void getAllPosts() {
 
         if (getArguments() == null) {
             return;

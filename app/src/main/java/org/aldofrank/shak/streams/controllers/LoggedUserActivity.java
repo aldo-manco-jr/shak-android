@@ -1,5 +1,6 @@
 package org.aldofrank.shak.streams.controllers;
 
+import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 

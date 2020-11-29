@@ -51,7 +51,7 @@ public class HomeFragment extends Fragment {
 
         streamsFragment = PostsListFragment.newInstance("all");
         favouritesFragment = PostsListFragment.newInstance("favourites");
-        postFormFragment = new PostFormFragment();
+        postFormFragment = PostFormFragment.newInstance(streamsFragment);
 
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getChildFragmentManager(), 0);
         viewPagerAdapter.addFragment(streamsFragment, "Streams");

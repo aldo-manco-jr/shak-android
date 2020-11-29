@@ -3,11 +3,8 @@ package org.aldofrank.shak.services;
 import android.text.TextUtils;
 
 import okhttp3.OkHttpClient;
-import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-
-import static okhttp3.logging.HttpLoggingInterceptor.Level.BODY;
 
 public class ServiceGenerator {
 
@@ -19,7 +16,7 @@ public class ServiceGenerator {
     // creating and setting an instance of GSON converter
     private static Retrofit.Builder builder =
             new Retrofit.Builder()
-                    .baseUrl("http://ec2-15-237-74-79.eu-west-3.compute.amazonaws.com/api/shak/")
+                    .baseUrl("http://10.0.2.2:3000/api/shak/")
                     .addConverterFactory(GsonConverterFactory.create());
 
     // Retrofit adapts a Java interface to HTTP calls by using annotations on the declared methods to define how requests are made.
