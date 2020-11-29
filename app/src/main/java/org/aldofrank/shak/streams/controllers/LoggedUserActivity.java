@@ -1,5 +1,6 @@
 package org.aldofrank.shak.streams.controllers;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
@@ -38,9 +39,13 @@ public class LoggedUserActivity extends AppCompatActivity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         BottomNavigationView navbarLoggedUser = findViewById(R.id.logged_user_navbar);
+        homeFragment =  new HomeFragment();
+
         navbarLoggedUser.setOnNavigationItemSelectedListener(navbarListener);
 
-        getSupportFragmentManager().beginTransaction().replace(R.id.logged_user_fragment, new HomeFragment()).commit();
+        // sostituisce il fragment attuale con un HomeFragment
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.logged_user_fragment, homeFragment).commit();
 
         try {
             token = getIntent().getExtras().getString("authToken");
@@ -54,65 +59,54 @@ public class LoggedUserActivity extends AppCompatActivity {
 
     private BottomNavigationView.OnNavigationItemSelectedListener navbarListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
+        @SuppressLint("NonConstantResourceId")
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
             Fragment selectedFragment = null;
+            Integer navigationSectionIdentifier = item.getItemId();
 
-            switch (item.getItemId()) {
-
+            switch (navigationSectionIdentifier) {
                 case R.id.navigation_home:
-
                     if (homeFragment == null) {
                         homeFragment = new HomeFragment();
                     }
 
                     selectedFragment = homeFragment;
-
                     break;
-
                 case R.id.navigation_profile:
-
                     if (profileFragment == null) {
                         profileFragment = new ProfileFragment();
                     }
 
                     selectedFragment = profileFragment;
-
                     break;
-
                 case R.id.navigation_users:
-
                     if (peopleFragment == null) {
                         peopleFragment = new PeopleFragment();
                     }
 
                     selectedFragment = peopleFragment;
-
                     break;
-
                 case R.id.navigation_notifications:
-
                     if (notificationsFragment == null) {
                         notificationsFragment = new NotificationsFragment();
                     }
 
                     selectedFragment = notificationsFragment;
-
                     break;
-
                 case R.id.navigation_settings:
-
                     if (settingsFragment == null) {
                         settingsFragment = new SettingsFragment();
                     }
 
                     selectedFragment = settingsFragment;
-
                     break;
             }
 
-            getSupportFragmentManager().beginTransaction().replace(R.id.logged_user_fragment, selectedFragment).commit();
+            // sostituisce il fragment attuale con un fragment scelto
+            assert selectedFragment != null : "selectedFragment non poteva essere null";
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.logged_user_fragment, selectedFragment).commit();
 
             return true;
         }

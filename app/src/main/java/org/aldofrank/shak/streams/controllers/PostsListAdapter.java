@@ -16,6 +16,7 @@ import com.bumptech.glide.Glide;
 
 import org.aldofrank.shak.R;
 import org.aldofrank.shak.models.Post;
+import org.aldofrank.shak.models.User;
 import org.aldofrank.shak.services.ServiceGenerator;
 import org.aldofrank.shak.services.StreamsService;
 
@@ -33,31 +34,34 @@ import com.github.nkzawa.socketio.client.Socket;
 public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.PostItemHolder> {
 
     private List<Post> listPosts;
+
     private Context context;
 
+    private final String basicUrlImage = "http://res.cloudinary.com/dfn8llckr/image/upload/v";
     private String token;
 
     public PostsListAdapter(List<Post> listPosts, Context context) {
-
         this.listPosts = listPosts;
         this.context = context;
-
-        token = LoggedUserActivity.getToken();
+        this.token = LoggedUserActivity.getToken();
     }
 
     @NonNull
     @Override
     public PostItemHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_item_post, parent, false);
+        View itemView = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.layout_item_post, parent, false);
         PostItemHolder viewHolder = new PostItemHolder(itemView);
+
         return viewHolder;
     }
 
     @Override
     public void onBindViewHolder(@NonNull final PostItemHolder holder, final int position) {
-
-        String urlImageProfileUser = "http://res.cloudinary.com/dfn8llckr/image/upload/v" + listPosts.get(position).getUserId().getProfileImageVersion() + "/" + listPosts.get(position).getUserId().getProfileImageId();
+        final Post post = listPosts.get(position);
+        final User user = post.getUserId();
+        String urlImageProfileUser = this.basicUrlImage + user.getProfileImageVersion() + "/"
+                + user.getProfileImageId();
 
         Glide.with(context)
                 .asBitmap()
@@ -65,61 +69,52 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
                 .into(holder.imageProfile);
 
         holder.usernameText.setText(listPosts.get(position).getUsernamePublisher());
-
-        if (listPosts.get(position).getUserId().getCity() != null && listPosts.get(position).getUserId().getCountry() != null) {
-            holder.locationText.setText("@" + listPosts.get(position).getUserId().getCity() + ", " + listPosts.get(position).getUserId().getCountry());
-        }
-
         holder.datePostText.setText(listPosts.get(position).getCreatedAt());
 
-        if (!listPosts.get(position).getImageVersion().isEmpty()) {
+        if (user.getCity() != null && user.getCountry() != null) {
+            holder.locationText.setText("@" + user.getCity() + ", " + user.getCountry());
+        }
 
-            String urlImagePost = "http://res.cloudinary.com/dfn8llckr/image/upload/v" + listPosts.get(position).getImageVersion() + "/" + listPosts.get(position).getImageId();
+        if (!post.getImageVersion().isEmpty()) {
+            String urlImagePost = this.basicUrlImage + post.getImageVersion() + "/" + post.getImageId();
 
             Glide.with(context)
                     .asBitmap()
                     .load(urlImagePost)
                     .into(holder.imagePost);
-
         } else {
             holder.imagePost.setVisibility(View.GONE);
         }
 
-        holder.postContent.setText(listPosts.get(position).getPostContent());
+        holder.postContent.setText(post.getPostContent());
 
-        if (!isLiked(listPosts.get(position))) {
+        if (!isLiked(post)) {
             holder.likeButton.setImageResource(R.drawable.ic_favorite_border_black_24dp);
         } else {
             holder.likeButton.setImageResource(R.drawable.ic_favorite_real_black_24dp);
         }
 
         holder.likeButton.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View view) {
                 likeOrUnlike(listPosts.get(position), holder);
             }
         });
-
-        holder.likesCounter.setText(listPosts.get(position).getTotalLikes() + "");
-
         holder.commentButton.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View view) {
-                Toast.makeText(context, "comment on " + listPosts.get(position), Toast.LENGTH_LONG).show();
+                Toast.makeText(context, "comment on " + post, Toast.LENGTH_LONG).show();
             }
         });
 
+        holder.likesCounter.setText(listPosts.get(position).getTotalLikes() + "");
         holder.commentsCounter.setText(listPosts.get(position).getArrayComments().size() + "");
 
-        if (listPosts.get(position).getUsernamePublisher().equals(LoggedUserActivity.getUsernameLoggedUser())) {
-
+        if (post.getUsernamePublisher().equals(LoggedUserActivity.getUsernameLoggedUser())) {
             holder.deletePostButton.setOnClickListener(new View.OnClickListener() {
-
                 @Override
                 public void onClick(View view) {
-                    deletePost(listPosts.get(position));
+                    deletePost(post);
                 }
             });
         } else {
@@ -133,10 +128,12 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
     }
 
     private boolean isLiked(Post post) {
+        String loggedUser = LoggedUserActivity.getUsernameLoggedUser();
 
         for (Post.Like like : post.getArrayLikes()) {
+            boolean isLiked = like.getUsernamePublisher().equals(loggedUser);
 
-            if (like.getUsernamePublisher().equals(LoggedUserActivity.getUsernameLoggedUser())) {
+            if (isLiked) {
                 return true;
             }
         }
@@ -145,25 +142,19 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
     }
 
     private void likeOrUnlike(Post post, final PostItemHolder holder) {
-
         StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, token);
 
         Toast.makeText(context, post.getPostContent(), Toast.LENGTH_LONG).show();
 
         if (!isLiked(post)) {
-
             Call<Object> httpRequest = streamsService.likePost(post);
 
             httpRequest.enqueue(new Callback<Object>() {
-
                 @Override
                 public void onResponse(Call<Object> call, Response<Object> response) {
-
                     if (response.isSuccessful()) {
-
                         holder.likeButton.setImageResource(R.drawable.ic_favorite_real_black_24dp);
                         Toast.makeText(context, "like", Toast.LENGTH_LONG).show();
-
                     } else {
                         Toast.makeText(context, response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                     }
@@ -174,16 +165,12 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
                     Toast.makeText(context, t.getMessage(), Toast.LENGTH_LONG).show();
                 }
             });
-
         } else {
-
             Call<Object> httpRequest = streamsService.unlikePost(post);
 
             httpRequest.enqueue(new Callback<Object>() {
-
                 @Override
                 public void onResponse(Call<Object> call, Response<Object> response) {
-
                     if (response.isSuccessful()) {
                         holder.likeButton.setImageResource(R.drawable.ic_favorite_border_black_24dp);
                         Toast.makeText(context, "unlike", Toast.LENGTH_LONG).show();
@@ -201,18 +188,14 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
     }
 
     private void deletePost(Post post) {
-
         StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, token);
+        Call<Object> httpRequest = streamsService.deletePost(post);
 
         Toast.makeText(context, post.getPostContent(), Toast.LENGTH_LONG).show();
 
-        Call<Object> httpRequest = streamsService.deletePost(post);
-
         httpRequest.enqueue(new Callback<Object>() {
-
             @Override
             public void onResponse(Call<Object> call, Response<Object> response) {
-
                 if (response.isSuccessful()) {
                     Toast.makeText(context, "deleted", Toast.LENGTH_LONG).show();
                 } else {
@@ -228,7 +211,6 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
     }
 
     public class PostItemHolder extends RecyclerView.ViewHolder {
-
         ConstraintLayout layoutItem;
 
         CircleImageView imageProfile;
@@ -236,38 +218,29 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
         TextView usernameText;
         TextView locationText;
         TextView datePostText;
-
-        ImageView imagePost;
         TextView postContent;
-
-        ImageView likeButton;
         TextView likesCounter;
-
-        ImageView commentButton;
         TextView commentsCounter;
 
+        ImageView imagePost;
+        ImageView likeButton;
+        ImageView commentButton;
         ImageView deletePostButton;
 
         public PostItemHolder(@NonNull View itemView) {
             super(itemView);
 
             imageProfile = itemView.findViewById(R.id.image_profile_circle);
-
             layoutItem = itemView.findViewById(R.id.layout_item);
-
             usernameText = itemView.findViewById(R.id.username_text);
             locationText = itemView.findViewById(R.id.location_text);
             datePostText = itemView.findViewById(R.id.date_post_text);
-
             imagePost = itemView.findViewById(R.id.post_image);
             postContent = itemView.findViewById(R.id.post_content);
-
             likeButton = itemView.findViewById(R.id.like_button);
             likesCounter = itemView.findViewById(R.id.likes_counter);
-
             commentButton = itemView.findViewById(R.id.comment_button);
             commentsCounter = itemView.findViewById(R.id.comments_counter);
-
             deletePostButton = itemView.findViewById(R.id.delete_post_button);
         }
     }

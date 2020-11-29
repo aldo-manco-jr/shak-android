@@ -35,11 +35,12 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class PostFormFragment extends Fragment {
+public class PostFormFragment extends Fragment implements View.OnClickListener {
 
     private String token;
 
     private Fragment postFormFragment;
+
     private static PostsListFragment postsListFragment;
 
     private Context context;
@@ -48,10 +49,11 @@ public class PostFormFragment extends Fragment {
     {
         try {
             socket = IO.socket("http://10.0.2.2:3000/");
-        } catch (URISyntaxException e) {}
+        } catch (URISyntaxException ignored) {}
     }
 
     private EditText postContentField;
+
     private FloatingActionButton buttonClosePostForm;
     private FloatingActionButton buttonUploadImagePost;
     private FloatingActionButton buttonSubmitPost;
@@ -61,9 +63,7 @@ public class PostFormFragment extends Fragment {
     }
 
     public static PostFormFragment newInstance(PostsListFragment postsListFragment) {
-
         PostFormFragment fragment = new PostFormFragment();
-
         PostFormFragment.postsListFragment = postsListFragment;
 
         return fragment;
@@ -73,7 +73,7 @@ public class PostFormFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        context=getContext();
+        context = getContext();
 
         socket.on("refreshPage", updatePostsList);
         socket.connect();
@@ -82,53 +82,28 @@ public class PostFormFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-        View view = inflater.inflate(R.layout.fragment_post_form, container, false);
-
+        View postFormFragmentView = inflater.inflate(R.layout.fragment_post_form, container, false);
         token = LoggedUserActivity.getToken();
-
         postFormFragment = this;
 
-        postContentField = view.findViewById(R.id.post_content_field);
-        buttonClosePostForm = view.findViewById(R.id.fab_close_post_form);
-        buttonUploadImagePost = view.findViewById(R.id.fab_add_post_image);
-        buttonSubmitPost = view.findViewById(R.id.fab_submit_button);
+        postContentField = postFormFragmentView.findViewById(R.id.post_content_field);
+        buttonClosePostForm = postFormFragmentView.findViewById(R.id.fab_close_post_form);
+        buttonUploadImagePost = postFormFragmentView.findViewById(R.id.fab_add_post_image);
+        buttonSubmitPost = postFormFragmentView.findViewById(R.id.fab_submit_button);
 
-        buttonSubmitPost.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                submitPost();
-            }
-        });
-
-        buttonClosePostForm.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                getFragmentManager().beginTransaction().remove(postFormFragment).commitAllowingStateLoss();
-            }
-        });
-
-        buttonUploadImagePost.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                uploadImagePost();
-            }
-        });
+        buttonSubmitPost.setOnClickListener(this);
+        buttonClosePostForm.setOnClickListener(this);
+        buttonUploadImagePost.setOnClickListener(this);
 
         postContentField.addTextChangedListener(new TextWatcher() {
-
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
             }
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
                 if (charSequence.toString().isEmpty()){
+                    // quando il campo di testo del post è vuoto
                     buttonSubmitPost.setVisibility(View.GONE);
                 }else {
                     buttonSubmitPost.setVisibility(View.VISIBLE);
@@ -137,42 +112,33 @@ public class PostFormFragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable editable) {
-
             }
         });
 
-        return view;
+        return postFormFragmentView;
     }
 
     private void submitPost(){
-
         StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, token);
-
         JsonObject postData = new JsonObject();
-        postData.addProperty("post", postContentField.getText().toString().trim());
-
         Call<Object> httpRequest = streamsService.submitPost(postData);
 
-        httpRequest.enqueue(new Callback<Object>() {
+        postData.addProperty("post", postContentField.getText().toString().trim());
 
+        httpRequest.enqueue(new Callback<Object>() {
             @Override
             public void onResponse(Call<Object> call, Response<Object> response) {
-
                 if (response.isSuccessful()) {
+                    assert getView() != null : "getView() non doveva essere null";
+                    assert getFragmentManager() != null : "getFragmentManager() non doveva essere null";
 
                     Snackbar.make(getView(), "Post Added Successfully!!", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
 
-                    getFragmentManager().beginTransaction().remove(postFormFragment).commitAllowingStateLoss();
-
-                    JSONObject json = new JSONObject();
-
-                    try {
-                        json.put("mex", "mex");
-                    }catch (Exception e){}
-
                     socket.emit("refresh");
 
+                    // il fragment chiude se stesso
+                    getFragmentManager().beginTransaction().remove(postFormFragment).commitAllowingStateLoss();
                 } else {
                     Toast.makeText(getActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                 }
@@ -186,7 +152,6 @@ public class PostFormFragment extends Fragment {
     }
 
     private void uploadImagePost(){
-
         //Intent intent = new Intent(Intent.ACTION_PICK);
         // intent.
     }
@@ -195,20 +160,33 @@ public class PostFormFragment extends Fragment {
 
         @Override
         public void call(final Object... args) {
-
-            if (getActivity()!=null){
+            if (getActivity() != null){
                 getActivity().runOnUiThread(new Runnable() {
 
                     @Override
                     public void run() {
-                        Toast.makeText(context, "wwww", Toast.LENGTH_LONG).show();
+                        // quando un post viene pubblicato la socket avvisa del necessario aggiornmento
                         PostFormFragment.postsListFragment.getAllPosts();
                     }
                 });
             }
-
-            // HomeFragment homeFragment = (HomeFragment) getParentFragment();
-            //Toast.makeText(getActivity(), homeFragment.TAG, Toast.LENGTH_LONG).show();
         }
     };
+
+    @Override
+    public void onClick(View view) {
+        int idButtonPressed = view.getId();
+
+        switch (idButtonPressed){
+            case R.id.fab_submit_button:
+                submitPost();
+                break;
+            case R.id.fab_close_post_form:
+                getFragmentManager().beginTransaction().remove(postFormFragment).commitAllowingStateLoss();
+                break;
+            case R.id.fab_add_post_image:
+                uploadImagePost();
+                break;
+        }
+    }
 }

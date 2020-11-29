@@ -33,55 +33,57 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class SignupFragment extends Fragment {
+public class SignupFragment extends Fragment implements View.OnClickListener, View.OnTouchListener{
 
-    AuthenticationService authService = ServiceGenerator.createService(AuthenticationService.class);
+    private final AuthenticationService authService = ServiceGenerator.createService(AuthenticationService.class);
 
     private EditText emailField;
-    TextView emailAlert;
-
     private EditText usernameField;
-    TextView usernameAlert;
-
     private EditText passwordField;
-    TextView passwordAlert;
+
+    private TextView emailAlert;
+    private TextView usernameAlert;
+    private TextView passwordAlert;
 
     private Button signUpButton;
 
     private ProgressBar loadingBar;
-
-    private String token;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
 
+    /**
+     * Consente la registrazione tramite l'inserimento di email, username e password.
+     * I dati vengono inseriti in una richiesta http e mandati al server, se i dati sono corretti
+     * l'utente viene registrato.
+     */
     protected void signup(){
 
-        SignupRequest signupRequest = new SignupRequest(emailField.getText().toString().trim(), usernameField.getText().toString().trim(), passwordField.getText().toString().trim());
+        SignupRequest signupRequest = new SignupRequest(
+                emailField.getText().toString().trim(),
+                usernameField.getText().toString().trim(),
+                passwordField.getText().toString().trim()
+        );
 
-        Call<SignupResponse> call = authService.register(signupRequest);
+        Call<SignupResponse> httpRequest = authService.register(signupRequest);
 
         loadingBar = getActivity().findViewById(R.id.loadingBar);
         loadingBar.setVisibility(View.VISIBLE);
 
-        call.enqueue(new Callback<SignupResponse>() {
+        httpRequest.enqueue(new Callback<SignupResponse>() {
             @Override
             public void onResponse(Call<SignupResponse> call, Response<SignupResponse> response) {
-
                 if (response.isSuccessful()){
-
-                    token = response.body().getToken();
+                    String token = response.body().getToken();
+                    Intent intentLoggedUser = new Intent(getActivity(), LoggedUserActivity.class);
 
                     loadingBar.setVisibility(View.GONE);
 
-                    Intent intentLoggedUser = new Intent(getActivity(), LoggedUserActivity.class);
                     intentLoggedUser.putExtra("authToken", token);
                     startActivity(intentLoggedUser);
-
                 }else {
-
                     Toast.makeText(getActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
 
                     loadingBar.setVisibility(View.GONE);
@@ -98,86 +100,55 @@ public class SignupFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         View view = inflater.inflate(R.layout.fragment_signup, container, false);
 
         emailField = view.findViewById(R.id.emailField);
-        emailField.setTag("email");
         emailAlert = view.findViewById(R.id.alert_email_invalid);
-        emailField.setOnFocusChangeListener(focusListener);
-
         usernameField = view.findViewById(R.id.usernameField);
-        usernameField.setTag("username");
         usernameAlert = view.findViewById(R.id.alert_username_invalid);
-        usernameField.setOnFocusChangeListener(focusListener);
-
         passwordField = view.findViewById(R.id.passwordField);
-        passwordField.setTag("password");
         passwordAlert = view.findViewById(R.id.alert_password_invalid);
-        passwordField.setOnFocusChangeListener(focusListener);
-
         signUpButton = view.findViewById(R.id.signUpButton);
 
-        signUpButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                signup();
-            }
-        });
+        emailField.setTag("email");
+        usernameField.setTag("username");
+        passwordField.setTag("password");
 
-        passwordField.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
+        emailField.setOnFocusChangeListener(focusListener);
+        usernameField.setOnFocusChangeListener(focusListener);
+        passwordField.setOnFocusChangeListener(focusListener);
 
-                if(event.getAction() == MotionEvent.ACTION_DOWN) {
-                    if (event.getRawX() >= passwordField.getWidth() - 32) {
+        signUpButton.setOnClickListener(this);
 
-                        if (passwordField.getTransformationMethod() == null) {
-                            passwordField.setTransformationMethod(new PasswordTransformationMethod());
-                            passwordField.setCompoundDrawablesWithIntrinsicBounds(R.drawable.password_drawable_left, 0, R.drawable.eye_open_drawable_right, 0);
-                            return true;
-                        } else {
-                            passwordField.setTransformationMethod(null);
-                            passwordField.setCompoundDrawablesWithIntrinsicBounds(R.drawable.password_drawable_left, 0, R.drawable.eye_closed_drawable_right, 0);
-                            return true;
-                        }
-                    }
-                }
-                return false;
-            }
-        });
+        passwordField.setOnTouchListener(this);
 
         // Inflate the layout for this fragment
         return view;
     }
 
+    /**
+     * Se l'username, la password o l'email non sono validi vengono mostrati degli errori
+     */
     private View.OnFocusChangeListener focusListener = new View.OnFocusChangeListener() {
 
         public void onFocusChange(View v, boolean hasFocus) {
-
             EditText editText = (EditText) v;
             int fieldLength = editText.getText().toString().trim().length();
 
             if (!hasFocus) {
-
                 if (v.getTag()=="username"){
-
                     if (fieldLength<4 || fieldLength>16){
                         usernameAlert.setVisibility(View.VISIBLE);
                     }else {
                         usernameAlert.setVisibility(View.GONE);
                     }
-
                 }else if (v.getTag()=="password"){
-
                     if (fieldLength<8 || fieldLength>64){
                         passwordAlert.setVisibility(View.VISIBLE);
                     }else {
                         passwordAlert.setVisibility(View.GONE);
                     }
-
                 }else if (v.getTag()=="email"){
-
                     String field = editText.getText().toString().trim();
                     Pattern regularExpression = Pattern.compile("@(.*?).");
                     Matcher m = regularExpression.matcher(field);
@@ -191,4 +162,47 @@ public class SignupFragment extends Fragment {
             }
         }
     };
+
+    @Override
+    public void onClick(View view) {
+        if (view.getId() == R.id.loginButton) {
+            signup();
+        }
+    }
+
+    @Override
+    public boolean onTouch(View view, MotionEvent event) {
+        boolean isTouched = event.getAction() == MotionEvent.ACTION_DOWN;
+        if (isTouched) {
+            final int eyeIconSize = 32;
+            final int passwordFieldWidth = passwordField.getWidth();
+            final int eyeWidthSize = passwordFieldWidth - eyeIconSize;
+
+            if (event.getRawX() >= eyeWidthSize) {
+                if (passwordField.getTransformationMethod() == null) {
+                    // nascondi password
+                    passwordField.setTransformationMethod(new PasswordTransformationMethod());
+                    passwordField.setCompoundDrawablesWithIntrinsicBounds(
+                            R.drawable.password_drawable_left,
+                            0,
+                            R.drawable.eye_open_drawable_right,
+                            0
+                    );
+                } else {
+                    // mostra password
+                    passwordField.setTransformationMethod(null);
+                    passwordField.setCompoundDrawablesWithIntrinsicBounds(
+                            R.drawable.password_drawable_left,
+                            0,
+                            R.drawable.eye_closed_drawable_right,
+                            0
+                    );
+                }
+
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

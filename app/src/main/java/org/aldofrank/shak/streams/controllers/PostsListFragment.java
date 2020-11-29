@@ -42,10 +42,9 @@ public class PostsListFragment extends Fragment {
      */
 
     public static PostsListFragment newInstance(String type) {
-
         PostsListFragment fragment = new PostsListFragment();
-
         Bundle args = new Bundle();
+
         args.putString("type", type);
         fragment.setArguments(args);
 
@@ -60,13 +59,10 @@ public class PostsListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         // recyclerview = dynamic list view
         // glide = image loading framework that fetch, decode, display video, images and GIF
         // circleimageview = wrap images in a circle
-
         view = inflater.inflate(R.layout.fragment_posts_list, container, false);
-
         token = LoggedUserActivity.getToken();
 
         getAllPosts();
@@ -75,35 +71,27 @@ public class PostsListFragment extends Fragment {
     }
 
     public void getAllPosts() {
-
         if (getArguments() == null) {
             return;
         }
 
         final String type = getArguments().getString("type");
-
         StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, token);
-
         Call<PostsListResponse> httpRequest = streamsService.getAllPosts();
 
         httpRequest.enqueue(new Callback<PostsListResponse>() {
-
             @Override
             public void onResponse(Call<PostsListResponse> call, Response<PostsListResponse> response) {
-
                 if (response.isSuccessful()) {
+                    assert response.body() != null : "body() non doveva essere null";
 
                     if (type.equals("all")) {
-
                         listPosts = response.body().getArrayPosts();
-                        initializeRecyclerView();
-
                     } else if (type.equals("favourites")) {
-
                         listPosts = response.body().getFavouritePosts();
-                        initializeRecyclerView();
                     }
 
+                    initializeRecyclerView();
                 } else {
                     Toast.makeText(getActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                 }
@@ -117,7 +105,6 @@ public class PostsListFragment extends Fragment {
     }
 
     private void initializeRecyclerView() {
-
         RecyclerView recyclerView = view.findViewById(R.id.listPosts);
         PostsListAdapter adapter = new PostsListAdapter(this.listPosts, getActivity());
 

@@ -28,11 +28,9 @@ import org.aldofrank.shak.R;
 import java.util.LinkedList;
 import java.util.List;
 
-public class HomeFragment extends Fragment {
-
-    public String TAG = "HomeFragment";
-
+public class HomeFragment extends Fragment implements View.OnClickListener {
     private ViewPager viewPager;
+
     private TabLayout homeTabs;
 
     private PostsListFragment streamsFragment;
@@ -42,12 +40,16 @@ public class HomeFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(
+            @NonNull LayoutInflater inflater,
+            @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState
+    ) {
+        View homeFragmentView = inflater.inflate(R.layout.fragment_home, container, false);
 
-        View view = inflater.inflate(R.layout.fragment_home, container, false);
-
-        viewPager = view.findViewById(R.id.view_pager);
-        homeTabs = view.findViewById(R.id.home_tabs);
+        viewPager = homeFragmentView.findViewById(R.id.view_pager);
+        homeTabs = homeFragmentView.findViewById(R.id.home_tabs);
+        FloatingActionButton fab = homeFragmentView.findViewById(R.id.fab_switch_to_post_form);
 
         streamsFragment = PostsListFragment.newInstance("all");
         favouritesFragment = PostsListFragment.newInstance("favourites");
@@ -69,34 +71,21 @@ public class HomeFragment extends Fragment {
         unreadPostsBadge.setNumber(12);
          */
 
-        FloatingActionButton fab = view.findViewById(R.id.fab_switch_to_post_form);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
+        fab.setOnClickListener(this);
 
-                getChildFragmentManager().beginTransaction().replace(R.id.home_fragment, postFormFragment).commit();
-            }
-        });
-
-        return view;
+        return homeFragmentView;
     }
 
-    public PostsListFragment getStreamsFragment() {
-        return streamsFragment;
-    }
-
-    public PostsListFragment getFavouritesFragment() {
-        return favouritesFragment;
-    }
-
-    public PostFormFragment getPostFormFragment() {
-        return postFormFragment;
+    @Override
+    public void onClick(View view) {
+        if (view.getId() == R.id.fab_switch_to_post_form){
+            // sostituisce il fragment attuale con un nuovo fragment
+            getChildFragmentManager().beginTransaction()
+                    .replace(R.id.home_fragment, postFormFragment).commit();
+        }
     }
 
     private class ViewPagerAdapter extends FragmentPagerAdapter{
-
         List<Fragment> listHomeFragments = new LinkedList<>();
         List<String> listHomeFragmentsTitles = new LinkedList<>();
 
@@ -105,7 +94,6 @@ public class HomeFragment extends Fragment {
         }
 
         public void addFragment(Fragment fragment, String title){
-
             listHomeFragments.add(fragment);
             listHomeFragmentsTitles.add(title);
         }

@@ -10,16 +10,10 @@ import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import org.aldofrank.shak.R;
-import org.aldofrank.shak.services.AuthenticationService;
-import org.aldofrank.shak.services.ServiceGenerator;
 
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private Fragment loginFragment;
     private Fragment signupFragment;
@@ -33,39 +27,47 @@ public class MainActivity extends AppCompatActivity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         loginFragment = new LoginFragment();
-
-        switchFragment(loginFragment);
-
         switchButton = findViewById(R.id.switchButton);
 
-        switchButton.setText(getString(R.string.switch_to_signup));
+        switchButton.setText(getString(R.string.auth_signup));
+        switchButton.setOnClickListener(this);
+
+        setFragment(loginFragment);
     }
 
-    protected void switchButton(View view) {
+    @Override
+    public void onClick(View view) {
+        if (view.getId() == R.id.switchButton){
+            // Azione sul frammento "auth_signup" per cambiare la scritta a seconda del contesto
+            String switchButtonText = switchButton.getText().toString().trim();
+            Boolean isAuthSignupString = switchButtonText.equals(getString(R.string.auth_signup));
 
-        if (switchButton.getText().toString().trim().equals(getString(R.string.switch_to_signup))) {
+            if (isAuthSignupString) {
+                // imposta frammento di registrazione
+                switchButton.setText(R.string.auth_login);
 
-            switchButton.setText(R.string.switch_to_login);
+                if (signupFragment == null) {
+                    signupFragment = new SignupFragment();
+                }
 
-            if (signupFragment == null) {
-                signupFragment = new SignupFragment();
+                setFragment(signupFragment);
+            } else {
+                // imposta frammento di login
+                switchButton.setText(R.string.auth_signup);
+
+                setFragment(loginFragment);
             }
-
-            switchFragment(signupFragment);
-
-        } else {
-
-            switchButton.setText(R.string.switch_to_signup);
-
-            switchFragment(loginFragment);
         }
     }
 
-    private void switchFragment(Fragment fragment){
-
+    /**
+     *  @param fragment stato futuro del frammento
+     *  la funzione permette di cambiare il frammento da login a signup e viceversa
+     */
+    private void setFragment(Fragment fragment){
         FragmentManager manager = getSupportFragmentManager();
         FragmentTransaction transaction = manager.beginTransaction();
-        transaction.replace(R.id.fragment, fragment);
+        transaction.replace(R.id.auth_fragment, fragment);
         transaction.commit();
     }
 }

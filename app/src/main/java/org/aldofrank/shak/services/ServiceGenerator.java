@@ -28,13 +28,10 @@ public class ServiceGenerator {
     }
 
     public static <S> S createService(Class<S> serviceClass, final String authToken) {
-
-        if (!authToken.equals("")) {
-
+        if (!authToken.isEmpty()) {
             AuthenticationInterceptor interceptor = new AuthenticationInterceptor(authToken);
 
             if (!httpClient.interceptors().contains(interceptor)) {
-
                 // add the interceptor to the http client
                 httpClient.addInterceptor(interceptor);
 
@@ -45,8 +42,9 @@ public class ServiceGenerator {
                 retrofit = builder.build();
             }
         }else {
-
+            // aggiunta client in retrofit
             builder.client(httpClient.build());
+
             retrofit = builder.build();
         }
 
