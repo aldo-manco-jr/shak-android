@@ -2,16 +2,21 @@ package org.aldofrank.shak.streams.controllers;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.github.nkzawa.emitter.Emitter;
@@ -149,12 +154,6 @@ public class PostFormFragment extends Fragment implements View.OnClickListener {
                 Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
-    }
-
-    private void uploadImagePost(){
-        //Intent intent = new Intent(Intent.ACTION_PICK);
-        // intent.
-        // branzolini mi ha detto che devo SOLO rifare tutto
     }
 
     private Emitter.Listener updatePostsList = new Emitter.Listener() {
