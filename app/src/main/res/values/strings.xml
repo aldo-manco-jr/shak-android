@@ -6,6 +6,9 @@
     <string name="base_url_localhost_api">http://10.0.2.2:3000/api/shak</string>
     <string name="title_activity_logged_user">LoggedUserActivity</string>
 
+    <string name="sharedpreferences_authentication">authentication</string>
+    <string name="sharedpreferences_token">authToken</string>
+
     <string name="title_home">Home</string>
     <string name="title_profile">Profile</string>
     <string name="title_users">Users</string>

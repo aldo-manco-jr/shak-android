@@ -180,7 +180,7 @@ public class PostFormFragment extends Fragment implements View.OnClickListener {
 
         if (requestCode == SELECT_PHOTO && resultCode == getActivity().RESULT_OK && data != null && data.getData() != null){
 
-            uri = data.getData();//
+            uri = data.getData();
 
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), uri);

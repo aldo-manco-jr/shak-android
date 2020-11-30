@@ -6,12 +6,21 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import org.aldofrank.shak.R;
+import org.aldofrank.shak.streams.controllers.LoggedUserActivity;
+
+import java.io.UnsupportedEncodingException;
 
 /**
  * Activity principale dell'applicazione, gestisce la visibilità dei tipi di autenticazione
@@ -23,6 +32,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Fragment signupFragment;
 
     private Button switchButton;
+
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -36,7 +47,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switchButton.setText(getString(R.string.auth_signup));
         switchButton.setOnClickListener(this);
 
-        setFragment(loginFragment);
+        sharedPreferences = getSharedPreferences(getString(R.string.sharedpreferences_authentication), Context.MODE_PRIVATE);
+        String token = sharedPreferences.getString(getString(R.string.sharedpreferences_token), null);
+
+        if (token != null) {
+            try {
+                String username = JWTUtils.decodeUsernameLoggedUser(token);
+
+                Intent intentLoggedUser = new Intent(this, LoggedUserActivity.class);
+                intentLoggedUser.putExtra("authToken", token);
+                intentLoggedUser.putExtra("username", username);
+                startActivity(intentLoggedUser);
+
+            } catch (Exception ignored) {}
+        } else {
+            setFragment(loginFragment);
+        }
     }
 
     /**
@@ -45,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      */
     @Override
     public void onClick(View view) {
-        if (view.getId() == R.id.switchButton){
+        if (view.getId() == R.id.switchButton) {
             // Azione sul frammento "auth_signup" per cambiare la scritta a seconda del contesto
             String switchButtonText = switchButton.getText().toString().trim();
             Boolean isAuthSignupString = switchButtonText.equals(getString(R.string.auth_signup));
@@ -69,13 +95,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     /**
-     *  @param fragment stato futuro del frammento
-     *  la funzione permette di cambiare il frammento da login a signup e viceversa
+     * @param fragment stato futuro del frammento
+     *                 la funzione permette di cambiare il frammento da login a signup e viceversa
      */
-    private void setFragment(Fragment fragment){
+    private void setFragment(Fragment fragment) {
         FragmentManager manager = getSupportFragmentManager();
         FragmentTransaction transaction = manager.beginTransaction();
         transaction.replace(R.id.auth_fragment, fragment);
         transaction.commit();
     }
+
 }

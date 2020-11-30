@@ -1,6 +1,8 @@
 package org.aldofrank.shak.authentication.controllers;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -35,6 +37,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
 
     private final AuthenticationService authService = ServiceGenerator.createService(AuthenticationService.class);
 
+    private SharedPreferences sharedPreferences;
+
     private EditText usernameField;
     private EditText passwordField;
 
@@ -68,10 +72,14 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
                     assert response.body() != null : "body() non doveva essere null";
 
                     String token = response.body().getToken();
-                    Intent intentLoggedUser = new Intent(getActivity(), LoggedUserActivity.class);
+
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString(getString(R.string.sharedpreferences_token), token);
+                    editor.commit();
 
                     loadingBar.setVisibility(View.GONE);
 
+                    Intent intentLoggedUser = new Intent(getActivity(), LoggedUserActivity.class);
                     intentLoggedUser.putExtra("authToken", token);
                     intentLoggedUser.putExtra("username", response.body().getUserFound().getUsername());
                     startActivity(intentLoggedUser);
@@ -117,7 +125,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
 
         passwordField.setOnTouchListener(this);
 
-        // Inflate the layout for this fragment
+        sharedPreferences = getActivity().getSharedPreferences(getString(R.string.sharedpreferences_authentication), Context.MODE_PRIVATE);
+
         return loginFragmentView;
     }
 

@@ -10,6 +10,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -28,6 +30,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 
@@ -38,16 +41,51 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
 
     private List<Post> listPosts;
 
-    private Context context;
+    private FragmentActivity activity;
+
+    private static PostsListFragment postsListFragment;
 
     private final String basicUrlImage = "http://res.cloudinary.com/dfn8llckr/image/upload/v";
     private String token;
 
-    public PostsListAdapter(List<Post> listPosts, Context context) {
-        this.listPosts = listPosts;
-        this.context = context;
-        this.token = LoggedUserActivity.getToken();
+    private Socket socket;
+
+    {
+        try {
+            socket = IO.socket("http://10.0.2.2:3000/");
+        } catch (URISyntaxException ignored) {
+        }
     }
+
+    public PostsListAdapter(List<Post> listPosts, FragmentActivity activity, PostsListFragment postsListFragment) {
+        this.listPosts = listPosts;
+        this.activity = activity;
+        PostsListAdapter.postsListFragment = postsListFragment;
+        this.token = LoggedUserActivity.getToken();
+
+        socket.on("refreshPage", updatePostsList);
+        socket.connect();
+    }
+
+    /**
+     * Quando un post viene pubblicato la home page viene aggiornata.
+     */
+    private Emitter.Listener updatePostsList = new Emitter.Listener() {
+
+        @Override
+        public void call(final Object... args) {
+            if (activity != null) {
+                activity.runOnUiThread(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        // quando un post viene pubblicato la socket avvisa del necessario aggiornmento
+                        PostsListAdapter.postsListFragment.getAllPosts();
+                    }
+                });
+            }
+        }
+    };
 
     @NonNull
     @Override
@@ -70,7 +108,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
         String urlImageProfileUser = this.basicUrlImage + user.getProfileImageVersion() + "/"
                 + user.getProfileImageId();
 
-        Glide.with(context)
+        Glide.with(activity)
                 .asBitmap()
                 .load(urlImageProfileUser)
                 .into(holder.imageProfile);
@@ -85,7 +123,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
         if (!post.getImageVersion().isEmpty()) {
             String urlImagePost = this.basicUrlImage + post.getImageVersion() + "/" + post.getImageId();
 
-            Glide.with(context)
+            Glide.with(activity)
                     .asBitmap()
                     .load(urlImagePost)
                     .into(holder.imagePost);
@@ -110,7 +148,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
         holder.commentButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(context, "comment on " + post, Toast.LENGTH_LONG).show();
+                Toast.makeText(activity, "comment on " + post, Toast.LENGTH_LONG).show();
             }
         });
 
@@ -159,7 +197,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
     private void likeOrUnlike(Post post, final PostItemHolder holder) {
         StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, token);
 
-        Toast.makeText(context, post.getPostContent(), Toast.LENGTH_LONG).show();
+        Toast.makeText(activity, post.getPostContent(), Toast.LENGTH_LONG).show();
 
         if (!isLiked(post)) {
             Call<Object> httpRequest = streamsService.likePost(post);
@@ -169,15 +207,16 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
                 public void onResponse(Call<Object> call, Response<Object> response) {
                     if (response.isSuccessful()) {
                         holder.likeButton.setImageResource(R.drawable.ic_favorite_real_black_24dp);
-                        Toast.makeText(context, "like", Toast.LENGTH_LONG).show();
+                        Toast.makeText(activity, "like", Toast.LENGTH_LONG).show();
+                        socket.emit("refresh");
                     } else {
-                        Toast.makeText(context, response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(activity, response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                     }
                 }
 
                 @Override
                 public void onFailure(Call<Object> call, Throwable t) {
-                    Toast.makeText(context, t.getMessage(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(activity, t.getMessage(), Toast.LENGTH_LONG).show();
                 }
             });
         } else {
@@ -188,15 +227,16 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
                 public void onResponse(Call<Object> call, Response<Object> response) {
                     if (response.isSuccessful()) {
                         holder.likeButton.setImageResource(R.drawable.ic_favorite_border_black_24dp);
-                        Toast.makeText(context, "unlike", Toast.LENGTH_LONG).show();
+                        Toast.makeText(activity, "unlike", Toast.LENGTH_LONG).show();
+                        socket.emit("refresh");
                     } else {
-                        Toast.makeText(context, response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(activity, response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                     }
                 }
 
                 @Override
                 public void onFailure(Call<Object> call, Throwable t) {
-                    Toast.makeText(context, t.getMessage(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(activity, t.getMessage(), Toast.LENGTH_LONG).show();
                 }
             });
         }
@@ -210,21 +250,22 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
         StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, token);
         Call<Object> httpRequest = streamsService.deletePost(post);
 
-        Toast.makeText(context, post.getPostContent(), Toast.LENGTH_LONG).show();
+        Toast.makeText(activity, post.getPostContent(), Toast.LENGTH_LONG).show();
 
         httpRequest.enqueue(new Callback<Object>() {
             @Override
             public void onResponse(Call<Object> call, Response<Object> response) {
                 if (response.isSuccessful()) {
-                    Toast.makeText(context, "deleted", Toast.LENGTH_LONG).show();
+                    Toast.makeText(activity, "deleted", Toast.LENGTH_LONG).show();
+                    socket.emit("refresh");
                 } else {
-                    Toast.makeText(context, response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(activity, response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
             public void onFailure(Call<Object> call, Throwable t) {
-                Toast.makeText(context, t.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(activity, t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }

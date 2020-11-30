@@ -34,8 +34,7 @@ public class PostsListFragment extends Fragment {
 
     private View view;
 
-    public PostsListFragment() {
-    }
+    public PostsListFragment() { }
 
     /**
      * Use this factory method to create a new instance of
@@ -43,7 +42,6 @@ public class PostsListFragment extends Fragment {
      *
      * @return A new instance of fragment PostsListFragment.
      */
-
     public static PostsListFragment newInstance(String type) {
         PostsListFragment fragment = new PostsListFragment();
         Bundle args = new Bundle();
@@ -114,11 +112,11 @@ public class PostsListFragment extends Fragment {
     }
 
     /**
-     * VIene collegata la recycler view con l'adapter
+     * Viene collegata la recycler view con l'adapter
      */
     private void initializeRecyclerView() {
         RecyclerView recyclerView = view.findViewById(R.id.listPosts);
-        PostsListAdapter adapter = new PostsListAdapter(this.listPosts, getActivity());
+        PostsListAdapter adapter = new PostsListAdapter(this.listPosts, getActivity(), this);
 
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
