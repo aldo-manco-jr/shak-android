@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,13 +28,10 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.JsonObject;
 
 import org.aldofrank.shak.R;
-import org.aldofrank.shak.models.Post;
 import org.aldofrank.shak.services.ServiceGenerator;
 import org.aldofrank.shak.services.StreamsService;
-import org.aldofrank.shak.streams.http.PostsListResponse;
-import org.json.JSONObject;
 
-import java.lang.ref.PhantomReference;
+import java.io.ByteArrayOutputStream;
 import java.net.URISyntaxException;
 
 import retrofit2.Call;
@@ -46,6 +44,7 @@ import retrofit2.Response;
 public class PostFormFragment extends Fragment implements View.OnClickListener {
 
     private String token;
+    private String imageEncoded;
 
     private Fragment postFormFragment;
 
@@ -82,6 +81,8 @@ public class PostFormFragment extends Fragment implements View.OnClickListener {
         super.onCreate(savedInstanceState);
 
         context = getContext();
+        imageEncoded = null;
+        imageView = getActivity().findViewById(R.id.fab_image);
 
         socket.on("refreshPage", updatePostsList);
         socket.connect();
@@ -136,6 +137,9 @@ public class PostFormFragment extends Fragment implements View.OnClickListener {
         Call<Object> httpRequest = streamsService.submitPost(postData);
 
         postData.addProperty("post", postContentField.getText().toString().trim());
+        if (imageEncoded != null) {
+            postData.addProperty("image", imageEncoded);
+        }
 
         httpRequest.enqueue(new Callback<Object>() {
             @Override
@@ -165,28 +169,36 @@ public class PostFormFragment extends Fragment implements View.OnClickListener {
 
     private final int SELECT_PHOTO = 1;
     private Uri uri;
-    private ImageView chosenImage;
+    private ImageView imageView;
 
     private void uploadImagePost(){
-
         Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setType("image/*");
         startActivityForResult(intent, SELECT_PHOTO);
+    }
+
+    private String bitmapToBase64(Bitmap bitmap) {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+        byte[] byteArray = byteArrayOutputStream.toByteArray();
+        return Base64.encodeToString(byteArray, Base64.DEFAULT);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == SELECT_PHOTO && resultCode == getActivity().RESULT_OK && data != null && data.getData() != null){
-
+        if (requestCode == SELECT_PHOTO && resultCode == getActivity().RESULT_OK
+                && data != null && data.getData() != null) {
             uri = data.getData();
 
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), uri);
-                chosenImage.setImageBitmap(bitmap);
+                imageEncoded = bitmapToBase64(bitmap);
+                imageView.setImageBitmap(bitmap);
             }catch (Exception e){
                 e.printStackTrace();
+                Toast.makeText(getActivity(), uri.toString(), Toast.LENGTH_LONG).show();
             }
         }
     }
