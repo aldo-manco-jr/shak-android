@@ -46,6 +46,9 @@ public class PostFormFragment extends Fragment implements View.OnClickListener {
     private String token;
     private String imageEncoded;
 
+    private ImageView chosenImagePost;
+    private FloatingActionButton buttonDeleteImagePost;
+
     private Fragment postFormFragment;
 
     private static PostsListFragment postsListFragment;
@@ -82,7 +85,6 @@ public class PostFormFragment extends Fragment implements View.OnClickListener {
 
         context = getContext();
         imageEncoded = null;
-        imageView = getActivity().findViewById(R.id.fab_image);
 
         socket.on("refreshPage", updatePostsList);
         socket.connect();
@@ -100,9 +102,13 @@ public class PostFormFragment extends Fragment implements View.OnClickListener {
         buttonUploadImagePost = postFormFragmentView.findViewById(R.id.fab_add_post_image);
         buttonSubmitPost = postFormFragmentView.findViewById(R.id.fab_submit_button);
 
+        chosenImagePost = postFormFragmentView.findViewById(R.id.image_chosen);
+        buttonDeleteImagePost = postFormFragmentView.findViewById(R.id.fab_delete_image_post);
+
         buttonSubmitPost.setOnClickListener(this);
         buttonClosePostForm.setOnClickListener(this);
         buttonUploadImagePost.setOnClickListener(this);
+        buttonDeleteImagePost.setOnClickListener(this);
 
         postContentField.addTextChangedListener(new TextWatcher() {
             @Override
@@ -138,7 +144,8 @@ public class PostFormFragment extends Fragment implements View.OnClickListener {
 
         postData.addProperty("post", postContentField.getText().toString().trim());
         if (imageEncoded != null) {
-            postData.addProperty("image", imageEncoded);
+            postData.addProperty("image", "data:image/png;base64," + imageEncoded);
+            Toast.makeText(getActivity(), imageEncoded, Toast.LENGTH_LONG).show();
         }
 
         httpRequest.enqueue(new Callback<Object>() {
@@ -169,7 +176,6 @@ public class PostFormFragment extends Fragment implements View.OnClickListener {
 
     private final int SELECT_PHOTO = 1;
     private Uri uri;
-    private ImageView imageView;
 
     private void uploadImagePost(){
         Intent intent = new Intent(Intent.ACTION_PICK);
@@ -194,11 +200,14 @@ public class PostFormFragment extends Fragment implements View.OnClickListener {
 
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), uri);
+                chosenImagePost.setImageBitmap(bitmap);
                 imageEncoded = bitmapToBase64(bitmap);
-                imageView.setImageBitmap(bitmap);
+
+                chosenImagePost.setVisibility(View.VISIBLE);
+                buttonDeleteImagePost.setVisibility(View.VISIBLE);
             }catch (Exception e){
                 e.printStackTrace();
-                Toast.makeText(getActivity(), uri.toString(), Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), "prova " + uri.toString(), Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -237,6 +246,11 @@ public class PostFormFragment extends Fragment implements View.OnClickListener {
             case R.id.fab_add_post_image:
                 uploadImagePost();
                 break;
+            case R.id.fab_delete_image_post:
+                chosenImagePost.setVisibility(View.GONE);
+                buttonDeleteImagePost.setVisibility(View.GONE);
+                imageEncoded = null;
+                chosenImagePost.setImageBitmap(null);
         }
     }
 }
