@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
 import android.provider.MediaStore;
@@ -170,6 +171,14 @@ public class PostFormFragment extends Fragment implements View.OnClickListener {
 
                     socket.emit("refresh");
 
+                    // ripristino stato iniziale del contenitore
+                    ConstraintLayout.LayoutParams layoutParams =
+                            new ConstraintLayout.LayoutParams(
+                                    ConstraintLayout.LayoutParams.MATCH_PARENT,
+                                    ConstraintLayout.LayoutParams.MATCH_PARENT
+                            );
+                    postContentField.setLayoutParams(layoutParams);
+
                     // il fragment chiude se stesso
                     getFragmentManager().beginTransaction().remove(postFormFragment).commitAllowingStateLoss();
                     postContentField.setText("");
@@ -205,7 +214,7 @@ public class PostFormFragment extends Fragment implements View.OnClickListener {
 
         chosenImagePost.setImageBitmap(null);
 
-        ViewGroup.LayoutParams layoutParams = postContentField.getLayoutParams();
+        ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) postContentField.getLayoutParams();
         layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT;
         postContentField.setLayoutParams(layoutParams);
     }
@@ -247,15 +256,16 @@ public class PostFormFragment extends Fragment implements View.OnClickListener {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), uri);
                 imageEncoded = bitmapToBase64(bitmap);
 
-                ViewGroup.LayoutParams layoutParams = postContentField.getLayoutParams();
+
+                ConstraintLayout.LayoutParams layoutParams =
+                        (ConstraintLayout.LayoutParams) postContentField.getLayoutParams();
                 layoutParams.height = fragmentHeight - spaceOccupiedByTheImage;
+                postContentField.setLayoutParams(layoutParams);
 
                 chosenImagePost.setImageBitmap(bitmap);
 
                 chosenImagePost.setVisibility(View.VISIBLE);
                 buttonDeleteImagePost.setVisibility(View.VISIBLE);
-
-                postContentField.setLayoutParams(layoutParams);
             }catch (Exception e){
                 e.printStackTrace();
                 Toast.makeText(getActivity(), "prova " + uri.toString(), Toast.LENGTH_LONG).show();
