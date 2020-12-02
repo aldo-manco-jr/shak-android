@@ -43,6 +43,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
     private PostFormFragment postFormFragment;
 
+    public static FragmentManager fragmentManager;
+
     @Nullable
     @Override
     public View onCreateView(
@@ -55,6 +57,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         viewPager = homeFragmentView.findViewById(R.id.view_pager);
         homeTabs = homeFragmentView.findViewById(R.id.home_tabs);
         FloatingActionButton fab = homeFragmentView.findViewById(R.id.fab_switch_to_post_form);
+
+        fragmentManager = getChildFragmentManager();
 
         streamsFragment = PostsListFragment.newInstance("all");
         favouritesFragment = PostsListFragment.newInstance("favourites");

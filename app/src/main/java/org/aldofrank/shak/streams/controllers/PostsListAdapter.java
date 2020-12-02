@@ -49,13 +49,14 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
     private String token;
 
     private Socket socket;
-
     {
         try {
             socket = IO.socket("http://10.0.2.2:3000/");
         } catch (URISyntaxException ignored) {
         }
     }
+
+    private CommentsListFragment commentsListFragment;
 
     public PostsListAdapter(List<Post> listPosts, FragmentActivity activity, PostsListFragment postsListFragment) {
         this.listPosts = listPosts;
@@ -105,6 +106,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
     public void onBindViewHolder(@NonNull final PostItemHolder holder, final int position) {
         final Post post = listPosts.get(position);
         final User user = post.getUserId();
+
         String urlImageProfileUser = this.basicUrlImage + user.getProfileImageVersion() + "/"
                 + user.getProfileImageId();
 
@@ -145,10 +147,14 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
                 likeOrUnlike(listPosts.get(position), holder);
             }
         });
+
         holder.commentButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(activity, "comment on " + post, Toast.LENGTH_LONG).show();
+                commentsListFragment = CommentsListFragment.newInstance(listPosts.get(position));
+
+                HomeFragment.fragmentManager.beginTransaction()
+                        .replace(R.id.home_fragment, commentsListFragment).commit();
             }
         });
 
@@ -207,7 +213,6 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
                 public void onResponse(Call<Object> call, Response<Object> response) {
                     if (response.isSuccessful()) {
                         holder.likeButton.setImageResource(R.drawable.ic_favorite_real_black_24dp);
-                        Toast.makeText(activity, "like", Toast.LENGTH_LONG).show();
                         socket.emit("refresh");
                     } else {
                         Toast.makeText(activity, response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
@@ -227,7 +232,6 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
                 public void onResponse(Call<Object> call, Response<Object> response) {
                     if (response.isSuccessful()) {
                         holder.likeButton.setImageResource(R.drawable.ic_favorite_border_black_24dp);
-                        Toast.makeText(activity, "unlike", Toast.LENGTH_LONG).show();
                         socket.emit("refresh");
                     } else {
                         Toast.makeText(activity, response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
@@ -256,7 +260,6 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
             @Override
             public void onResponse(Call<Object> call, Response<Object> response) {
                 if (response.isSuccessful()) {
-                    Toast.makeText(activity, "deleted", Toast.LENGTH_LONG).show();
                     socket.emit("refresh");
                 } else {
                     Toast.makeText(activity, response.code() + " " + response.message(), Toast.LENGTH_LONG).show();

@@ -22,20 +22,8 @@
             android:paddingTop="@dimen/activity_vertical_margin"
             android:paddingBottom="@dimen/activity_vertical_margin">
 
-            <ImageView
-                android:id="@+id/image_chosen"
-                android:layout_width="@dimen/new_post_image_dimension"
-                android:layout_height="@dimen/new_post_image_dimension"
-                android:adjustViewBounds="true"
-                android:layout_marginBottom="@dimen/activity_vertical_margin"
-                android:layout_marginStart="15dp"
-                android:visibility="visible"
-                android:layout_marginTop="@dimen/activity_horizontal_margin"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"/>
-
             <EditText
-                android:id="@+id/post_content_field"
+                android:id="@+id/comment_content_field"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@drawable/input_text_style"
@@ -53,20 +41,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_delete_image_post"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="80dp"
-            android:layout_marginBottom="15dp"
-            app:backgroundTint="@color/white"
-            android:clickable="true"
-            android:visibility="gone"
-            android:src="@drawable/ic_delete_black_24dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent" />
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_close_post_form"
+            android:id="@+id/fab_close_comment_form"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="15dp"
@@ -78,19 +53,7 @@
             app:layout_constraintRight_toRightOf="parent" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_add_post_image"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="15dp"
-            android:layout_marginBottom="15dp"
-            app:backgroundTint="@color/colorSHAK"
-            android:clickable="true"
-            android:src="@drawable/ic_baseline_insert_photo_24"
-            app:layout_constraintBottom_toTopOf="@id/fab_submit_button"
-            app:layout_constraintRight_toRightOf="parent" />
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_submit_button"
+            android:id="@+id/fab_submit_comment_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="15dp"

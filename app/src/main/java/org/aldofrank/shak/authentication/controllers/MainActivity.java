@@ -11,16 +11,13 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
-import android.util.Base64;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import org.aldofrank.shak.R;
 import org.aldofrank.shak.streams.controllers.LoggedUserActivity;
 
-import java.io.UnsupportedEncodingException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Activity principale dell'applicazione, gestisce la visibilità dei tipi di autenticazione
@@ -50,18 +47,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         sharedPreferences = getSharedPreferences(getString(R.string.sharedpreferences_authentication), Context.MODE_PRIVATE);
         String token = sharedPreferences.getString(getString(R.string.sharedpreferences_token), null);
 
+        setFragment(loginFragment);
+
         if (token != null) {
             try {
-                String username = JWTUtils.decodeUsernameLoggedUser(token);
+                String username = JWTUtils.decodeUsernameLoggedUser(token).getString("username");
+                long expirationDate = JWTUtils.decodeUsernameLoggedUser(token).getLong("expirationDate");
 
-                Intent intentLoggedUser = new Intent(this, LoggedUserActivity.class);
-                intentLoggedUser.putExtra("authToken", token);
-                intentLoggedUser.putExtra("username", username);
-                startActivity(intentLoggedUser);
+                long currentTimeMillis = System.currentTimeMillis();
+                long currentTimeSeconds = TimeUnit.MILLISECONDS.toSeconds(currentTimeMillis);
+
+                if (currentTimeSeconds<=expirationDate){
+                    Intent intentLoggedUser = new Intent(this, LoggedUserActivity.class);
+                    intentLoggedUser.putExtra("authToken", token);
+                    intentLoggedUser.putExtra("username", username);
+                    startActivity(intentLoggedUser);
+                }
 
             } catch (Exception ignored) {}
-        } else {
-            setFragment(loginFragment);
         }
     }
 

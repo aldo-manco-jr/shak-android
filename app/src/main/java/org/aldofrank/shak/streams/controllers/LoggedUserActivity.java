@@ -2,6 +2,7 @@ package org.aldofrank.shak.streams.controllers;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 
@@ -37,6 +38,8 @@ public class LoggedUserActivity extends AppCompatActivity {
     private Fragment notificationsFragment;
     private Fragment settingsFragment;
 
+    private SharedPreferences sharedPreferences;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,6 +48,8 @@ public class LoggedUserActivity extends AppCompatActivity {
 
         BottomNavigationView navbarLoggedUser = findViewById(R.id.logged_user_navbar);
         homeFragment =  new HomeFragment();
+
+        sharedPreferences = getSharedPreferences(getString(R.string.sharedpreferences_authentication), Context.MODE_PRIVATE);
 
         navbarLoggedUser.setOnNavigationItemSelectedListener(navbarListener);
 
@@ -123,5 +128,15 @@ public class LoggedUserActivity extends AppCompatActivity {
 
     protected static String getUsernameLoggedUser(){
         return LoggedUserActivity.usernameLoggedUser;
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.remove("authToken");
+        editor.commit();
+
+        super.onBackPressed();  // optional depending on your needs
     }
 }

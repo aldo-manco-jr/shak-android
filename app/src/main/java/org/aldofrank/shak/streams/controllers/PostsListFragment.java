@@ -106,7 +106,7 @@ public class PostsListFragment extends Fragment {
 
             @Override
             public void onFailure(Call<PostsListResponse> call, Throwable t) {
-                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), "adada " + t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }

@@ -13,6 +13,7 @@ import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Base64;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,6 +47,10 @@ public class PostFormFragment extends Fragment implements View.OnClickListener {
     private String token;
     private String imageEncoded;
 
+    private final int spaceOccupiedByTheImage = 850;
+    private final int SELECT_PHOTO = 1;
+    private int fragmentHeight;
+
     private ImageView chosenImagePost;
     private FloatingActionButton buttonDeleteImagePost;
 
@@ -54,6 +59,8 @@ public class PostFormFragment extends Fragment implements View.OnClickListener {
     private static PostsListFragment postsListFragment;
 
     private Context context;
+
+    private Uri uri;
 
     private Socket socket;
     {
@@ -96,6 +103,9 @@ public class PostFormFragment extends Fragment implements View.OnClickListener {
         View postFormFragmentView = inflater.inflate(R.layout.fragment_post_form, container, false);
         token = LoggedUserActivity.getToken();
         postFormFragment = this;
+
+        Display display = getActivity().getWindowManager().getDefaultDisplay();
+        fragmentHeight = display.getHeight();
 
         postContentField = postFormFragmentView.findViewById(R.id.post_content_field);
         buttonClosePostForm = postFormFragmentView.findViewById(R.id.fab_close_post_form);
@@ -162,6 +172,7 @@ public class PostFormFragment extends Fragment implements View.OnClickListener {
 
                     // il fragment chiude se stesso
                     getFragmentManager().beginTransaction().remove(postFormFragment).commitAllowingStateLoss();
+                    postContentField.setText("");
                 } else {
                     Toast.makeText(getActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                 }
@@ -174,15 +185,45 @@ public class PostFormFragment extends Fragment implements View.OnClickListener {
         });
     }
 
-    private final int SELECT_PHOTO = 1;
-    private Uri uri;
+    /**
+     * Il post viene chiuso e le informazioni scritte dall'utente vengono cancellate
+     */
+    private void closePost(){
+        getFragmentManager().beginTransaction().remove(postFormFragment).commitAllowingStateLoss();
+        postContentField.setText("");
+    }
 
+    /**
+     * Cancella un immagine selezionata. L'immagine non sarà più visibile e non verrà caricata sul
+     * server con il messaggio.
+     */
+    private void deleteImagePost(){
+        imageEncoded = null;
+
+        chosenImagePost.setVisibility(View.GONE);
+        buttonDeleteImagePost.setVisibility(View.GONE);
+
+        chosenImagePost.setImageBitmap(null);
+
+        ViewGroup.LayoutParams layoutParams = postContentField.getLayoutParams();
+        layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT;
+        postContentField.setLayoutParams(layoutParams);
+    }
+
+    /**
+     * Avvia la fase di caricamento di un immagine dalla memoria dell'utente all'applicazione
+     */
     private void uploadImagePost(){
         Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setType("image/*");
         startActivityForResult(intent, SELECT_PHOTO);
     }
 
+    /**
+     * @param bitmap un'immagine in formato bitmap
+     *
+     * @return una stringa che rappresenta un'immagine codificata secondo Base64
+     */
     private String bitmapToBase64(Bitmap bitmap) {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
@@ -190,6 +231,10 @@ public class PostFormFragment extends Fragment implements View.OnClickListener {
         return Base64.encodeToString(byteArray, Base64.DEFAULT);
     }
 
+    /**
+     * L'immagine selezionata viene aggiunta e mostrata all'utente tramite un'anteprima, vengono
+     * anche mostrate eventuali azioni eseguibili sulle immagini
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -200,11 +245,17 @@ public class PostFormFragment extends Fragment implements View.OnClickListener {
 
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), uri);
-                chosenImagePost.setImageBitmap(bitmap);
                 imageEncoded = bitmapToBase64(bitmap);
+
+                ViewGroup.LayoutParams layoutParams = postContentField.getLayoutParams();
+                layoutParams.height = fragmentHeight - spaceOccupiedByTheImage;
+
+                chosenImagePost.setImageBitmap(bitmap);
 
                 chosenImagePost.setVisibility(View.VISIBLE);
                 buttonDeleteImagePost.setVisibility(View.VISIBLE);
+
+                postContentField.setLayoutParams(layoutParams);
             }catch (Exception e){
                 e.printStackTrace();
                 Toast.makeText(getActivity(), "prova " + uri.toString(), Toast.LENGTH_LONG).show();
@@ -241,16 +292,14 @@ public class PostFormFragment extends Fragment implements View.OnClickListener {
                 submitPost();
                 break;
             case R.id.fab_close_post_form:
-                getFragmentManager().beginTransaction().remove(postFormFragment).commitAllowingStateLoss();
+                closePost();
                 break;
             case R.id.fab_add_post_image:
                 uploadImagePost();
                 break;
             case R.id.fab_delete_image_post:
-                chosenImagePost.setVisibility(View.GONE);
-                buttonDeleteImagePost.setVisibility(View.GONE);
-                imageEncoded = null;
-                chosenImagePost.setImageBitmap(null);
+                deleteImagePost();
+                break;
         }
     }
 }

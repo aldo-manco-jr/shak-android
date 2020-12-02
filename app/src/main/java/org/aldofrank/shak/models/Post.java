@@ -1,5 +1,6 @@
 package org.aldofrank.shak.models;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.annotations.SerializedName;
@@ -14,7 +15,7 @@ import java.util.regex.Pattern;
 public class Post {
 
     @SerializedName("_id")
-    private Object postId;
+    private JsonElement postId;
 
     @SerializedName("user_id")
     private User userId;
@@ -43,8 +44,8 @@ public class Post {
     @SerializedName("created_at")
     private String createdAt;
 
-    public Object getPostId() {
-        return postId;
+    public String getPostId() {
+        return postId.getAsString();
     }
 
     public User getUserId() {
@@ -101,6 +102,9 @@ public class Post {
 
     public class Comment{
 
+        @SerializedName("_id")
+        private Object commentId;
+
         @SerializedName("user_id")
         private Object userId;
 
@@ -112,6 +116,15 @@ public class Post {
 
         @SerializedName("created_at")
         private String createdAt;
+
+        public Comment(String usernamePublisher, String commentContent) {
+            this.usernamePublisher = usernamePublisher;
+            this.commentContent = commentContent;
+        }
+
+        public Object getCommentId() {
+            return commentId;
+        }
 
         public String getUserId() {
 
@@ -144,6 +157,9 @@ public class Post {
     }
 
     public class Like{
+
+        @SerializedName("_id")
+        private Object likeId;
 
         @SerializedName("username")
         private String usernamePublisher;

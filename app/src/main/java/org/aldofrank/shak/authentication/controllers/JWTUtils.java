@@ -7,6 +7,7 @@ import android.widget.Toast;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 
 public class JWTUtils {
 
@@ -20,21 +21,25 @@ public class JWTUtils {
         }
     }*/
 
-    public static String decodeUsernameLoggedUser(String JWTEncoded) throws Exception {
+    public static JSONObject decodeUsernameLoggedUser(String JWTEncoded) throws Exception {
 
-        String username = null;
+        JSONObject tokenDataJson = null;
 
         try {
             String[] split = JWTEncoded.split("\\.");
-
+            Log.d("JWT_DECODED", "Header: " + getJson(split[0]));
+            Log.d("JWT_DECODED", "Body: " + getJson(split[1]));
             JSONObject json = new JSONObject(getJson(split[1]));
             JSONObject jsonUserData = (JSONObject) json.get("data");
-            username = jsonUserData.getString("username");
+
+            tokenDataJson = new JSONObject();
+            tokenDataJson.put("username", jsonUserData.getString("username"));
+            tokenDataJson.put("expirationDate", json.getLong("exp"));
 
         } catch (UnsupportedEncodingException e) {
             //Error
         }
-        return username;
+        return tokenDataJson;
     }
 
     private static String getJson(String strEncoded) throws UnsupportedEncodingException {

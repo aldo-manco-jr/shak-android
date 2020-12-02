@@ -178,7 +178,7 @@ public class SignupFragment extends Fragment implements View.OnClickListener, Vi
 
     @Override
     public void onClick(View view) {
-        if (view.getId() == R.id.loginButton) {
+        if (view.getId() == R.id.signUpButton) {
             signup();
         }
     }

@@ -15,8 +15,11 @@
         android:usesCleartextTraffic="true">
         <activity
             android:name=".streams.controllers.LoggedUserActivity"
-            android:label="@string/title_activity_logged_user"></activity>
-        <activity android:name=".authentication.controllers.MainActivity">
+            android:label="@string/title_activity_logged_user"
+            android:windowSoftInputMode="adjustNothing"  ></activity>
+        <activity
+            android:name=".authentication.controllers.MainActivity"
+            android:windowSoftInputMode="adjustNothing"  >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
