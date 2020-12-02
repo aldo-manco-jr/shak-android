@@ -4,9 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.text.method.PasswordTransformationMethod;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -17,6 +14,9 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
 
 import org.aldofrank.shak.R;
 import org.aldofrank.shak.authentication.http.login.LoginRequest;
@@ -82,7 +82,9 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
                     Intent intentLoggedUser = new Intent(getActivity(), LoggedUserActivity.class);
                     intentLoggedUser.putExtra("authToken", token);
                     intentLoggedUser.putExtra("username", response.body().getUserFound().getUsername());
+                    intentLoggedUser.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intentLoggedUser);
+                    ActivityCompat.finishAffinity(getActivity());
                 } else {
                     // errore a livello di applicazione
                     // response.code() == (401) -> token expired
@@ -122,7 +124,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
         passwordField.setOnFocusChangeListener(focusListener);
 
         loginButton.setOnClickListener(this);
-
         passwordField.setOnTouchListener(this);
 
         sharedPreferences = getActivity().getSharedPreferences(getString(R.string.sharedpreferences_authentication), Context.MODE_PRIVATE);

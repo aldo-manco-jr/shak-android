@@ -18,6 +18,10 @@
             android:label="@string/title_activity_logged_user"
             android:windowSoftInputMode="adjustNothing"  ></activity>
         <activity
+            android:name=".authentication.controllers.AccessActivity"
+            android:label="@string/app_name"
+            android:windowSoftInputMode="adjustNothing"  ></activity>
+        <activity
             android:name=".authentication.controllers.MainActivity"
             android:windowSoftInputMode="adjustNothing"  >
             <intent-filter>

@@ -1,18 +1,12 @@
 package org.aldofrank.shak.authentication.controllers;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
+
+import androidx.core.app.ActivityCompat;
 
 import org.aldofrank.shak.R;
 import org.aldofrank.shak.streams.controllers.LoggedUserActivity;
@@ -20,36 +14,24 @@ import org.aldofrank.shak.streams.controllers.LoggedUserActivity;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Activity principale dell'applicazione, gestisce la visibilità dei tipi di autenticazione
- * (login e signup)
+ * Controlla se all'avvio è presente un token non scaduto, in caso affermativo avvia
+ * {@link AccessActivity}, altrimenti {@link LoggedUserActivity}.
  */
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-
-    private Fragment loginFragment;
-    private Fragment signupFragment;
-
-    private Button switchButton;
-
-    private SharedPreferences sharedPreferences;
+public class MainActivity extends Activity {
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        loginFragment = new LoginFragment();
-        switchButton = findViewById(R.id.switchButton);
-
-        switchButton.setText(getString(R.string.auth_signup));
-        switchButton.setOnClickListener(this);
-
-        sharedPreferences = getSharedPreferences(getString(R.string.sharedpreferences_authentication), Context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.sharedpreferences_authentication), Context.MODE_PRIVATE);
         String token = sharedPreferences.getString(getString(R.string.sharedpreferences_token), null);
+        Intent intentFirstActivity = null;
 
-        setFragment(loginFragment);
-
-        if (token != null) {
+        if (token == null){
+            // non è mai stato effettuato alcun login
+            intentFirstActivity = new Intent(this, AccessActivity.class);
+        } else {
             try {
                 String username = JWTUtils.decodeUsernameLoggedUser(token).getString("username");
                 long expirationDate = JWTUtils.decodeUsernameLoggedUser(token).getLong("expirationDate");
@@ -57,55 +39,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 long currentTimeMillis = System.currentTimeMillis();
                 long currentTimeSeconds = TimeUnit.MILLISECONDS.toSeconds(currentTimeMillis);
 
-                if (currentTimeSeconds<=expirationDate){
-                    Intent intentLoggedUser = new Intent(this, LoggedUserActivity.class);
-                    intentLoggedUser.putExtra("authToken", token);
-                    intentLoggedUser.putExtra("username", username);
-                    startActivity(intentLoggedUser);
+                if (currentTimeSeconds <= expirationDate){
+                    intentFirstActivity = new Intent(this, LoggedUserActivity.class);
+                    intentFirstActivity.putExtra("authToken", token);
+                    intentFirstActivity.putExtra("username", username);
+                } else {
+                    // token scaduto, occorre effettuare nuovamente il login
+                    intentFirstActivity = new Intent(this, AccessActivity.class);
                 }
-
             } catch (Exception ignored) {}
         }
+
+        intentFirstActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intentFirstActivity);
+        ActivityCompat.finishAffinity(this);
     }
-
-    /**
-     * Se viene premuto il pulsante con id "switchButton" viene invertita l'interfaccia di login
-     * con quella di signup e viceversa
-     */
-    @Override
-    public void onClick(View view) {
-        if (view.getId() == R.id.switchButton) {
-            // Azione sul frammento "auth_signup" per cambiare la scritta a seconda del contesto
-            String switchButtonText = switchButton.getText().toString().trim();
-            Boolean isAuthSignupString = switchButtonText.equals(getString(R.string.auth_signup));
-
-            if (isAuthSignupString) {
-                // imposta frammento di registrazione
-                switchButton.setText(R.string.auth_login);
-
-                if (signupFragment == null) {
-                    signupFragment = new SignupFragment();
-                }
-
-                setFragment(signupFragment);
-            } else {
-                // imposta frammento di login
-                switchButton.setText(R.string.auth_signup);
-
-                setFragment(loginFragment);
-            }
-        }
-    }
-
-    /**
-     * @param fragment stato futuro del frammento
-     *                 la funzione permette di cambiare il frammento da login a signup e viceversa
-     */
-    private void setFragment(Fragment fragment) {
-        FragmentManager manager = getSupportFragmentManager();
-        FragmentTransaction transaction = manager.beginTransaction();
-        transaction.replace(R.id.auth_fragment, fragment);
-        transaction.commit();
-    }
-
 }

@@ -5,16 +5,13 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.view.MenuItem;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
-import android.view.MenuItem;
-import android.widget.TextView;
-import android.widget.Toast;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import org.aldofrank.shak.R;
 import org.aldofrank.shak.notifications.controllers.NotificationsFragment;
@@ -130,6 +127,8 @@ public class LoggedUserActivity extends AppCompatActivity {
         return LoggedUserActivity.usernameLoggedUser;
     }
 
+    /*
+    TODO @Aldo perchè lo avevi creato?
     @Override
     public void onBackPressed()
     {
@@ -139,4 +138,5 @@ public class LoggedUserActivity extends AppCompatActivity {
 
         super.onBackPressed();  // optional depending on your needs
     }
+     */
 }
