@@ -195,7 +195,7 @@ public class CommentFormFragment extends Fragment implements View.OnClickListene
                     socket.emit("refresh");
 
                     // il fragment chiude se stesso
-                    getFragmentManager().beginTransaction().remove(commentFormFragment).commitAllowingStateLoss();
+                    closeComment();
                 } else {
                     Toast.makeText(getActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                 }
@@ -212,8 +212,9 @@ public class CommentFormFragment extends Fragment implements View.OnClickListene
      * Il post viene chiuso e le informazioni scritte dall'utente vengono cancellate
      */
     private void closeComment(){
-        getFragmentManager().beginTransaction().remove(commentFormFragment).commitAllowingStateLoss();
+        getFragmentManager().beginTransaction().replace(R.id.home_fragment, CommentFormFragment.commentsListFragment).addToBackStack("backCommentsListFragment").commit();
         commentContentField.setText("");
+        getFragmentManager().beginTransaction().remove(commentFormFragment).commitAllowingStateLoss();
     }
 
     /**

@@ -164,6 +164,10 @@ public class Post {
         @SerializedName("username")
         private String usernamePublisher;
 
+        public Object getLikeId() {
+            return likeId;
+        }
+
         public String getUsernamePublisher() {
             return usernamePublisher;
         }

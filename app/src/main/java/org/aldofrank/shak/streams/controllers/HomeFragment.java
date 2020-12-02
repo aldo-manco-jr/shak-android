@@ -90,7 +90,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         if (view.getId() == R.id.fab_switch_to_post_form){
             // sostituisce il fragment attuale con un nuovo fragment
             getChildFragmentManager().beginTransaction()
-                    .replace(R.id.home_fragment, postFormFragment).commit();
+                    .replace(R.id.home_fragment, postFormFragment).addToBackStack("openPostFormFragment").commit();
         }
     }
 

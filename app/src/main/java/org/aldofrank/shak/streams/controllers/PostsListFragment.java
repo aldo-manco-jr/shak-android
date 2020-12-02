@@ -11,12 +11,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.github.nkzawa.socketio.client.IO;
+import com.github.nkzawa.socketio.client.Socket;
+
 import org.aldofrank.shak.R;
 import org.aldofrank.shak.models.Post;
 import org.aldofrank.shak.services.ServiceGenerator;
 import org.aldofrank.shak.services.StreamsService;
 import org.aldofrank.shak.streams.http.PostsListResponse;
 
+import java.net.URISyntaxException;
 import java.util.List;
 
 import retrofit2.Call;
@@ -33,6 +37,14 @@ public class PostsListFragment extends Fragment {
     private String token;
 
     private View view;
+
+    protected Socket socket;
+    {
+        try {
+            socket = IO.socket("http://10.0.2.2:3000/");
+        } catch (URISyntaxException ignored) {
+        }
+    }
 
     public PostsListFragment() { }
 
@@ -111,12 +123,21 @@ public class PostsListFragment extends Fragment {
         });
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        socket.disconnect();
+        //socket.off("disconnect");
+    }
+
     /**
      * Viene collegata la recycler view con l'adapter
      */
     private void initializeRecyclerView() {
         RecyclerView recyclerView = view.findViewById(R.id.listPosts);
         PostsListAdapter adapter = new PostsListAdapter(this.listPosts, getActivity(), this);
+        this.socket = adapter.socket;
 
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));

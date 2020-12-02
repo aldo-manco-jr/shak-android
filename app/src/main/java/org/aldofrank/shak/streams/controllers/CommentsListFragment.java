@@ -87,7 +87,7 @@ public class CommentsListFragment extends Fragment {
         buttonAddComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                HomeFragment.fragmentManager.beginTransaction().replace(R.id.home_fragment, commentFormFragment).commit();
+                HomeFragment.fragmentManager.beginTransaction().replace(R.id.home_fragment, commentFormFragment).addToBackStack("openCommentFormFragment").commit();
             }
         });
 

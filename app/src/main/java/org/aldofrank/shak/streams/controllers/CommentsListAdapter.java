@@ -25,8 +25,11 @@ import org.aldofrank.shak.services.ServiceGenerator;
 import org.aldofrank.shak.services.StreamsService;
 import org.aldofrank.shak.streams.http.DeleteCommentRequest;
 import org.aldofrank.shak.streams.http.GetPostResponse;
+import org.ocpsoft.prettytime.PrettyTime;
 
 import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -119,19 +122,29 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
                 .into(holder.imageProfile);*/
 
         holder.usernameText.setText(listComments.get(position).getUsernamePublisher());
-        holder.datePostText.setText(listComments.get(position).getCreatedAt());
+
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" );
+        Date date = new Date();
+
+        try {
+            date = formatter.parse(listComments.get(position).getCreatedAt());
+            date.setTime(date.getTime()+3_600_000);
+        }catch (Exception ignored){}
+
+        PrettyTime formattedDateTime = new PrettyTime();
+        holder.dateCommentText.setText(formattedDateTime.format(date));
 
         holder.commentContent.setText(comment.getCommentContent());
 
         if (comment.getUsernamePublisher().equals(LoggedUserActivity.getUsernameLoggedUser())) {
-            holder.deletePostButton.setOnClickListener(new View.OnClickListener() {
+            holder.deleteCommentButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     deleteComment(CommentsListAdapter.postId, comment);
                 }
             });
         } else {
-            holder.deletePostButton.setVisibility(View.GONE);
+            holder.deleteCommentButton.setVisibility(View.GONE);
         }
     }
 
@@ -180,7 +193,6 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
             public void onResponse(Call<Object> call, Response<Object> response) {
                 if (response.isSuccessful()) {
                     socket.emit("refresh");
-                    System.out.println("232323");
                 } else {
                     Toast.makeText(activity, response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                 }
@@ -199,10 +211,10 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
         CircleImageView imageProfile;
 
         TextView usernameText;
-        TextView datePostText;
+        TextView dateCommentText;
         TextView commentContent;
 
-        ImageView deletePostButton;
+        ImageView deleteCommentButton;
 
         public CommentItemHolder(@NonNull View itemView) {
             super(itemView);
@@ -210,9 +222,9 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
             imageProfile = itemView.findViewById(R.id.image_profile_circle_comment);
             layoutItem = itemView.findViewById(R.id.layout_item_comment);
             usernameText = itemView.findViewById(R.id.username_text_comment);
-            datePostText = itemView.findViewById(R.id.date_comment_text);
+            dateCommentText = itemView.findViewById(R.id.date_comment_text);
             commentContent = itemView.findViewById(R.id.comment_content);
-            deletePostButton = itemView.findViewById(R.id.delete_comment_button);
+            deleteCommentButton = itemView.findViewById(R.id.delete_comment_button);
         }
     }
 }

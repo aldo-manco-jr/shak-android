@@ -150,14 +150,15 @@ public class PostFormFragment extends Fragment implements View.OnClickListener {
      */
     private void submitPost(){
         StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, token);
-        JsonObject postData = new JsonObject();
-        Call<Object> httpRequest = streamsService.submitPost(postData);
 
+        JsonObject postData = new JsonObject();
         postData.addProperty("post", postContentField.getText().toString().trim());
         if (imageEncoded != null) {
             postData.addProperty("image", "data:image/png;base64," + imageEncoded);
-            Toast.makeText(getActivity(), imageEncoded, Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), postData.get("image").getAsString(), Toast.LENGTH_LONG).show();
         }
+
+        Call<Object> httpRequest = streamsService.submitPost(postData);
 
         httpRequest.enqueue(new Callback<Object>() {
             @Override
@@ -180,8 +181,7 @@ public class PostFormFragment extends Fragment implements View.OnClickListener {
                     postContentField.setLayoutParams(layoutParams);
 
                     // il fragment chiude se stesso
-                    getFragmentManager().beginTransaction().remove(postFormFragment).commitAllowingStateLoss();
-                    postContentField.setText("");
+                    closePost();
                 } else {
                     Toast.makeText(getActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                 }
@@ -235,7 +235,7 @@ public class PostFormFragment extends Fragment implements View.OnClickListener {
      */
     private String bitmapToBase64(Bitmap bitmap) {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream);
         byte[] byteArray = byteArrayOutputStream.toByteArray();
         return Base64.encodeToString(byteArray, Base64.DEFAULT);
     }
@@ -292,6 +292,14 @@ public class PostFormFragment extends Fragment implements View.OnClickListener {
             }
         }
     };
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        socket.disconnect();
+        //socket.off("disconnect");
+    }
 
     @Override
     public void onClick(View view) {

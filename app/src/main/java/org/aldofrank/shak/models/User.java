@@ -1,5 +1,6 @@
 package org.aldofrank.shak.models;
 
+import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
 
 import org.aldofrank.shak.models.Post;
@@ -29,11 +30,23 @@ public class User {
     @SerializedName("followers")
     private List<Follower> arrayFollowers;
 
+    @SerializedName("notifications")
+    private List<Notification> arrayNotifications;
+
+    @SerializedName("images")
+    private List<Image> arrayImages;
+
     @SerializedName("profileImageId")
     private String profileImageId;
 
     @SerializedName("profileImageVersion")
     private String profileImageVersion;
+
+    @SerializedName("coverImageId")
+    private String coverImageId;
+
+    @SerializedName("coverImageVersion")
+    private String coverImageVersion;
 
     @SerializedName("city")
     private String city;
@@ -84,46 +97,89 @@ public class User {
     public class Following{
 
         @SerializedName("userFollowed")
-        private Object followingId;
+        private JsonElement followingId;
 
         public String getFollowingId() {
-
-            String jsonUser = followingId.toString();
-
-            //using a regex to decipher a _id object from DB
-
-            Pattern regularExpression = Pattern.compile("_id=(.*?),");
-            Matcher m = regularExpression.matcher(jsonUser);
-            String objectId = "";
-
-            if (m.find()){
-                objectId = m.group(1);
-            }
-
-            return objectId;
+            return followingId.getAsString();
         }
     }
 
     public class Follower{
 
         @SerializedName("follower")
-        private Object followerId;
+        private JsonElement followerId;
 
         public String getFollowerId() {
+            return followerId.getAsString();
+        }
+    }
 
-            String jsonUser = followerId.toString();
+    public class Notification{
 
-            //using a regex to decipher a _id object from DB
+        @SerializedName("_id")
+        private JsonElement notificationId;
 
-            Pattern regularExpression = Pattern.compile("_id=(.*?),");
-            Matcher m = regularExpression.matcher(jsonUser);
-            String objectId = "";
+        @SerializedName("senderId")
+        private JsonElement userId;
 
-            if (m.find()){
-                objectId = m.group(1);
-            }
+        @SerializedName("message")
+        private String notificationContent;
 
-            return objectId;
+        @SerializedName("viewProfile")
+        private boolean isAboutViewedProfile;
+
+        @SerializedName("created")
+        private String createdAt;
+
+        @SerializedName("read")
+        private boolean isRead;
+
+        public String getNotificationId() {
+            return notificationId.getAsString();
+        }
+
+        public String getUserId() {
+            return userId.getAsString();
+        }
+
+        public String getNotificationContent() {
+            return notificationContent;
+        }
+
+        public boolean isAboutViewedProfile() {
+            return isAboutViewedProfile;
+        }
+
+        public String getCreatedAt() {
+            return createdAt;
+        }
+
+        public boolean isRead() {
+            return isRead;
+        }
+    }
+
+    public class Image{
+
+        @SerializedName("_id")
+        private JsonElement imageDatabaseId;
+
+        @SerializedName("imageId")
+        private String imageId;
+
+        @SerializedName("imageVersion")
+        private String imageVersion;
+
+        public String getImageDatabaseId() {
+            return imageDatabaseId.getAsString();
+        }
+
+        public String getImageId() {
+            return imageId;
+        }
+
+        public String getImageVersion() {
+            return imageVersion;
         }
     }
 }

@@ -1,6 +1,7 @@
 package org.aldofrank.shak.streams.controllers;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -21,8 +23,11 @@ import org.aldofrank.shak.models.Post;
 import org.aldofrank.shak.models.User;
 import org.aldofrank.shak.services.ServiceGenerator;
 import org.aldofrank.shak.services.StreamsService;
+import org.ocpsoft.prettytime.PrettyTime;
 
 import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -30,6 +35,10 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
@@ -48,7 +57,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
     private final String basicUrlImage = "http://res.cloudinary.com/dfn8llckr/image/upload/v";
     private String token;
 
-    private Socket socket;
+    protected Socket socket;
     {
         try {
             socket = IO.socket("http://10.0.2.2:3000/");
@@ -113,10 +122,21 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
         Glide.with(activity)
                 .asBitmap()
                 .load(urlImageProfileUser)
+                .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
                 .into(holder.imageProfile);
 
         holder.usernameText.setText(listPosts.get(position).getUsernamePublisher());
-        holder.datePostText.setText(listPosts.get(position).getCreatedAt());
+
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" );
+        Date date = new Date();
+
+        try {
+            date = formatter.parse(listPosts.get(position).getCreatedAt());
+            date.setTime(date.getTime()+3_600_000);
+        }catch (Exception ignored){}
+
+        PrettyTime formattedDateTime = new PrettyTime();
+        holder.datePostText.setText(formattedDateTime.format(date));
 
         if (user.getCity() != null && user.getCountry() != null) {
             holder.locationText.setText("@" + user.getCity() + ", " + user.getCountry());
