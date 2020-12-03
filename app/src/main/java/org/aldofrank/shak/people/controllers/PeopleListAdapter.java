@@ -66,24 +66,14 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
 
     @NonNull
     @Override
-    public UserItemHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public PeopleListAdapter.UserItemHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.layout_item_user, parent, false);
-        UserItemHolder viewHolder = new UserItemHolder(itemView);
+        PeopleListAdapter.UserItemHolder viewHolder = new PeopleListAdapter.UserItemHolder(itemView);
 
         return viewHolder;
     }
-    /*
-    @NonNull
-    @Override
-    public PostsListAdapter.PostItemHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.layout_item_post, parent, false);
-        PostsListAdapter.PostItemHolder viewHolder = new PostsListAdapter.PostItemHolder(itemView);
 
-        return viewHolder;
-    }
-*/
     /**
      * Questo metodo viene eseguito per ogni elemento nella lista, ogni elemento quindi viene
      * processato e aggiunto alla lista.
@@ -103,6 +93,7 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
                 .into(holder.imageProfile);
 
         holder.usernameText.setText(listUsers.get(position).getUsername());
+        holder.emailText.setText(listUsers.get(position).getEmail());
 
         if (user.getCity() != null && user.getCountry() != null) {
             holder.locationText.setText("@" + user.getCity() + ", " + user.getCountry());
@@ -213,40 +204,4 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
             followButton =  itemView.findViewById(R.id.follow);
         }
     }
-/*
-
-
-
-
-
-    private List<Post> listPosts;
-
-    private final String basicUrlImage = "http://res.cloudinary.com/dfn8llckr/image/upload/v";
-
-    public PostsListAdapter(List<Post> listPosts) {
-        this.listPosts = listPosts;
-
-        LoggedUserActivity.getSocket().on("refreshPage", updatePostsList);
-    }
-
-    /**
-     * Quando un post viene pubblicato la home page viene aggiornata.
-     */
-/*    private Emitter.Listener updatePostsList = new Emitter.Listener() {
-
-        @Override
-        public void call(final Object... args) {
-            if (LoggedUserActivity.getLoggedUserActivity() != null) {
-                LoggedUserActivity.getLoggedUserActivity().runOnUiThread(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        // quando un post viene pubblicato la socket avvisa del necessario aggiornmento
-                        HomeFragment.getHomeFragment().getStreamsFragment().getAllPosts();
-                        HomeFragment.getHomeFragment().getFavouritesFragment().getAllPosts();
-                    }
-                });
-            }
-        }
-    };
-*/}
+}

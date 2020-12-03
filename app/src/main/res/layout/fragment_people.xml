@@ -8,15 +8,16 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/title_users_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/title_users_list"
                 android:textAlignment="center"
+                style="@style/Base.TextAppearance.AppCompat.Title"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.recyclerview.widget.RecyclerView
@@ -25,8 +26,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_gravity="top"
-                app:layout_constraintLeft_toRightOf="@id/title_users_list"
-                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintTop_toTopOf="@id/title_users_list"
                 />
 
         </LinearLayout>

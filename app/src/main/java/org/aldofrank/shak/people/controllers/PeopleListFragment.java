@@ -135,14 +135,9 @@ public class PeopleListFragment extends Fragment {
                 if (response.isSuccessful()) {
                     assert response.body() != null : "body() non doveva essere null";
 
-                    Toast.makeText(getActivity(), response.body().getAllUsers().get(0).getUsername(), Toast.LENGTH_LONG).show();
-                    Toast.makeText(getActivity(), response.body().getAllUsers().get(1).getUsername(), Toast.LENGTH_LONG).show();
-
                     listUsers = response.body().getAllUsers();
 
                     initializeRecyclerView();
-                } else {
-                    Toast.makeText(getActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                 }
             }
 
