@@ -20,6 +20,12 @@ public interface StreamsService {
     @GET("posts")
     Call<GetPostsListResponse> getAllPosts();
 
+    @GET("post/{id}")
+    Call<GetPostResponse> getPost(@Path("id") String postId);
+
+    @POST("post/add-post")
+    Call<Object> submitPost(@Body JsonObject postData);
+
     @POST("post/remove-post")
     Call<Object> deletePost(@Body Post post);
 
@@ -29,18 +35,12 @@ public interface StreamsService {
     @POST("post/remove-like")
     Call<Object> unlikePost(@Body Post post);
 
-    @GET("username/{username}")
-    Call<GetUserByUsernameResponse> getUserByUsername(@Path("username") String username);
-
-    @POST("post/add-post")
-    Call<Object> submitPost(@Body JsonObject postData);
-
-    @GET("post/{id}")
-    Call<GetPostResponse> getPost(@Path("id") String postId);
-
     @POST("post/add-comment")
     Call<Object> submitComment(@Body AddCommentRequest addCommentRequest);
 
     @POST("post/remove-comment")
     Call<Object> deleteComment(@Body DeleteCommentRequest deleteCommentRequest);
+
+    @GET("username/{username}")
+    Call<GetUserByUsernameResponse> getUserByUsername(@Path("username") String username);
 }

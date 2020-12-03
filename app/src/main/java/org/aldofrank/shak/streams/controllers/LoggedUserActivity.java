@@ -5,22 +5,19 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.view.MenuItem;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-
-import android.view.MenuItem;
-import android.widget.TextView;
-import android.widget.Toast;
-
 import org.aldofrank.shak.R;
 import org.aldofrank.shak.notifications.controllers.NotificationsFragment;
-import org.aldofrank.shak.people.controllers.PeopleFragment;
+import org.aldofrank.shak.people.controllers.PeopleListFragment;
 import org.aldofrank.shak.profile.controllers.ProfileFragment;
 import org.aldofrank.shak.settings.controllers.SettingsFragment;
 
@@ -107,7 +104,7 @@ public class LoggedUserActivity extends AppCompatActivity {
                     break;
                 case R.id.navigation_users:
                     if (peopleFragment == null) {
-                        peopleFragment = new PeopleFragment();
+                        peopleFragment = new PeopleListFragment();
                     }
 
                     selectedFragment = peopleFragment;
@@ -137,7 +134,7 @@ public class LoggedUserActivity extends AppCompatActivity {
         }
     };
 
-    protected static String getToken() {
+    public static String getToken() {
         return LoggedUserActivity.token;
     }
 

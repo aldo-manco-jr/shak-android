@@ -1,31 +1,24 @@
 package org.aldofrank.shak.streams.controllers;
 
-import android.content.Context;
-import android.net.ProxyInfo;
-import android.net.Uri;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.appcompat.widget.Toolbar;
-
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
-import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 
 import org.aldofrank.shak.R;
 import org.aldofrank.shak.models.Post;
+import org.aldofrank.shak.models.User;
+import org.aldofrank.shak.people.controllers.PeopleListFragment;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -47,6 +40,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
     private CommentsListFragment commentsListFragment;
     private CommentFormFragment commentFormFragment;
+    private PeopleListFragment peopleListFragment;
 
     private static HomeFragment homeFragment;
 
@@ -148,6 +142,19 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         }
 
         return commentFormFragment;
+    }
+
+    public PeopleListFragment getPeopleListFragment() {
+        return peopleListFragment;
+    }
+
+    public PeopleListFragment getPeopleListFragment(User user) {
+
+        if (this.peopleListFragment == null) {
+            this.peopleListFragment = new PeopleListFragment().newInstance(user);
+        }
+
+        return peopleListFragment;
     }
 
     private class ViewPagerAdapter extends FragmentPagerAdapter {
