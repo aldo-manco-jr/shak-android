@@ -8,7 +8,6 @@ import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 
 import android.text.method.PasswordTransformationMethod;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -20,8 +19,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.aldofrank.shak.R;
-import org.aldofrank.shak.authentication.http.signup.SignupRequest;
-import org.aldofrank.shak.authentication.http.signup.SignupResponse;
+import org.aldofrank.shak.authentication.http.SignupRequest;
+import org.aldofrank.shak.authentication.http.SignupResponse;
 import org.aldofrank.shak.services.AuthenticationService;
 import org.aldofrank.shak.services.ServiceGenerator;
 import org.aldofrank.shak.streams.controllers.LoggedUserActivity;
@@ -32,8 +31,6 @@ import java.util.regex.Pattern;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Frammento che consente l'inserimento dei dati inerenti la registrazione e gestisce il contatto

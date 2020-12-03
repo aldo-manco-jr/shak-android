@@ -50,31 +50,12 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
 
     private List<Post> listPosts;
 
-    private FragmentActivity activity;
-
-    private static PostsListFragment postsListFragment;
-
     private final String basicUrlImage = "http://res.cloudinary.com/dfn8llckr/image/upload/v";
-    private String token;
 
-    protected Socket socket;
-    {
-        try {
-            socket = IO.socket("http://10.0.2.2:3000/");
-        } catch (URISyntaxException ignored) {
-        }
-    }
-
-    private CommentsListFragment commentsListFragment;
-
-    public PostsListAdapter(List<Post> listPosts, FragmentActivity activity, PostsListFragment postsListFragment) {
+    public PostsListAdapter(List<Post> listPosts) {
         this.listPosts = listPosts;
-        this.activity = activity;
-        PostsListAdapter.postsListFragment = postsListFragment;
-        this.token = LoggedUserActivity.getToken();
 
-        socket.on("refreshPage", updatePostsList);
-        socket.connect();
+        LoggedUserActivity.getSocket().on("refreshPage", updatePostsList);
     }
 
     /**
@@ -84,13 +65,14 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
 
         @Override
         public void call(final Object... args) {
-            if (activity != null) {
-                activity.runOnUiThread(new Runnable() {
+            if (LoggedUserActivity.getLoggedUserActivity() != null) {
+                LoggedUserActivity.getLoggedUserActivity().runOnUiThread(new Runnable() {
 
                     @Override
                     public void run() {
                         // quando un post viene pubblicato la socket avvisa del necessario aggiornmento
-                        PostsListAdapter.postsListFragment.getAllPosts();
+                        HomeFragment.getHomeFragment().getStreamsFragment().getAllPosts();
+                        HomeFragment.getHomeFragment().getFavouritesFragment().getAllPosts();
                     }
                 });
             }
@@ -119,7 +101,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
         String urlImageProfileUser = this.basicUrlImage + user.getProfileImageVersion() + "/"
                 + user.getProfileImageId();
 
-        Glide.with(activity)
+        Glide.with(LoggedUserActivity.getLoggedUserActivity())
                 .asBitmap()
                 .load(urlImageProfileUser)
                 .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
@@ -145,7 +127,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
         if (!post.getImageVersion().isEmpty()) {
             String urlImagePost = this.basicUrlImage + post.getImageVersion() + "/" + post.getImageId();
 
-            Glide.with(activity)
+            Glide.with(LoggedUserActivity.getLoggedUserActivity())
                     .asBitmap()
                     .load(urlImagePost)
                     .into(holder.imagePost);
@@ -171,10 +153,9 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
         holder.commentButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                commentsListFragment = CommentsListFragment.newInstance(listPosts.get(position));
 
-                HomeFragment.fragmentManager.beginTransaction()
-                        .replace(R.id.home_fragment, commentsListFragment).commit();
+                HomeFragment.getHomeFragment().getFragmentManager().beginTransaction()
+                        .replace(R.id.home_fragment, HomeFragment.getHomeFragment().getCommentsListFragment(listPosts.get(position))).commit();
             }
         });
 
@@ -221,9 +202,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
      * "like" o di "unlike" verso il post.
      */
     private void likeOrUnlike(Post post, final PostItemHolder holder) {
-        StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, token);
-
-        Toast.makeText(activity, post.getPostContent(), Toast.LENGTH_LONG).show();
+        StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
 
         if (!isLiked(post)) {
             Call<Object> httpRequest = streamsService.likePost(post);
@@ -233,15 +212,15 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
                 public void onResponse(Call<Object> call, Response<Object> response) {
                     if (response.isSuccessful()) {
                         holder.likeButton.setImageResource(R.drawable.ic_favorite_real_black_24dp);
-                        socket.emit("refresh");
+                        LoggedUserActivity.getSocket().emit("refresh");
                     } else {
-                        Toast.makeText(activity, response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                     }
                 }
 
                 @Override
                 public void onFailure(Call<Object> call, Throwable t) {
-                    Toast.makeText(activity, t.getMessage(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
                 }
             });
         } else {
@@ -252,15 +231,15 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
                 public void onResponse(Call<Object> call, Response<Object> response) {
                     if (response.isSuccessful()) {
                         holder.likeButton.setImageResource(R.drawable.ic_favorite_border_black_24dp);
-                        socket.emit("refresh");
+                        LoggedUserActivity.getSocket().emit("refresh");
                     } else {
-                        Toast.makeText(activity, response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                     }
                 }
 
                 @Override
                 public void onFailure(Call<Object> call, Throwable t) {
-                    Toast.makeText(activity, t.getMessage(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
                 }
             });
         }
@@ -271,24 +250,22 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
      * http in cui richieste la cancellazione del post.
      */
     private void deletePost(Post post) {
-        StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, token);
+        StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
         Call<Object> httpRequest = streamsService.deletePost(post);
-
-        Toast.makeText(activity, post.getPostContent(), Toast.LENGTH_LONG).show();
 
         httpRequest.enqueue(new Callback<Object>() {
             @Override
             public void onResponse(Call<Object> call, Response<Object> response) {
                 if (response.isSuccessful()) {
-                    socket.emit("refresh");
+                    LoggedUserActivity.getSocket().emit("refresh");
                 } else {
-                    Toast.makeText(activity, response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
             public void onFailure(Call<Object> call, Throwable t) {
-                Toast.makeText(activity, t.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }

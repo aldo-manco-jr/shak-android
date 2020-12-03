@@ -41,34 +41,16 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
 
     private List<Post.Comment> listComments;
 
-    private FragmentActivity activity;
-
-    private static CommentsListFragment commentsListFragment;
-
     public static String postId;
 
     private final String basicUrlImage = "http://res.cloudinary.com/dfn8llckr/image/upload/v";
-    private String token;
 
     private User user;
 
-    private Socket socket;
-
-    {
-        try {
-            socket = IO.socket("http://10.0.2.2:3000/");
-        } catch (URISyntaxException ignored) {
-        }
-    }
-
-    public CommentsListAdapter(List<Post.Comment> listComments, FragmentActivity activity, CommentsListFragment commentsListFragment) {
+    public CommentsListAdapter(List<Post.Comment> listComments) {
         this.listComments = listComments;
-        this.activity = activity;
-        CommentsListAdapter.commentsListFragment = commentsListFragment;
-        this.token = LoggedUserActivity.getToken();
 
-        socket.on("refreshPage", updatePostCommentsList);
-        socket.connect();
+        LoggedUserActivity.getSocket().on("refreshPage", updatePostCommentsList);
     }
 
     /**
@@ -78,13 +60,13 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
 
         @Override
         public void call(final Object... args) {
-            if (activity != null) {
-                activity.runOnUiThread(new Runnable() {
+            if (LoggedUserActivity.getLoggedUserActivity() != null) {
+                LoggedUserActivity.getLoggedUserActivity().runOnUiThread(new Runnable() {
 
                     @Override
                     public void run() {
                         // quando un post viene pubblicato la socket avvisa del necessario aggiornmento
-                        CommentsListAdapter.commentsListFragment.getAllPostComments();
+                        HomeFragment.getHomeFragment().getCommentsListFragment().getAllPostComments();
                     }
                 });
             }
@@ -111,8 +93,7 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
 
         final Post.Comment comment = listComments.get(position);
 
-        System.out.println(comment.getUsernamePublisher());
-        getUserByUsername(comment.getUsernamePublisher());
+        //getUserByUsername(comment.getUsernamePublisher());
 
         //String urlImageProfileUser = this.basicUrlImage + user.getProfileImageVersion() + "/" + user.getProfileImageId();
 
@@ -155,7 +136,7 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
 
     private void getUserByUsername(final String username){
 
-        StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, token);
+        StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
         Call<GetUserByUsernameResponse> httpRequest = streamsService.getUserByUsername(username);
 
         httpRequest.enqueue(new Callback<GetUserByUsernameResponse>() {
@@ -164,13 +145,13 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
                 if (response.isSuccessful()) {
                     user = response.body().getUserFoundByUsername();
                 } else {
-                    Toast.makeText(activity, response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
             public void onFailure(Call<GetUserByUsernameResponse> call, Throwable t) {
-                Toast.makeText(activity, t.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -182,25 +163,23 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
     private void deleteComment(String postId, Post.Comment comment) {
 
         DeleteCommentRequest deleteCommentRequest = new DeleteCommentRequest(CommentsListAdapter.postId, comment);
-        System.out.println(CommentsListAdapter.postId);
-        System.out.println(comment.getCommentContent());
 
-        StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, token);
+        StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
         Call<Object> httpRequest = streamsService.deleteComment(deleteCommentRequest);
 
         httpRequest.enqueue(new Callback<Object>() {
             @Override
             public void onResponse(Call<Object> call, Response<Object> response) {
                 if (response.isSuccessful()) {
-                    socket.emit("refresh");
+                    LoggedUserActivity.getSocket().emit("refresh");
                 } else {
-                    Toast.makeText(activity, response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
             public void onFailure(Call<Object> call, Throwable t) {
-                Toast.makeText(activity, t.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }

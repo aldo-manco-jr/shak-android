@@ -45,30 +45,15 @@ import retrofit2.Response;
  */
 public class PostFormFragment extends Fragment implements View.OnClickListener {
 
-    private String token;
     private String imageEncoded;
 
+    private Uri uri;
     private final int spaceOccupiedByTheImage = 850;
     private final int SELECT_PHOTO = 1;
     private int fragmentHeight;
 
     private ImageView chosenImagePost;
     private FloatingActionButton buttonDeleteImagePost;
-
-    private Fragment postFormFragment;
-
-    private static PostsListFragment postsListFragment;
-
-    private Context context;
-
-    private Uri uri;
-
-    private Socket socket;
-    {
-        try {
-            socket = IO.socket("http://10.0.2.2:3000/");
-        } catch (URISyntaxException ignored) {}
-    }
 
     private EditText postContentField;
 
@@ -80,30 +65,19 @@ public class PostFormFragment extends Fragment implements View.OnClickListener {
         // Required empty public constructor
     }
 
-    public static PostFormFragment newInstance(PostsListFragment postsListFragment) {
-        PostFormFragment fragment = new PostFormFragment();
-        PostFormFragment.postsListFragment = postsListFragment;
-
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        context = getContext();
         imageEncoded = null;
 
-        socket.on("refreshPage", updatePostsList);
-        socket.connect();
+        LoggedUserActivity.getSocket().on("refreshPage", updatePostsList);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View postFormFragmentView = inflater.inflate(R.layout.fragment_post_form, container, false);
-        token = LoggedUserActivity.getToken();
-        postFormFragment = this;
 
         Display display = getActivity().getWindowManager().getDefaultDisplay();
         fragmentHeight = display.getHeight();
@@ -149,13 +123,13 @@ public class PostFormFragment extends Fragment implements View.OnClickListener {
      * I dati vengono inseriti in una richiesta http e mandati al server.
      */
     private void submitPost(){
-        StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, token);
+        StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
 
         JsonObject postData = new JsonObject();
         postData.addProperty("post", postContentField.getText().toString().trim());
+
         if (imageEncoded != null) {
             postData.addProperty("image", "data:image/png;base64," + imageEncoded);
-            Toast.makeText(getActivity(), postData.get("image").getAsString(), Toast.LENGTH_LONG).show();
         }
 
         Call<Object> httpRequest = streamsService.submitPost(postData);
@@ -170,7 +144,7 @@ public class PostFormFragment extends Fragment implements View.OnClickListener {
                     Snackbar.make(getView(), "Post Added Successfully!!", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
 
-                    socket.emit("refresh");
+                    LoggedUserActivity.getSocket().emit("refresh");
 
                     // ripristino stato iniziale del contenitore
                     ConstraintLayout.LayoutParams layoutParams =
@@ -198,7 +172,7 @@ public class PostFormFragment extends Fragment implements View.OnClickListener {
      * Il post viene chiuso e le informazioni scritte dall'utente vengono cancellate
      */
     private void closePost(){
-        getFragmentManager().beginTransaction().remove(postFormFragment).commitAllowingStateLoss();
+        getFragmentManager().beginTransaction().remove(HomeFragment.getHomeFragment().getPostFormFragment()).commitAllowingStateLoss();
         postContentField.setText("");
     }
 
@@ -286,20 +260,12 @@ public class PostFormFragment extends Fragment implements View.OnClickListener {
                     @Override
                     public void run() {
                         // quando un post viene pubblicato la socket avvisa del necessario aggiornmento
-                        PostFormFragment.postsListFragment.getAllPosts();
+                        HomeFragment.getHomeFragment().getStreamsFragment().getAllPosts();
                     }
                 });
             }
         }
     };
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        socket.disconnect();
-        //socket.off("disconnect");
-    }
 
     @Override
     public void onClick(View view) {

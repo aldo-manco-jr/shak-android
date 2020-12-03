@@ -7,7 +7,7 @@ import org.aldofrank.shak.people.http.GetUserByUsernameResponse;
 import org.aldofrank.shak.streams.http.AddCommentRequest;
 import org.aldofrank.shak.streams.http.DeleteCommentRequest;
 import org.aldofrank.shak.streams.http.GetPostResponse;
-import org.aldofrank.shak.streams.http.PostsListResponse;
+import org.aldofrank.shak.streams.http.GetPostsListResponse;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -18,7 +18,7 @@ import retrofit2.http.Path;
 public interface StreamsService {
 
     @GET("posts")
-    Call<PostsListResponse> getAllPosts();
+    Call<GetPostsListResponse> getAllPosts();
 
     @POST("post/remove-post")
     Call<Object> deletePost(@Body Post post);

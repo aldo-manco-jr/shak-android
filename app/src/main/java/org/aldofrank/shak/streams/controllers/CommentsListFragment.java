@@ -1,7 +1,5 @@
 package org.aldofrank.shak.streams.controllers;
 
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -14,16 +12,12 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-import com.google.gson.JsonObject;
 
 import org.aldofrank.shak.R;
 import org.aldofrank.shak.models.Post;
 import org.aldofrank.shak.services.ServiceGenerator;
 import org.aldofrank.shak.services.StreamsService;
-import org.aldofrank.shak.streams.http.AddCommentRequest;
 import org.aldofrank.shak.streams.http.GetPostResponse;
-import org.aldofrank.shak.streams.http.PostsListResponse;
 
 import java.util.List;
 
@@ -31,21 +25,16 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static java.util.Arrays.asList;
 import static org.aldofrank.shak.streams.controllers.CommentsListAdapter.postId;
 
 public class CommentsListFragment extends Fragment {
     private List<Post.Comment> listPostComments;
-
-    private String token;
 
     private View view;
 
     private static Post post;
 
     private FloatingActionButton buttonAddComment;
-
-    private CommentFormFragment commentFormFragment;
 
     public CommentsListFragment() { }
 
@@ -76,9 +65,6 @@ public class CommentsListFragment extends Fragment {
         // glide = image loading framework that fetch, decode, display video, images and GIF
         // circleimageview = wrap images in a circle
         view = inflater.inflate(R.layout.fragment_comments_list, container, false);
-        token = LoggedUserActivity.getToken();
-
-        commentFormFragment = CommentFormFragment.newInstance(this);
 
         CommentsListAdapter.postId = post.getPostId();
 
@@ -87,7 +73,7 @@ public class CommentsListFragment extends Fragment {
         buttonAddComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                HomeFragment.fragmentManager.beginTransaction().replace(R.id.home_fragment, commentFormFragment).addToBackStack("openCommentFormFragment").commit();
+                HomeFragment.getHomeFragment().getFragmentManager().beginTransaction().replace(R.id.home_fragment, HomeFragment.getHomeFragment().getCommentFormFragment()).addToBackStack("openCommentFormFragment").commit();
             }
         });
 
@@ -112,7 +98,7 @@ public class CommentsListFragment extends Fragment {
             return;
         }
 
-        StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, token);
+        StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
 
         Call<GetPostResponse> httpRequest = streamsService.getPost(postId);
 
@@ -143,7 +129,7 @@ public class CommentsListFragment extends Fragment {
      */
     private void initializeRecyclerView() {
         RecyclerView recyclerView = view.findViewById(R.id.listComments);
-        CommentsListAdapter adapter = new CommentsListAdapter(this.listPostComments, getActivity(), this);
+        CommentsListAdapter adapter = new CommentsListAdapter(this.listPostComments);
 
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));

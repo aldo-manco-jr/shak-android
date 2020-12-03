@@ -29,13 +29,13 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 
 import org.aldofrank.shak.R;
-import org.aldofrank.shak.authentication.http.login.LoginRequest;
-import org.aldofrank.shak.authentication.http.login.LoginResponse;
+import org.aldofrank.shak.authentication.http.LoginRequest;
+import org.aldofrank.shak.authentication.http.LoginResponse;
 import org.aldofrank.shak.models.Post;
 import org.aldofrank.shak.services.AuthenticationService;
 import org.aldofrank.shak.services.ServiceGenerator;
 import org.aldofrank.shak.services.StreamsService;
-import org.aldofrank.shak.streams.http.posts.PostsListResponse;
+import org.aldofrank.shak.streams.http.posts.GetPostsListResponse;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -91,12 +91,12 @@ public class LoginFragment extends Fragment {
 
                     /////Toast.makeText(getActivity(), token, Toast.LENGTH_LONG).show();
 
-                    Call<PostsListResponse> httpRequest = streamsService.getAllPosts();
+                    Call<GetPostsListResponse> httpRequest = streamsService.getAllPosts();
 
-                    httpRequest.enqueue(new Callback<PostsListResponse>() {
+                    httpRequest.enqueue(new Callback<GetPostsListResponse>() {
 
                         @Override
-                        public void onResponse(Call<PostsListResponse> call, Response<PostsListResponse> response) {
+                        public void onResponse(Call<GetPostsListResponse> call, Response<GetPostsListResponse> response) {
 
                             if (response.isSuccessful()){
 
@@ -118,7 +118,7 @@ public class LoginFragment extends Fragment {
                                 Toast.makeText(getActivity(), firstPost.getCreatedAt(), Toast.LENGTH_LONG).show();
                                 Toast.makeText(getActivity(), userComments.get(0).getCommentContent(), Toast.LENGTH_LONG).show();
                                 //Toast.makeText(getActivity(), response.body().getArrayPosts().get(0).getPostContent(), Toast.LENGTH_LONG).show();
-                                PostsListResponse body = response.body();
+                                GetPostsListResponse body = response.body();
 
                                 //JSONObject userData = null;
                                 //JSONObject comment = null;
@@ -227,7 +227,7 @@ public class LoginFragment extends Fragment {
         }
 
 @Override
-public void onFailure(Call<PostsListResponse> call, Throwable t) {
+public void onFailure(Call<GetPostsListResponse> call, Throwable t) {
         Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
         }
         });
@@ -432,7 +432,7 @@ package org.aldofrank.shak.streams.http.posts;
 
         import retrofit2.http.POST;
 
-public class PostsListResponse {
+public class GetPostsListResponse {
 
     @SerializedName("message")
     String message;

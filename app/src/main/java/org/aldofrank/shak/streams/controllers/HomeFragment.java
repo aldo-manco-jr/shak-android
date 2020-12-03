@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import androidx.appcompat.widget.Toolbar;
 
 import androidx.fragment.app.FragmentManager;
@@ -24,6 +25,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 
 import org.aldofrank.shak.R;
+import org.aldofrank.shak.models.Post;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -43,7 +45,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
     private PostFormFragment postFormFragment;
 
-    public static FragmentManager fragmentManager;
+    private CommentsListFragment commentsListFragment;
+    private CommentFormFragment commentFormFragment;
+
+    private static HomeFragment homeFragment;
 
     @Nullable
     @Override
@@ -54,15 +59,14 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     ) {
         View homeFragmentView = inflater.inflate(R.layout.fragment_home, container, false);
 
+        homeFragment = this;
+
         viewPager = homeFragmentView.findViewById(R.id.view_pager);
         homeTabs = homeFragmentView.findViewById(R.id.home_tabs);
         FloatingActionButton fab = homeFragmentView.findViewById(R.id.fab_switch_to_post_form);
 
-        fragmentManager = getChildFragmentManager();
-
-        streamsFragment = PostsListFragment.newInstance("all");
-        favouritesFragment = PostsListFragment.newInstance("favourites");
-        postFormFragment = PostFormFragment.newInstance(streamsFragment);
+        getStreamsFragment();
+        getFavouritesFragment();
 
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getChildFragmentManager(), 0);
         viewPagerAdapter.addFragment(streamsFragment, "Streams");
@@ -87,14 +91,66 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
-        if (view.getId() == R.id.fab_switch_to_post_form){
+        if (view.getId() == R.id.fab_switch_to_post_form) {
+
+            getPostFormFragment();
+
             // sostituisce il fragment attuale con un nuovo fragment
             getChildFragmentManager().beginTransaction()
                     .replace(R.id.home_fragment, postFormFragment).addToBackStack("openPostFormFragment").commit();
         }
     }
 
-    private class ViewPagerAdapter extends FragmentPagerAdapter{
+    public static HomeFragment getHomeFragment() {
+        return homeFragment;
+    }
+
+    public PostsListFragment getStreamsFragment() {
+
+        if (this.streamsFragment == null) {
+            this.streamsFragment = PostsListFragment.newInstance("all");
+        }
+
+        return streamsFragment;
+    }
+
+    public PostsListFragment getFavouritesFragment() {
+
+        if (this.favouritesFragment == null) {
+            this.favouritesFragment = PostsListFragment.newInstance("favourites");
+        }
+
+        return favouritesFragment;
+    }
+
+    public PostFormFragment getPostFormFragment() {
+
+        if (this.postFormFragment == null) {
+            this.postFormFragment = new PostFormFragment();
+        }
+
+        return postFormFragment;
+    }
+
+    public CommentsListFragment getCommentsListFragment() {
+        return commentsListFragment;
+    }
+
+    public CommentsListFragment getCommentsListFragment(Post post) {
+        this.commentsListFragment = CommentsListFragment.newInstance(post);
+        return commentsListFragment;
+    }
+
+    public CommentFormFragment getCommentFormFragment() {
+
+        if (this.commentFormFragment == null) {
+            this.commentFormFragment = new CommentFormFragment();
+        }
+
+        return commentFormFragment;
+    }
+
+    private class ViewPagerAdapter extends FragmentPagerAdapter {
         List<Fragment> listHomeFragments = new LinkedList<>();
         List<String> listHomeFragmentsTitles = new LinkedList<>();
 
@@ -102,7 +158,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
             super(fm, behavior);
         }
 
-        public void addFragment(Fragment fragment, String title){
+        public void addFragment(Fragment fragment, String title) {
             listHomeFragments.add(fragment);
             listHomeFragmentsTitles.add(title);
         }

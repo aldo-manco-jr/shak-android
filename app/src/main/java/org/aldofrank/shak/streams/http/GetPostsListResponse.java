@@ -10,7 +10,7 @@ import java.util.List;
 
 import retrofit2.http.POST;
 
-public class PostsListResponse {
+public class GetPostsListResponse {
 
     @SerializedName("message")
     String message;

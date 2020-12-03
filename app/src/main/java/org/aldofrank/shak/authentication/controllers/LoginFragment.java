@@ -19,8 +19,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import org.aldofrank.shak.R;
-import org.aldofrank.shak.authentication.http.login.LoginRequest;
-import org.aldofrank.shak.authentication.http.login.LoginResponse;
+import org.aldofrank.shak.authentication.http.LoginRequest;
+import org.aldofrank.shak.authentication.http.LoginResponse;
 import org.aldofrank.shak.services.AuthenticationService;
 import org.aldofrank.shak.services.ServiceGenerator;
 import org.aldofrank.shak.streams.controllers.LoggedUserActivity;

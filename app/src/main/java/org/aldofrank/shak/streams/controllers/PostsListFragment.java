@@ -11,16 +11,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.github.nkzawa.socketio.client.IO;
-import com.github.nkzawa.socketio.client.Socket;
-
 import org.aldofrank.shak.R;
 import org.aldofrank.shak.models.Post;
 import org.aldofrank.shak.services.ServiceGenerator;
 import org.aldofrank.shak.services.StreamsService;
-import org.aldofrank.shak.streams.http.PostsListResponse;
+import org.aldofrank.shak.streams.http.GetPostsListResponse;
 
-import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -34,17 +31,7 @@ public class PostsListFragment extends Fragment {
 
     private List<Post> listPosts;
 
-    private String token;
-
     private View view;
-
-    protected Socket socket;
-    {
-        try {
-            socket = IO.socket("http://10.0.2.2:3000/");
-        } catch (URISyntaxException ignored) {
-        }
-    }
 
     public PostsListFragment() { }
 
@@ -56,9 +43,26 @@ public class PostsListFragment extends Fragment {
      */
     public static PostsListFragment newInstance(String type) {
         PostsListFragment fragment = new PostsListFragment();
-        Bundle args = new Bundle();
 
+        Bundle args = new Bundle();
         args.putString("type", type);
+        fragment.setArguments(args);
+
+        return fragment;
+    }
+
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @return A new instance of fragment PostsListFragment.
+     */
+    public static PostsListFragment newInstance(String type, String username) {
+        PostsListFragment fragment = new PostsListFragment();
+
+        Bundle args = new Bundle();
+        args.putString("type", type);
+        args.putString("username", username);
         fragment.setArguments(args);
 
         return fragment;
@@ -76,7 +80,6 @@ public class PostsListFragment extends Fragment {
         // glide = image loading framework that fetch, decode, display video, images and GIF
         // circleimageview = wrap images in a circle
         view = inflater.inflate(R.layout.fragment_posts_list, container, false);
-        token = LoggedUserActivity.getToken();
 
         getAllPosts();
 
@@ -95,12 +98,13 @@ public class PostsListFragment extends Fragment {
         }
 
         final String type = getArguments().getString("type");
-        StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, token);
-        Call<PostsListResponse> httpRequest = streamsService.getAllPosts();
+        final String username = getArguments().getString("username");
+        StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
+        Call<GetPostsListResponse> httpRequest = streamsService.getAllPosts();
 
-        httpRequest.enqueue(new Callback<PostsListResponse>() {
+        httpRequest.enqueue(new Callback<GetPostsListResponse>() {
             @Override
-            public void onResponse(Call<PostsListResponse> call, Response<PostsListResponse> response) {
+            public void onResponse(Call<GetPostsListResponse> call, Response<GetPostsListResponse> response) {
                 if (response.isSuccessful()) {
                     assert response.body() != null : "body() non doveva essere null";
 
@@ -108,6 +112,17 @@ public class PostsListFragment extends Fragment {
                         listPosts = response.body().getArrayPosts();
                     } else if (type.equals("favourites")) {
                         listPosts = response.body().getFavouritePosts();
+                    } else if (type.equals("profile") && !username.isEmpty()){
+
+                        listPosts = new ArrayList<>();
+
+                        List<Post> copy = response.body().getArrayPosts();
+
+                        for (Post post : copy) {
+                            if (post.getUsernamePublisher().equals(username)){
+                                listPosts.add(post);
+                            }
+                        }
                     }
 
                     initializeRecyclerView();
@@ -117,18 +132,10 @@ public class PostsListFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(Call<PostsListResponse> call, Throwable t) {
-                Toast.makeText(getActivity(), "adada " + t.getMessage(), Toast.LENGTH_LONG).show();
+            public void onFailure(Call<GetPostsListResponse> call, Throwable t) {
+                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        socket.disconnect();
-        //socket.off("disconnect");
     }
 
     /**
@@ -136,8 +143,7 @@ public class PostsListFragment extends Fragment {
      */
     private void initializeRecyclerView() {
         RecyclerView recyclerView = view.findViewById(R.id.listPosts);
-        PostsListAdapter adapter = new PostsListAdapter(this.listPosts, getActivity(), this);
-        this.socket = adapter.socket;
+        PostsListAdapter adapter = new PostsListAdapter(this.listPosts);
 
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));

@@ -1,4 +1,4 @@
-package org.aldofrank.shak.authentication.http.signup;
+package org.aldofrank.shak.authentication.http;
 
 import com.google.gson.annotations.SerializedName;
 

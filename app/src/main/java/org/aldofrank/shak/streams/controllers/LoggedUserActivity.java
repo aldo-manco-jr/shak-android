@@ -5,19 +5,26 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
-import android.view.MenuItem;
 
-import androidx.annotation.NonNull;
+import com.github.nkzawa.socketio.client.IO;
+import com.github.nkzawa.socketio.client.Socket;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
+import android.view.MenuItem;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import org.aldofrank.shak.R;
 import org.aldofrank.shak.notifications.controllers.NotificationsFragment;
 import org.aldofrank.shak.people.controllers.PeopleFragment;
 import org.aldofrank.shak.profile.controllers.ProfileFragment;
 import org.aldofrank.shak.settings.controllers.SettingsFragment;
+
+import java.net.URISyntaxException;
 
 /**
  * Permette di accedere alle varie funzionalità del programma.
@@ -37,11 +44,24 @@ public class LoggedUserActivity extends AppCompatActivity {
 
     private SharedPreferences sharedPreferences;
 
+    private static LoggedUserActivity loggedUserActivity;
+
+    private static Socket socket;
+    {
+        try {
+            socket = IO.socket("http://10.0.2.2:3000/");
+        } catch (URISyntaxException ignored) {}
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_logged_user);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        loggedUserActivity = this;
+
+        socket.connect();
 
         BottomNavigationView navbarLoggedUser = findViewById(R.id.logged_user_navbar);
         homeFragment =  new HomeFragment();
@@ -60,8 +80,6 @@ public class LoggedUserActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        // Toast.makeText(getApplicationContext(), token, Toast.LENGTH_LONG).show();
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener navbarListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -127,8 +145,6 @@ public class LoggedUserActivity extends AppCompatActivity {
         return LoggedUserActivity.usernameLoggedUser;
     }
 
-    /*
-    TODO @Aldo perchè lo avevi creato?
     @Override
     public void onBackPressed()
     {
@@ -138,5 +154,19 @@ public class LoggedUserActivity extends AppCompatActivity {
 
         super.onBackPressed();  // optional depending on your needs
     }
-     */
+
+    @Override
+    public void onDestroy() {
+        socket.disconnect();
+        super.onDestroy();
+        //socket.off("disconnect");
+    }
+
+    public static Socket getSocket() {
+        return socket;
+    }
+
+    public static LoggedUserActivity getLoggedUserActivity() {
+        return loggedUserActivity;
+    }
 }

@@ -44,23 +44,6 @@ import static org.aldofrank.shak.streams.controllers.CommentsListAdapter.postId;
 
 public class CommentFormFragment extends Fragment implements View.OnClickListener {
 
-    private String token;
-
-    private Fragment commentFormFragment;
-
-    private static CommentsListFragment commentsListFragment;
-
-    private Context context;
-
-    private Uri uri;
-
-    private Socket socket;
-    {
-        try {
-            socket = IO.socket("http://10.0.2.2:3000/");
-        } catch (URISyntaxException ignored) {}
-    }
-
     private EditText commentContentField;
 
     private FloatingActionButton buttonCloseCommentForm;
@@ -74,33 +57,13 @@ public class CommentFormFragment extends Fragment implements View.OnClickListene
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        context = getContext();
-
-        socket.on("refreshPage", updateCommentsList);
-        socket.connect();
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @return A new instance of fragment PostsListFragment.
-     */
-    public static CommentFormFragment newInstance(CommentsListFragment commentsListFragment) {
-
-        CommentFormFragment fragment = new CommentFormFragment();
-
-        CommentFormFragment.commentsListFragment = commentsListFragment;
-
-        return fragment;
+        LoggedUserActivity.getSocket().on("refreshPage", updateCommentsList);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View postFormFragmentView = inflater.inflate(R.layout.fragment_comment_form, container, false);
-        token = LoggedUserActivity.getToken();
-        commentFormFragment = this;
 
         commentContentField = postFormFragmentView.findViewById(R.id.comment_content_field);
         buttonCloseCommentForm = postFormFragmentView.findViewById(R.id.fab_close_comment_form);
@@ -132,51 +95,9 @@ public class CommentFormFragment extends Fragment implements View.OnClickListene
         return postFormFragmentView;
     }
 
-    /**
-     * Consente la pubblicazione di un post ad un'utente autenticato.
-     * I dati vengono inseriti in una richiesta http e mandati al server.
-     */
-   /* private void submitPost(){
-        StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, token);
-        JsonObject postData = new JsonObject();
-        Call<Object> httpRequest = streamsService.submitPost(postData);
-
-        postData.addProperty("post", postContentField.getText().toString().trim());
-        if (imageEncoded != null) {
-            postData.addProperty("image", "data:image/png;base64," + imageEncoded);
-            Toast.makeText(getActivity(), imageEncoded, Toast.LENGTH_LONG).show();
-        }
-
-        httpRequest.enqueue(new Callback<Object>() {
-            @Override
-            public void onResponse(Call<Object> call, Response<Object> response) {
-                if (response.isSuccessful()) {
-                    assert getView() != null : "getView() non doveva essere null";
-                    assert getFragmentManager() != null : "getFragmentManager() non doveva essere null";
-
-                    Snackbar.make(getView(), "Post Added Successfully!!", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
-
-                    socket.emit("refresh");
-
-                    // il fragment chiude se stesso
-                    getFragmentManager().beginTransaction().remove(postFormFragment).commitAllowingStateLoss();
-                    postContentField.setText("");
-                } else {
-                    Toast.makeText(getActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Object> call, Throwable t) {
-                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        });
-    }*/
-
     private void submitComment(){
 
-        StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, token);
+        StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
 
         AddCommentRequest addCommentRequest = new AddCommentRequest(postId, commentContentField.getText().toString().trim());
 
@@ -192,10 +113,10 @@ public class CommentFormFragment extends Fragment implements View.OnClickListene
                     Snackbar.make(getView(), "Comment Added Successfully!!", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
 
-                    socket.emit("refresh");
-
                     // il fragment chiude se stesso
                     closeComment();
+
+                    LoggedUserActivity.getSocket().emit("refresh");
                 } else {
                     Toast.makeText(getActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                 }
@@ -212,9 +133,9 @@ public class CommentFormFragment extends Fragment implements View.OnClickListene
      * Il post viene chiuso e le informazioni scritte dall'utente vengono cancellate
      */
     private void closeComment(){
-        getFragmentManager().beginTransaction().replace(R.id.home_fragment, CommentFormFragment.commentsListFragment).addToBackStack("backCommentsListFragment").commit();
+        getFragmentManager().beginTransaction().replace(R.id.home_fragment, HomeFragment.getHomeFragment().getCommentsListFragment()).addToBackStack("backCommentsListFragment").commit();
         commentContentField.setText("");
-        getFragmentManager().beginTransaction().remove(commentFormFragment).commitAllowingStateLoss();
+        getFragmentManager().beginTransaction().remove(HomeFragment.getHomeFragment().getCommentFormFragment()).commitAllowingStateLoss();
     }
 
     /**
@@ -230,7 +151,7 @@ public class CommentFormFragment extends Fragment implements View.OnClickListene
                     @Override
                     public void run() {
                         // quando un post viene pubblicato la socket avvisa del necessario aggiornamento
-                        commentsListFragment.getAllPostComments();
+                        HomeFragment.getHomeFragment().getCommentsListFragment().getAllPostComments();
                     }
                 });
             }
