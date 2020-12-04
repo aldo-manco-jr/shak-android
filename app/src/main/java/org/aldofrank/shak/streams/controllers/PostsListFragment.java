@@ -1,15 +1,14 @@
 package org.aldofrank.shak.streams.controllers;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import org.aldofrank.shak.R;
 import org.aldofrank.shak.models.Post;
@@ -18,7 +17,6 @@ import org.aldofrank.shak.services.StreamsService;
 import org.aldofrank.shak.streams.http.GetAllUserPostsResponse;
 import org.aldofrank.shak.streams.http.GetPostsListResponse;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -146,7 +144,9 @@ public class PostsListFragment extends Fragment {
                         listPosts = response.body().getArrayUserPosts();
                         initializeRecyclerView();
                     } else {
-                        Toast.makeText(getActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
+                        //TODO nel caso in cui non sia possibile accedere a internet usare response.code
+                        // e response.message causa il crash dell'applicazione
+                        //Toast.makeText(getActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                     }
                 }
 

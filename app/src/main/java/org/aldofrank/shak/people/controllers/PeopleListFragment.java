@@ -29,8 +29,10 @@ public class PeopleListFragment extends Fragment {
     private List<User> listUsers;
 
     private static User user;
+    private static String type;
+    private static PeopleListAdapter adapter;
 
-    private View view;
+    private static View view;
 
     @SuppressLint("StaticFieldLeak")
     private static PeopleListFragment peopleListFragment;
@@ -87,6 +89,35 @@ public class PeopleListFragment extends Fragment {
         return fragment;
     }
 
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @return A new instance of fragment PostsListFragment.
+     */
+    public static PeopleListFragment newInstance(User user) {
+        PeopleListFragment fragment = new PeopleListFragment();
+
+        PeopleListFragment.user = user;
+
+        return fragment;
+    }
+
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @return A new instance of fragment PostsListFragment.
+     */
+    public static PeopleListFragment newInstance(User user, String type) {
+        PeopleListFragment fragment = new PeopleListFragment();
+
+        PeopleListFragment.user = user;
+        PeopleListFragment.type = type;
+
+        return fragment;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,7 +126,6 @@ public class PeopleListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        //return inflater.inflate(R.layout.fragment_people, container, false);
         view = inflater.inflate(R.layout.fragment_people, container, false);
 
         getAllUsers();
@@ -110,7 +140,6 @@ public class PeopleListFragment extends Fragment {
      * Viene mandata una richiesta http per recuperati i dal server.
      */
     public void getAllUsers() {
-        // TODO RESO getToken da protetto a pubblico per via del diverso package che contiene PeopleFragment
         UsersService usersService = ServiceGenerator.createService(UsersService.class, LoggedUserActivity.getToken());
         Call<GetAllUsersResponse> httpRequest = usersService.getAllUsers();
 
@@ -137,11 +166,10 @@ public class PeopleListFragment extends Fragment {
      * Viene collegata la recycler view con l'adapter
      */
     private void initializeRecyclerView() {
-        RecyclerView recyclerView = view.findViewById(R.id.list_users);
-        PeopleListAdapter adapter = new PeopleListAdapter(this.listUsers);
+        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.list_users);
+        PeopleListFragment.adapter = new PeopleListAdapter(this.listUsers);
 
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 }
-

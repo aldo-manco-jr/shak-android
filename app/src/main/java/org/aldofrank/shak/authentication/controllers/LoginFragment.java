@@ -84,6 +84,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
                     Intent intentLoggedUser = new Intent(getActivity(), LoggedUserActivity.class);
                     intentLoggedUser.putExtra("authToken", token);
                     intentLoggedUser.putExtra("username", response.body().getUserFound().getUsername());
+                    intentLoggedUser.putExtra("_id", response.body().getUserFound().getId());
                     intentLoggedUser.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intentLoggedUser);
                     ActivityCompat.finishAffinity(getActivity());

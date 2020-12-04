@@ -1,16 +1,15 @@
 package org.aldofrank.shak.models;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
 
-import org.aldofrank.shak.models.Post;
-
-import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class User {
+
+    @SerializedName("_id")
+    private String _id;
 
     @SerializedName("email")
     private String email;
@@ -102,23 +101,33 @@ public class User {
         return country;
     }
 
+    public String getId() {
+        return _id;
+    }
+
     public class Following{
 
-        @SerializedName("userFollowed")
-        private JsonElement followingId;
+        @SerializedName("_id")
+        private Object id;
 
-        public String getFollowingId() {
-            return followingId.getAsString();
+        @SerializedName("userFollowed")
+        private Object followingId;
+
+        // TODO QUESTO GENERA UN ERRORE NON è USERFOLLOWED
+        public Object getFollowingId() {
+            return followingId;
         }
     }
 
     public class Follower{
-
         @SerializedName("follower")
+        //JsonObject non funziona
+        //TODO il dato offerto dal server è un JsonElement, ma in realtà è un JsonObject
         private JsonElement followerId;
 
-        public String getFollowerId() {
-            return followerId.getAsString();
+        public JsonArray getFollowerId() {
+            return followerId.getAsJsonObject().get("followers").getAsJsonArray();
+            //return followerId.getAsJsonObject().get("followers").getAsJsonArray().get(0).getAsJsonArray();
         }
     }
 

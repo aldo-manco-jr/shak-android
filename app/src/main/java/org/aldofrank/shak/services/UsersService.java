@@ -3,7 +3,7 @@ package org.aldofrank.shak.services;
 import org.aldofrank.shak.people.http.GetAllUsersResponse;
 import org.aldofrank.shak.people.http.GetUserByIdResponse;
 import org.aldofrank.shak.people.http.GetUserByUsernameResponse;
-import org.aldofrank.shak.settings.http.ChangePasswordRequest;
+import org.aldofrank.shak.settings.http.FollowOrUnfollowRequest;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -23,17 +23,11 @@ public interface UsersService {
     Call<GetUserByIdResponse> getUserById(@Path("id") String username);
 
     @POST("follow-user")
-    Call<Object> followUser(@Body String followedUserId);
+    Call<Object> followUser(@Body FollowOrUnfollowRequest followedUserId);
 
     @POST("unfollow-user")
-    Call<Object> unfollowUser(@Body String unfollowedUserId);
+    Call<Object> unfollowUser(@Body FollowOrUnfollowRequest followedUserId);
 
     @POST("user/view-profile")
     Call<Object> addViewProfileNotification(@Body String userId);
-
-    /*se il parametro varia occorre usare @Path, se invece non varia perchè è generale usare @body,
-     se il dato varia occorre usare nomeparametro/{...}
-    @GET("username/{username}")
-    Call<GetUserByUsernameResponse> getUserByUsername(@Path("username") String username);
-     */
 }

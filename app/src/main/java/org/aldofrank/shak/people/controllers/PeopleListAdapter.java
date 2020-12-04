@@ -15,11 +15,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.Target;
 import com.github.nkzawa.emitter.Emitter;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 
 import org.aldofrank.shak.R;
 import org.aldofrank.shak.models.User;
 import org.aldofrank.shak.services.ServiceGenerator;
 import org.aldofrank.shak.services.UsersService;
+import org.aldofrank.shak.settings.http.FollowOrUnfollowRequest;
 import org.aldofrank.shak.streams.controllers.LoggedUserActivity;
 
 import java.util.List;
@@ -39,6 +42,14 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
     private final String basicUrlImage = "http://res.cloudinary.com/dfn8llckr/image/upload/v";
 
     public PeopleListAdapter(List<User> listUsers) {
+        for (User user: listUsers){
+            if (user.getId().equals(LoggedUserActivity.getIdLoggedUser())){
+                // se l'utente nella lista era l'utente che aveva effettuato il login lo rimuove
+                listUsers.remove(user);
+                break;
+            }
+        }
+
         this.listUsers = listUsers;
 
         LoggedUserActivity.getSocket().on("refreshPage", updateUsersList);
@@ -56,7 +67,7 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
 
                     @Override
                     public void run() {
-                        // quando un post viene pubblicato la socket avvisa del necessario aggiornmento
+                        // quando un follow viene aggiunto/rimosso la socket avvisa del necessario aggiornmento
                         PeopleListFragment.getPeopleListFragment().getAllUsers();
                     }
                 });
@@ -81,8 +92,12 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
     @Override
     public void onBindViewHolder(@NonNull final UserItemHolder holder, final int position) {
         final User user = listUsers.get(position);
-        //final User user = post.getUserId();
 
+       /* if (user.getId().equals(LoggedUserActivity.getIdLoggedUser())) {
+            // se l'utente da mostrare è l'utente loggato
+            listUsers.remove(holder.getAdapterPosition());
+        }
+*/
         String urlImageProfileUser = this.basicUrlImage + user.getProfileImageVersion() + "/"
                 + user.getProfileImageId();
 
@@ -111,17 +126,17 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
             holder.imageProfile.setVisibility(View.GONE);
         }
 
-        holder.followButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                followOrUnfollow(listUsers.get(position), holder);
-            }
-        });
+        if (isFollow(user)) {
+            //l'utente selezionato è già follow dell'utente
+            holder.followButton.setText("Unfollow");
+        } else {
+            holder.followButton.setText("Follow");
+        }
 
         holder.followButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //TODO MANCA UN'AZIONE per followbutton
+                followOrUnfollow(listUsers.get(position), holder);
             }
         });
     }
@@ -138,44 +153,58 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
     private void followOrUnfollow(User user, final UserItemHolder holder) {
         UsersService usersService = ServiceGenerator.createService(UsersService.class, LoggedUserActivity.getToken());
 
-        //if (!isFollow(user)) {
-            Call<Object> httpRequest = usersService.followUser(user.getUsername());
+        Call<Object> httpRequest;
 
-            httpRequest.enqueue(new Callback<Object>() {
-                @Override
-                public void onResponse(Call<Object> call, Response<Object> response) {
-                    if (response.isSuccessful()) {
-                        Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), "refresh", Toast.LENGTH_LONG).show();
-                    } else {
-                        Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
-                    }
-                }
+        if (isFollow(user)) {
+            // l'utente che ha effettuato l'accesso è un follower dell'utente considerato
+            httpRequest = usersService.unfollowUser(new FollowOrUnfollowRequest(user.getId()));
+        } else {
+            httpRequest = usersService.followUser(new FollowOrUnfollowRequest(user.getId()));
+        }
 
-                @Override
-                public void onFailure(Call<Object> call, Throwable t) {
-                    Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
+        httpRequest.enqueue(new Callback<Object>() {
+            @Override
+            public void onResponse(Call<Object> call, Response<Object> response) {
+                if (response.isSuccessful()) {
+                    LoggedUserActivity.getSocket().emit("refresh");
+                } else {
+                    Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + "   " + response.message(), Toast.LENGTH_LONG).show();
                 }
-            });
-        /*} else {
-            Call<Object> httpRequest = streamsService.unlikePost(post);
+            }
 
-            httpRequest.enqueue(new Callback<Object>() {
-                @Override
-                public void onResponse(Call<Object> call, Response<Object> response) {
-                    if (response.isSuccessful()) {
-                        holder.likeButton.setImageResource(R.drawable.ic_favorite_border_black_24dp);
-                        LoggedUserActivity.getSocket().emit("refresh");
-                    } else {
-                        Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
-                    }
-                }
+            @Override
+            public void onFailure(Call<Object> call, Throwable t) {
+                Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
 
-                @Override
-                public void onFailure(Call<Object> call, Throwable t) {
-                    Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
+    /**
+     * @param user un user generico in input
+     *
+     * @return true se l'utente selezionato è un follower, false altrimenti
+     */
+    private boolean isFollow(User user) {
+        String loggedUserId = LoggedUserActivity.getIdLoggedUser();
+
+        boolean isEmptyArray = user.getArrayFollowers().isEmpty();
+
+        if (!isEmptyArray) {
+            // esistono dei followers
+            JsonArray userFollowersArray = user.getArrayFollowers().get(0).getFollowerId();
+
+            for (JsonElement userFollowerElement : userFollowersArray) {
+                // esiste un utente che è
+                String userFollower = userFollowerElement.getAsJsonObject().get("follower").getAsString();
+                boolean isLoggedUserFollower = userFollower.equals(loggedUserId);
+
+                if (isLoggedUserFollower) {
+                    return true;
                 }
-            });
-        }*/
+            }
+        }
+
+        return false;
     }
 
     public class UserItemHolder extends RecyclerView.ViewHolder {

@@ -65,7 +65,12 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
                         // quando un post viene pubblicato la socket avvisa del necessario aggiornmento
                         HomeFragment.getHomeFragment().getStreamsFragment().getAllPosts();
                         HomeFragment.getHomeFragment().getFavouritesFragment().getAllPosts();
-                        ProfileFragment.getProfileFragment().getProfilePostsFragment(type).getAllPosts();
+                        // TODO QUESTA MODIFICA IMPEDISCE IL CRASH DEL PROGRAMMA NEL CASO IN CUI
+                        //  LO SMARTPHONE NON SIA CONNESSO
+                        ProfileFragment profileFragment = ProfileFragment.getProfileFragment();
+                        if (profileFragment != null) {
+                            profileFragment.getProfilePostsFragment(type).getAllPosts();
+                        }
                     }
                 });
             }

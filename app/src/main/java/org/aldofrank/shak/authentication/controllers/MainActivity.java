@@ -34,6 +34,7 @@ public class MainActivity extends Activity {
         } else {
             try {
                 String username = JWTUtils.decodeUsernameLoggedUser(token).getString("username");
+                String id = JWTUtils.decodeUsernameLoggedUser(token).getString("_id");
                 long expirationDate = JWTUtils.decodeUsernameLoggedUser(token).getLong("expirationDate");
 
                 long currentTimeMillis = System.currentTimeMillis();
@@ -43,6 +44,7 @@ public class MainActivity extends Activity {
                     intentFirstActivity = new Intent(this, LoggedUserActivity.class);
                     intentFirstActivity.putExtra("authToken", token);
                     intentFirstActivity.putExtra("username", username);
+                    intentFirstActivity.putExtra("_id", id);
                 } else {
                     // token scaduto, occorre effettuare nuovamente il login
                     intentFirstActivity = new Intent(this, AccessActivity.class);

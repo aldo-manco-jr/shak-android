@@ -32,6 +32,7 @@ public class LoggedUserActivity extends AppCompatActivity {
 
     private static String token;
     private static String usernameLoggedUser;
+    private static String idLoggedUser;
 
     private Fragment homeFragment;
     private Fragment profileFragment;
@@ -75,6 +76,7 @@ public class LoggedUserActivity extends AppCompatActivity {
         try {
             token = getIntent().getExtras().getString("authToken");
             usernameLoggedUser = getIntent().getExtras().getString("username");
+            idLoggedUser = getIntent().getExtras().getString("_id");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -141,6 +143,10 @@ public class LoggedUserActivity extends AppCompatActivity {
 
     public static String getUsernameLoggedUser(){
         return LoggedUserActivity.usernameLoggedUser;
+    }
+
+    public static String getIdLoggedUser(){
+        return LoggedUserActivity.idLoggedUser;
     }
 
     @Override

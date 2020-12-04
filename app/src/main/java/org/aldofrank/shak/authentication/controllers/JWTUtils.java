@@ -2,12 +2,10 @@ package org.aldofrank.shak.authentication.controllers;
 
 import android.util.Base64;
 import android.util.Log;
-import android.widget.Toast;
 
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 
 public class JWTUtils {
 
@@ -34,8 +32,8 @@ public class JWTUtils {
 
             tokenDataJson = new JSONObject();
             tokenDataJson.put("username", jsonUserData.getString("username"));
+            tokenDataJson.put("_id", jsonUserData.getString("_id"));
             tokenDataJson.put("expirationDate", json.getLong("exp"));
-
         } catch (UnsupportedEncodingException e) {
             //Error
         }
