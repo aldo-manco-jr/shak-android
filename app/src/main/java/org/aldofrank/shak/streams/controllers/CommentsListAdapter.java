@@ -21,6 +21,7 @@ import org.aldofrank.shak.R;
 import org.aldofrank.shak.models.Post;
 import org.aldofrank.shak.models.User;
 import org.aldofrank.shak.people.http.GetUserByUsernameResponse;
+import org.aldofrank.shak.profile.controllers.ProfileFragment;
 import org.aldofrank.shak.services.ServiceGenerator;
 import org.aldofrank.shak.services.StreamsService;
 import org.aldofrank.shak.streams.http.DeleteCommentRequest;
@@ -43,12 +44,15 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
 
     public static String postId;
 
+    private String type;
+
     private final String basicUrlImage = "http://res.cloudinary.com/dfn8llckr/image/upload/v";
 
     private User user;
 
-    public CommentsListAdapter(List<Post.Comment> listComments) {
+    public CommentsListAdapter(List<Post.Comment> listComments, String type) {
         this.listComments = listComments;
+        this.type = type;
 
         LoggedUserActivity.getSocket().on("refreshPage", updatePostCommentsList);
     }
@@ -66,7 +70,11 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
                     @Override
                     public void run() {
                         // quando un post viene pubblicato la socket avvisa del necessario aggiornmento
-                        HomeFragment.getHomeFragment().getCommentsListFragment().getAllPostComments();
+                        if (type.equals("home")){
+                            HomeFragment.getHomeFragment().getCommentsListFragment().getAllPostComments();
+                        }else if (type.equals("profile")){
+                            ProfileFragment.getProfileFragment().getCommentsListFragment().getAllPostComments();
+                        }
                     }
                 });
             }

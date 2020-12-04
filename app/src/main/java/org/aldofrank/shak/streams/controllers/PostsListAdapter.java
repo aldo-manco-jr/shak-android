@@ -16,6 +16,7 @@ import com.bumptech.glide.Glide;
 import org.aldofrank.shak.R;
 import org.aldofrank.shak.models.Post;
 import org.aldofrank.shak.models.User;
+import org.aldofrank.shak.profile.controllers.ProfileFragment;
 import org.aldofrank.shak.services.ServiceGenerator;
 import org.aldofrank.shak.services.StreamsService;
 import org.ocpsoft.prettytime.PrettyTime;
@@ -38,11 +39,13 @@ import com.github.nkzawa.emitter.Emitter;
 public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.PostItemHolder> {
 
     private List<Post> listPosts;
+    private String type;
 
     private final String basicUrlImage = "http://res.cloudinary.com/dfn8llckr/image/upload/v";
 
-    public PostsListAdapter(List<Post> listPosts) {
+    public PostsListAdapter(List<Post> listPosts, String type) {
         this.listPosts = listPosts;
+        this.type = type;
 
         LoggedUserActivity.getSocket().on("refreshPage", updatePostsList);
     }
@@ -62,6 +65,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
                         // quando un post viene pubblicato la socket avvisa del necessario aggiornmento
                         HomeFragment.getHomeFragment().getStreamsFragment().getAllPosts();
                         HomeFragment.getHomeFragment().getFavouritesFragment().getAllPosts();
+                        ProfileFragment.getProfileFragment().getProfilePostsFragment(type).getAllPosts();
                     }
                 });
             }
@@ -98,13 +102,14 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
 
         holder.usernameText.setText(listPosts.get(position).getUsernamePublisher());
 
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" );
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         Date date = new Date();
 
         try {
             date = formatter.parse(listPosts.get(position).getCreatedAt());
-            date.setTime(date.getTime()+3_600_000);
-        }catch (Exception ignored){}
+            date.setTime(date.getTime() + 3_600_000);
+        } catch (Exception ignored) {
+        }
 
         PrettyTime formattedDateTime = new PrettyTime();
         holder.datePostText.setText(formattedDateTime.format(date));
@@ -143,8 +148,13 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
             @Override
             public void onClick(View view) {
 
-                HomeFragment.getHomeFragment().getFragmentManager().beginTransaction()
-                        .replace(R.id.home_fragment, HomeFragment.getHomeFragment().getCommentsListFragment(listPosts.get(position))).commit();
+                if (type.equals("all") || type.equals("favourites")) {
+                    HomeFragment.getHomeFragment().getFragmentManager().beginTransaction()
+                            .replace(R.id.home_fragment, HomeFragment.getHomeFragment().getCommentsListFragment(listPosts.get(position))).commit();
+                } else if (type.equals("profile")) {
+                    ProfileFragment.getProfileFragment().getFragmentManager().beginTransaction()
+                            .replace(R.id.profile_fragment, ProfileFragment.getProfileFragment().getCommentsListFragment(listPosts.get(position))).commit();
+                }
             }
         });
 

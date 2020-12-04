@@ -35,7 +35,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
     private PostsListFragment streamsFragment;
     private PostsListFragment favouritesFragment;
-
     private PostFormFragment postFormFragment;
 
     private CommentsListFragment commentsListFragment;
@@ -131,30 +130,17 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     }
 
     public CommentsListFragment getCommentsListFragment(Post post) {
-        this.commentsListFragment = CommentsListFragment.newInstance(post);
+        this.commentsListFragment = CommentsListFragment.newInstance("home", post);
         return commentsListFragment;
     }
 
     public CommentFormFragment getCommentFormFragment() {
 
         if (this.commentFormFragment == null) {
-            this.commentFormFragment = new CommentFormFragment();
+            this.commentFormFragment = CommentFormFragment.newInstance("home");
         }
 
         return commentFormFragment;
-    }
-
-    public PeopleListFragment getPeopleListFragment() {
-        return peopleListFragment;
-    }
-
-    public PeopleListFragment getPeopleListFragment(User user) {
-
-        if (this.peopleListFragment == null) {
-            this.peopleListFragment = new PeopleListFragment().newInstance(user);
-        }
-
-        return peopleListFragment;
     }
 
     private class ViewPagerAdapter extends FragmentPagerAdapter {

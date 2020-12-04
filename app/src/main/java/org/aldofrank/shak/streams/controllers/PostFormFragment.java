@@ -95,28 +95,30 @@ public class PostFormFragment extends Fragment implements View.OnClickListener {
         buttonUploadImagePost.setOnClickListener(this);
         buttonDeleteImagePost.setOnClickListener(this);
 
-        postContentField.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if (charSequence.toString().isEmpty()){
-                    // quando il campo di testo del post è vuoto
-                    buttonSubmitPost.setVisibility(View.GONE);
-                }else {
-                    buttonSubmitPost.setVisibility(View.VISIBLE);
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-            }
-        });
+        postContentField.addTextChangedListener(checkPostContent);
 
         return postFormFragmentView;
     }
+
+    TextWatcher checkPostContent = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            if (charSequence.toString().isEmpty()){
+                // quando il campo di testo del post è vuoto
+                buttonSubmitPost.setVisibility(View.GONE);
+            }else {
+                buttonSubmitPost.setVisibility(View.VISIBLE);
+            }
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+        }
+    };
 
     /**
      * Consente la pubblicazione di un post ad un'utente autenticato.

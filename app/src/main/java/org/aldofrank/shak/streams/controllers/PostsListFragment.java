@@ -15,6 +15,7 @@ import org.aldofrank.shak.R;
 import org.aldofrank.shak.models.Post;
 import org.aldofrank.shak.services.ServiceGenerator;
 import org.aldofrank.shak.services.StreamsService;
+import org.aldofrank.shak.streams.http.GetAllUserPostsResponse;
 import org.aldofrank.shak.streams.http.GetPostsListResponse;
 
 import java.util.ArrayList;
@@ -31,9 +32,12 @@ public class PostsListFragment extends Fragment {
 
     private List<Post> listPosts;
 
+    private String type;
+
     private View view;
 
-    public PostsListFragment() { }
+    public PostsListFragment() {
+    }
 
     /**
      * Use this factory method to create a new instance of
@@ -88,8 +92,8 @@ public class PostsListFragment extends Fragment {
 
     /**
      * Consente di recuperare tutti i post:
-     *  - streams: lista dei post dell'utente e dei suoi following
-     *  - favorites: sono i post a cui l'utente ha espresso la preferenza
+     * - streams: lista dei post dell'utente e dei suoi following
+     * - favorites: sono i post a cui l'utente ha espresso la preferenza
      * Viene mandata una richiesta http per recuperati i dal server.
      */
     public void getAllPosts() {
@@ -97,45 +101,61 @@ public class PostsListFragment extends Fragment {
             return;
         }
 
-        final String type = getArguments().getString("type");
+        this.type = getArguments().getString("type");
         final String username = getArguments().getString("username");
         StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
-        Call<GetPostsListResponse> httpRequest = streamsService.getAllPosts();
 
-        httpRequest.enqueue(new Callback<GetPostsListResponse>() {
-            @Override
-            public void onResponse(Call<GetPostsListResponse> call, Response<GetPostsListResponse> response) {
-                if (response.isSuccessful()) {
-                    assert response.body() != null : "body() non doveva essere null";
+        if (type.equals("all") || type.equals("favourites")) {
 
-                    if (type.equals("all")) {
-                        listPosts = response.body().getArrayPosts();
-                    } else if (type.equals("favourites")) {
-                        listPosts = response.body().getFavouritePosts();
-                    } else if (type.equals("profile") && !username.isEmpty()){
+            Call<GetPostsListResponse> httpRequest = streamsService.getAllPosts();
 
-                        listPosts = new ArrayList<>();
+            httpRequest.enqueue(new Callback<GetPostsListResponse>() {
+                @Override
+                public void onResponse(Call<GetPostsListResponse> call, Response<GetPostsListResponse> response) {
+                    if (response.isSuccessful()) {
+                        assert response.body() != null : "body() non doveva essere null";
 
-                        List<Post> copy = response.body().getArrayPosts();
-
-                        for (Post post : copy) {
-                            if (post.getUsernamePublisher().equals(username)){
-                                listPosts.add(post);
-                            }
+                        if (type.equals("all")) {
+                            listPosts = response.body().getArrayPosts();
+                        } else if (type.equals("favourites")) {
+                            listPosts = response.body().getFavouritePosts();
                         }
+
+                        initializeRecyclerView();
+                    } else {
+                        Toast.makeText(getActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                     }
-
-                    initializeRecyclerView();
-                } else {
-                    Toast.makeText(getActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                 }
-            }
 
-            @Override
-            public void onFailure(Call<GetPostsListResponse> call, Throwable t) {
-                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        });
+                @Override
+                public void onFailure(Call<GetPostsListResponse> call, Throwable t) {
+                    Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            });
+
+        } else if (type.equals("profile") && !username.isEmpty()) {
+
+            Call<GetAllUserPostsResponse> httpRequest = streamsService.getAllUserPosts(username);
+
+            httpRequest.enqueue(new Callback<GetAllUserPostsResponse>() {
+                @Override
+                public void onResponse(Call<GetAllUserPostsResponse> call, Response<GetAllUserPostsResponse> response) {
+                    if (response.isSuccessful()) {
+                        assert response.body() != null : "body() non doveva essere null";
+
+                        listPosts = response.body().getArrayUserPosts();
+                        initializeRecyclerView();
+                    } else {
+                        Toast.makeText(getActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<GetAllUserPostsResponse> call, Throwable t) {
+                    Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            });
+        }
     }
 
     /**
@@ -143,7 +163,7 @@ public class PostsListFragment extends Fragment {
      */
     private void initializeRecyclerView() {
         RecyclerView recyclerView = view.findViewById(R.id.listPosts);
-        PostsListAdapter adapter = new PostsListAdapter(this.listPosts);
+        PostsListAdapter adapter = new PostsListAdapter(this.listPosts, this.type);
 
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));

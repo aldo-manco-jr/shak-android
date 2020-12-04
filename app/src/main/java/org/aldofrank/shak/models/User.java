@@ -86,6 +86,14 @@ public class User {
         return profileImageVersion;
     }
 
+    public String getCoverImageId() {
+        return coverImageId;
+    }
+
+    public String getCoverImageVersion() {
+        return coverImageVersion;
+    }
+
     public String getCity() {
         return city;
     }

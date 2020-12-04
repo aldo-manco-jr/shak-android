@@ -60,21 +60,6 @@ public class PeopleListFragment extends Fragment {
      *
      * @return A new instance of fragment PostsListFragment.
      */
-    public static PeopleListFragment newInstance(User user) {
-
-        PeopleListFragment fragment = new PeopleListFragment();
-
-        PeopleListFragment.user = user;
-
-        return fragment;
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @return A new instance of fragment PostsListFragment.
-     */
     public static PeopleListFragment newInstance(String type) {
         PeopleListFragment fragment = new PeopleListFragment();
 

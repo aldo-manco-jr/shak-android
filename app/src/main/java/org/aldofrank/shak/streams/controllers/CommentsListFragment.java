@@ -15,6 +15,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.aldofrank.shak.R;
 import org.aldofrank.shak.models.Post;
+import org.aldofrank.shak.profile.controllers.ProfileFragment;
 import org.aldofrank.shak.services.ServiceGenerator;
 import org.aldofrank.shak.services.StreamsService;
 import org.aldofrank.shak.streams.http.GetPostResponse;
@@ -44,9 +45,13 @@ public class CommentsListFragment extends Fragment {
      *
      * @return A new instance of fragment PostsListFragment.
      */
-    public static CommentsListFragment newInstance(Post post) {
+    public static CommentsListFragment newInstance(String type, Post post) {
 
         CommentsListFragment fragment = new CommentsListFragment();
+
+        Bundle args = new Bundle();
+        args.putString("type", type);
+        fragment.setArguments(args);
 
         CommentsListFragment.post = post;
 
@@ -73,7 +78,11 @@ public class CommentsListFragment extends Fragment {
         buttonAddComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                HomeFragment.getHomeFragment().getFragmentManager().beginTransaction().replace(R.id.home_fragment, HomeFragment.getHomeFragment().getCommentFormFragment()).addToBackStack("openCommentFormFragment").commit();
+                if (getArguments().getString("type").equals("home")){
+                    HomeFragment.getHomeFragment().getFragmentManager().beginTransaction().replace(R.id.home_fragment, HomeFragment.getHomeFragment().getCommentFormFragment()).addToBackStack("openCommentFormFragment").commit();
+                }else if (getArguments().getString("type").equals("profile")){
+                    ProfileFragment.getProfileFragment().getFragmentManager().beginTransaction().replace(R.id.profile_fragment, ProfileFragment.getProfileFragment().getCommentFormFragment()).commit();
+                }
             }
         });
 
@@ -81,16 +90,6 @@ public class CommentsListFragment extends Fragment {
 
         return view;
     }
-
-    /*public void getAllPostComments() {
-        if (post == null) {
-            return;
-        }
-
-        listPostComments = post.getArrayComments();
-        CommentsListAdapter.postId = post.getPostId();
-        initializeRecyclerView();
-    }*/
 
     public void getAllPostComments() {
 
@@ -129,7 +128,7 @@ public class CommentsListFragment extends Fragment {
      */
     private void initializeRecyclerView() {
         RecyclerView recyclerView = view.findViewById(R.id.listComments);
-        CommentsListAdapter adapter = new CommentsListAdapter(this.listPostComments);
+        CommentsListAdapter adapter = new CommentsListAdapter(this.listPostComments, getArguments().getString("type"));
 
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));

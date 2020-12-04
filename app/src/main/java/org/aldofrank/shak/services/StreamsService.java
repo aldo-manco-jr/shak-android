@@ -6,6 +6,7 @@ import org.aldofrank.shak.models.Post;
 import org.aldofrank.shak.people.http.GetUserByUsernameResponse;
 import org.aldofrank.shak.streams.http.AddCommentRequest;
 import org.aldofrank.shak.streams.http.DeleteCommentRequest;
+import org.aldofrank.shak.streams.http.GetAllUserPostsResponse;
 import org.aldofrank.shak.streams.http.GetPostResponse;
 import org.aldofrank.shak.streams.http.GetPostsListResponse;
 
@@ -19,6 +20,9 @@ public interface StreamsService {
 
     @GET("posts")
     Call<GetPostsListResponse> getAllPosts();
+
+    @GET("posts/{username}")
+    Call<GetAllUserPostsResponse> getAllUserPosts(@Path("username") String username);
 
     @GET("post/{id}")
     Call<GetPostResponse> getPost(@Path("id") String postId);

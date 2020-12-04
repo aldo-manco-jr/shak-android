@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.text.method.PasswordTransformationMethod;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -123,6 +125,9 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
         usernameField.setOnFocusChangeListener(focusListener);
         passwordField.setOnFocusChangeListener(focusListener);
 
+        usernameField.addTextChangedListener(checkLoginForm);
+        passwordField.addTextChangedListener(checkLoginForm);
+
         loginButton.setOnClickListener(this);
         passwordField.setOnTouchListener(this);
 
@@ -130,6 +135,25 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
 
         return loginFragmentView;
     }
+
+    TextWatcher checkLoginForm = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            if (charSequence.toString().isEmpty()){
+                loginButton.setVisibility(View.GONE);
+            }else {
+                loginButton.setVisibility(View.VISIBLE);
+            }
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+        }
+    };
 
     /**
      * Gestisce la visibilità dei messaggi di errore
@@ -143,14 +167,18 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
                 if (v.getTag() == "username") {
                     if (inputTextLength < 4 || inputTextLength > 16) {
                         usernameAlert.setVisibility(View.VISIBLE);
+                        loginButton.setEnabled(false);
                     } else {
                         usernameAlert.setVisibility(View.GONE);
+                        loginButton.setEnabled(true);
                     }
                 } else if (v.getTag() == "password") {
                     if (inputTextLength < 8 || inputTextLength > 64) {
                         passwordAlert.setVisibility(View.VISIBLE);
+                        loginButton.setEnabled(false);
                     } else {
                         passwordAlert.setVisibility(View.GONE);
+                        loginButton.setEnabled(true);
                     }
                 }
             }

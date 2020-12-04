@@ -29,6 +29,8 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.JsonObject;
 
 import org.aldofrank.shak.R;
+import org.aldofrank.shak.models.Post;
+import org.aldofrank.shak.profile.controllers.ProfileFragment;
 import org.aldofrank.shak.services.ServiceGenerator;
 import org.aldofrank.shak.services.StreamsService;
 import org.aldofrank.shak.streams.http.AddCommentRequest;
@@ -72,27 +74,41 @@ public class CommentFormFragment extends Fragment implements View.OnClickListene
         buttonSubmitComment.setOnClickListener(this);
         buttonCloseCommentForm.setOnClickListener(this);
 
-        commentContentField.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if (charSequence.toString().isEmpty()){
-                    // quando il campo di testo del post è vuoto
-                    buttonSubmitComment.setVisibility(View.GONE);
-                }else {
-                    buttonSubmitComment.setVisibility(View.VISIBLE);
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-            }
-        });
+        commentContentField.addTextChangedListener(checkCommentContent);
 
         return postFormFragmentView;
+    }
+
+    TextWatcher checkCommentContent = new TextWatcher() {
+
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            if (charSequence.toString().isEmpty()){
+                // quando il campo di testo del post è vuoto
+                buttonSubmitComment.setVisibility(View.GONE);
+            }else {
+                buttonSubmitComment.setVisibility(View.VISIBLE);
+            }
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+        }
+    };
+
+    public static CommentFormFragment newInstance(String type) {
+
+        CommentFormFragment fragment = new CommentFormFragment();
+
+        Bundle args = new Bundle();
+        args.putString("type", type);
+        fragment.setArguments(args);
+
+        return fragment;
     }
 
     private void submitComment(){
@@ -114,7 +130,7 @@ public class CommentFormFragment extends Fragment implements View.OnClickListene
                             .setAction("Action", null).show();
 
                     // il fragment chiude se stesso
-                    closeComment();
+                    closeCommentBox();
 
                     LoggedUserActivity.getSocket().emit("refresh");
                 } else {
@@ -132,8 +148,14 @@ public class CommentFormFragment extends Fragment implements View.OnClickListene
     /**
      * Il post viene chiuso e le informazioni scritte dall'utente vengono cancellate
      */
-    private void closeComment(){
-        getFragmentManager().beginTransaction().replace(R.id.home_fragment, HomeFragment.getHomeFragment().getCommentsListFragment()).addToBackStack("backCommentsListFragment").commit();
+    private void closeCommentBox(){
+
+        if (getArguments().getString("type").equals("home")){
+            getFragmentManager().beginTransaction().replace(R.id.home_fragment, HomeFragment.getHomeFragment().getCommentsListFragment()).addToBackStack("backCommentsListFragment").commit();
+        }else if (getArguments().getString("type").equals("profile")){
+            getFragmentManager().beginTransaction().replace(R.id.profile_fragment, ProfileFragment.getProfileFragment().getCommentsListFragment()).commit();
+        }
+
         commentContentField.setText("");
         getFragmentManager().beginTransaction().remove(HomeFragment.getHomeFragment().getCommentFormFragment()).commitAllowingStateLoss();
     }
@@ -151,7 +173,11 @@ public class CommentFormFragment extends Fragment implements View.OnClickListene
                     @Override
                     public void run() {
                         // quando un post viene pubblicato la socket avvisa del necessario aggiornamento
-                        HomeFragment.getHomeFragment().getCommentsListFragment().getAllPostComments();
+                        if (getArguments().getString("type").equals("home")){
+                            HomeFragment.getHomeFragment().getCommentsListFragment().getAllPostComments();
+                        }else if (getArguments().getString("type").equals("profile")){
+                            ProfileFragment.getProfileFragment().getCommentsListFragment().getAllPostComments();
+                        }
                     }
                 });
             }
@@ -167,7 +193,7 @@ public class CommentFormFragment extends Fragment implements View.OnClickListene
                 submitComment();
                 break;
             case R.id.fab_close_comment_form:
-                closeComment();
+                closeCommentBox();
                 break;
         }
     }
