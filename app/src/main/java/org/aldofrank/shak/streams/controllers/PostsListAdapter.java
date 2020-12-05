@@ -12,6 +12,8 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.Target;
+import com.github.nkzawa.emitter.Emitter;
 
 import org.aldofrank.shak.R;
 import org.aldofrank.shak.models.Post;
@@ -21,17 +23,17 @@ import org.aldofrank.shak.services.ServiceGenerator;
 import org.aldofrank.shak.services.StreamsService;
 import org.ocpsoft.prettytime.PrettyTime;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
-import com.bumptech.glide.request.target.Target;
-import com.github.nkzawa.emitter.Emitter;
 
 /**
  * Permette il collegamento tra la struttura dell'oggetto e la recycler view che lo deve rappresentare
@@ -105,16 +107,10 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
                 .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
                 .into(holder.imageProfile);
 
-        holder.usernameText.setText(listPosts.get(position).getUsernamePublisher());
-
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-        Date date = new Date();
-
+        Date date = null;
         try {
-            date = formatter.parse(listPosts.get(position).getCreatedAt());
-            date.setTime(date.getTime() + 3_600_000);
-        } catch (Exception ignored) {
-        }
+            date = localTimeToUtc(listPosts.get(position).getCreatedAt());
+        } catch (ParseException ignored) {}
 
         PrettyTime formattedDateTime = new PrettyTime();
         holder.datePostText.setText(formattedDateTime.format(date));
@@ -134,6 +130,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
             holder.imagePost.setVisibility(View.GONE);
         }
 
+        holder.usernameText.setText(post.getUsernamePublisher());
         holder.postContent.setText(post.getPostContent());
 
         if (!isLiked(post)) {
@@ -176,6 +173,25 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
         } else {
             holder.deletePostButton.setVisibility(View.GONE);
         }
+    }
+
+    /**
+     * @param dateString una data in formato UDC contenuta nel database remoto
+     *
+     * @return un valore di tipo Date convertito da UTC (formato atteso dal server) nel fuso orario
+     *         usato dall'utente
+     */
+    private Date localTimeToUtc(String dateString) throws ParseException {
+        TimeZone timeZone = TimeZone.getDefault();
+        String[] timeZoneSplitStrings = timeZone.getID().split("(/)");
+        String CurrentTimeZone = timeZoneSplitStrings[timeZoneSplitStrings.length - 1];
+
+        SimpleDateFormat dateFormat =
+                new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
+        dateFormat.setTimeZone(TimeZone.getTimeZone(CurrentTimeZone));
+        Date correctDateForUserDevice = dateFormat.parse(dateString);
+
+        return correctDateForUserDevice;
     }
 
     @Override
