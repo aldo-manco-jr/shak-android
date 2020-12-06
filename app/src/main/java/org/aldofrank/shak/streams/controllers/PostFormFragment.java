@@ -244,7 +244,6 @@ public class PostFormFragment extends Fragment implements View.OnClickListener {
                 buttonDeleteImagePost.setVisibility(View.VISIBLE);
             }catch (Exception e){
                 e.printStackTrace();
-                Toast.makeText(getActivity(), "prova " + uri.toString(), Toast.LENGTH_LONG).show();
             }
         }
     }

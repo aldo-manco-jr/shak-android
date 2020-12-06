@@ -1,5 +1,6 @@
 package org.aldofrank.shak.people.controllers;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +23,7 @@ import org.aldofrank.shak.R;
 import org.aldofrank.shak.models.User;
 import org.aldofrank.shak.services.ServiceGenerator;
 import org.aldofrank.shak.services.UsersService;
-import org.aldofrank.shak.settings.http.FollowOrUnfollowRequest;
+import org.aldofrank.shak.people.http.FollowOrUnfollowRequest;
 import org.aldofrank.shak.streams.controllers.LoggedUserActivity;
 
 import java.util.List;
@@ -166,6 +167,7 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
             @Override
             public void onResponse(Call<Object> call, Response<Object> response) {
                 if (response.isSuccessful()) {
+                    Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), "wewe", Toast.LENGTH_LONG).show();
                     LoggedUserActivity.getSocket().emit("refresh");
                 } else {
                     Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + "   " + response.message(), Toast.LENGTH_LONG).show();

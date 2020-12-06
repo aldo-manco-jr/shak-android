@@ -63,7 +63,7 @@ public class LoggedUserActivity extends AppCompatActivity {
 
         BottomNavigationView navbarLoggedUser = findViewById(R.id.logged_user_navbar);
         homeFragment =  new HomeFragment();
-        profileFragment = ProfileFragment.newInstance("Iiii");
+        profileFragment = ProfileFragment.newInstance("Aldo");
 
         sharedPreferences = getSharedPreferences(getString(R.string.sharedpreferences_authentication), Context.MODE_PRIVATE);
 

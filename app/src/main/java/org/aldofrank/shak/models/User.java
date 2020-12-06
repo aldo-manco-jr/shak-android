@@ -105,6 +105,14 @@ public class User {
         return _id;
     }
 
+    public List<Notification> getArrayNotifications() {
+        return arrayNotifications;
+    }
+
+    public List<Image> getArrayImages() {
+        return arrayImages;
+    }
+
     public class Following{
 
         @SerializedName("_id")

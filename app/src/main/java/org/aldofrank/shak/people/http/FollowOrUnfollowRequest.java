@@ -1,4 +1,4 @@
-package org.aldofrank.shak.settings.http;
+package org.aldofrank.shak.people.http;
 
 public class FollowOrUnfollowRequest {
     private String userFollowed;

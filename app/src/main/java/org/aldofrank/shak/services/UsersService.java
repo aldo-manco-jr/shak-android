@@ -3,7 +3,8 @@ package org.aldofrank.shak.services;
 import org.aldofrank.shak.people.http.GetAllUsersResponse;
 import org.aldofrank.shak.people.http.GetUserByIdResponse;
 import org.aldofrank.shak.people.http.GetUserByUsernameResponse;
-import org.aldofrank.shak.settings.http.FollowOrUnfollowRequest;
+import org.aldofrank.shak.people.http.SetUserLocationRequest;
+import org.aldofrank.shak.people.http.FollowOrUnfollowRequest;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -27,6 +28,9 @@ public interface UsersService {
 
     @POST("unfollow-user")
     Call<Object> unfollowUser(@Body FollowOrUnfollowRequest followedUserId);
+
+    @POST("user/location")
+    Call<Object> setUserLocation(@Body SetUserLocationRequest setUserLocationRequest);
 
     @POST("user/view-profile")
     Call<Object> addViewProfileNotification(@Body String userId);

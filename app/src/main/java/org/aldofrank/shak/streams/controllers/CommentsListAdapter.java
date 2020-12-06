@@ -24,6 +24,7 @@ import org.aldofrank.shak.people.http.GetUserByUsernameResponse;
 import org.aldofrank.shak.profile.controllers.ProfileFragment;
 import org.aldofrank.shak.services.ServiceGenerator;
 import org.aldofrank.shak.services.StreamsService;
+import org.aldofrank.shak.services.UsersService;
 import org.aldofrank.shak.streams.http.DeleteCommentRequest;
 import org.aldofrank.shak.streams.http.GetPostResponse;
 import org.ocpsoft.prettytime.PrettyTime;
@@ -71,8 +72,10 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
                     public void run() {
                         // quando un post viene pubblicato la socket avvisa del necessario aggiornmento
                         if (type.equals("home")){
+                            Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), "home", Toast.LENGTH_LONG).show();
                             HomeFragment.getHomeFragment().getCommentsListFragment().getAllPostComments();
                         }else if (type.equals("profile")){
+                            Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), "profile", Toast.LENGTH_LONG).show();
                             ProfileFragment.getProfileFragment().getCommentsListFragment().getAllPostComments();
                         }
                     }
@@ -101,11 +104,11 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
 
         final Post.Comment comment = listComments.get(position);
 
-        //getUserByUsername(comment.getUsernamePublisher());
+        getUserByUsername(comment.getUsernamePublisher());
 
-        //String urlImageProfileUser = this.basicUrlImage + user.getProfileImageVersion() + "/" + user.getProfileImageId();
+        /*String urlImageProfileUser = this.basicUrlImage + user.getProfileImageVersion() + "/" + user.getProfileImageId();
 
-        /*Glide.with(activity)
+        Glide.with(LoggedUserActivity.getLoggedUserActivity())
                 .asBitmap()
                 .load(urlImageProfileUser)
                 .into(holder.imageProfile);*/
@@ -144,8 +147,8 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
 
     private void getUserByUsername(final String username){
 
-        StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
-        Call<GetUserByUsernameResponse> httpRequest = streamsService.getUserByUsername(username);
+        UsersService usersService = ServiceGenerator.createService(UsersService.class, LoggedUserActivity.getToken());
+        Call<GetUserByUsernameResponse> httpRequest = usersService.getUserByUsername(username);
 
         httpRequest.enqueue(new Callback<GetUserByUsernameResponse>() {
             @Override

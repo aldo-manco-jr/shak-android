@@ -1,5 +1,6 @@
 package org.aldofrank.shak.streams.controllers;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,7 @@ import com.github.nkzawa.emitter.Emitter;
 import org.aldofrank.shak.R;
 import org.aldofrank.shak.models.Post;
 import org.aldofrank.shak.models.User;
+import org.aldofrank.shak.profile.controllers.ImageViewerActivity;
 import org.aldofrank.shak.profile.controllers.ProfileFragment;
 import org.aldofrank.shak.services.ServiceGenerator;
 import org.aldofrank.shak.services.StreamsService;
@@ -98,7 +100,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
         final Post post = listPosts.get(position);
         final User user = post.getUserId();
 
-        String urlImageProfileUser = this.basicUrlImage + user.getProfileImageVersion() + "/"
+        final String urlImageProfileUser = this.basicUrlImage + user.getProfileImageVersion() + "/"
                 + user.getProfileImageId();
 
         Glide.with(LoggedUserActivity.getLoggedUserActivity())
@@ -120,12 +122,21 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
         }
 
         if (!post.getImageVersion().isEmpty()) {
-            String urlImagePost = this.basicUrlImage + post.getImageVersion() + "/" + post.getImageId();
+            final String urlImagePost = this.basicUrlImage + post.getImageVersion() + "/" + post.getImageId();
 
             Glide.with(LoggedUserActivity.getLoggedUserActivity())
                     .asBitmap()
                     .load(urlImagePost)
                     .into(holder.imagePost);
+
+            holder.imagePost.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(LoggedUserActivity.getLoggedUserActivity(), ImageViewerActivity.class);
+                    intent.putExtra("urlImage", urlImagePost);
+                    LoggedUserActivity.getLoggedUserActivity().startActivity(intent);
+                }
+            });
         } else {
             holder.imagePost.setVisibility(View.GONE);
         }

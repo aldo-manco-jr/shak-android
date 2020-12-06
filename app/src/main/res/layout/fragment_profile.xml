@@ -77,6 +77,26 @@
                 android:text="Isernia, Italy"
                 android:textAlignment="center"
                 android:textSize="18sp"/>
+
+            <Button
+                android:id="@+id/button_set_location"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="SET LOCATION"
+                android:background="@color/colorSHAK"
+                android:gravity="center"
+                android:layout_gravity="center_horizontal"
+                android:visibility="gone"/>
+
+            <Button
+                android:id="@+id/followUser"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="FOLLOW"
+                android:background="@color/colorSHAK"
+                android:gravity="center"
+                android:layout_gravity="center_horizontal" />
+
         </LinearLayout>
 
         <LinearLayout

@@ -1,7 +1,6 @@
 package org.aldofrank.shak.profile.controllers;
 
-import android.content.Context;
-import android.net.Uri;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -20,7 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.github.nkzawa.emitter.Emitter;
 import com.google.android.material.tabs.TabLayout;
 
 import org.aldofrank.shak.R;
@@ -28,14 +27,12 @@ import org.aldofrank.shak.models.Post;
 import org.aldofrank.shak.models.User;
 import org.aldofrank.shak.people.controllers.PeopleListFragment;
 import org.aldofrank.shak.people.http.GetUserByUsernameResponse;
+import org.aldofrank.shak.people.http.SetUserLocationRequest;
 import org.aldofrank.shak.services.ServiceGenerator;
-import org.aldofrank.shak.services.StreamsService;
 import org.aldofrank.shak.services.UsersService;
 import org.aldofrank.shak.streams.controllers.CommentFormFragment;
 import org.aldofrank.shak.streams.controllers.CommentsListFragment;
-import org.aldofrank.shak.streams.controllers.HomeFragment;
 import org.aldofrank.shak.streams.controllers.LoggedUserActivity;
-import org.aldofrank.shak.streams.controllers.PostFormFragment;
 import org.aldofrank.shak.streams.controllers.PostsListFragment;
 
 import java.util.LinkedList;
@@ -46,7 +43,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class ProfileFragment extends Fragment {
+public class ProfileFragment extends Fragment implements View.OnClickListener {
 
     private User user;
 
@@ -57,6 +54,7 @@ public class ProfileFragment extends Fragment {
     private TextView usernameTextView;
     private TextView emailTextView;
     private TextView locationTextView;
+    private Button setLocationButton;
 
     private Button followButton;
 
@@ -74,6 +72,20 @@ public class ProfileFragment extends Fragment {
 
     private static ProfileFragment profileFragment;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        LoggedUserActivity.getSocket().on("refreshPage", updateProfilePage);
+    }
+
+    public Emitter.Listener updateProfilePage = new Emitter.Listener() {
+        @Override
+        public void call(Object... args) {
+            userDataBinding(LoggedUserActivity.getUsernameLoggedUser());
+        }
+    };
+
     @Nullable
     @Override
     public View onCreateView(
@@ -90,8 +102,13 @@ public class ProfileFragment extends Fragment {
         usernameTextView = profileFragmentView.findViewById(R.id.username_profile);
         emailTextView = profileFragmentView.findViewById(R.id.email_profile);
         locationTextView = profileFragmentView.findViewById(R.id.location_profile);
+        setLocationButton = profileFragmentView.findViewById(R.id.button_set_location);
 
         userDataBinding(getArguments().getString("username"));
+
+        emailTextView.setOnClickListener(this);
+        locationTextView.setOnClickListener(this);
+        setLocationButton.setOnClickListener(this);
 
         viewPager = profileFragmentView.findViewById(R.id.view_pager_profile);
         profileTabs = profileFragmentView.findViewById(R.id.profile_tabs);
@@ -99,13 +116,13 @@ public class ProfileFragment extends Fragment {
         getProfilePostsFragment(getArguments().getString("username"));
         //getProfileFollowingFragment(getArguments().getString("username"));
         //getProfileFollowersFragment(getArguments().getString("username"));
-        //getProfileImagesFragment(getArguments().getString("username"));
+        getProfileImagesFragment(getArguments().getString("username"));
 
         ProfileFragment.ViewPagerAdapter viewPagerAdapter = new ProfileFragment.ViewPagerAdapter(getChildFragmentManager(), 0);
         viewPagerAdapter.addFragment(profilePostsFragment, "Streams");
         //viewPagerAdapter.addFragment(profileFollowingFragment, "Following");
         //viewPagerAdapter.addFragment(profileFollowersFragment, "Followers");
-        //viewPagerAdapter.addFragment(profileImagesFragment, "Images");
+        viewPagerAdapter.addFragment(profileImagesFragment, "Images");
         viewPager.setAdapter(viewPagerAdapter);
 
         profileTabs.setupWithViewPager(viewPager);
@@ -113,7 +130,7 @@ public class ProfileFragment extends Fragment {
         profileTabs.getTabAt(0).setIcon(R.drawable.ic_library_books_black_24dp);
         //profileTabs.getTabAt(1).setIcon(R.drawable.ic_group_black_24dp);
         //profileTabs.getTabAt(2).setIcon(R.drawable.ic_baseline_people_outline_white_24);
-        //profileTabs.getTabAt(3).setIcon(R.drawable.ic_baseline_photo_library_white_24);
+        profileTabs.getTabAt(1).setIcon(R.drawable.ic_baseline_photo_library_white_24);
 
         return profileFragmentView;
     }
@@ -132,6 +149,61 @@ public class ProfileFragment extends Fragment {
         profileFragment.setArguments(args);
 
         return profileFragment;
+    }
+
+    @Override
+    public void onClick(View view) {
+
+        switch (view.getId()) {
+            case R.id.button_set_location:
+            case R.id.location_profile:
+                getLocation();
+                break;
+            case R.id.email_profile:
+                Intent intent = new Intent(LoggedUserActivity.getLoggedUserActivity(), SendMailActivity.class);
+                intent.putExtra("email", user.getEmail());
+                intent.putExtra("username", user.getUsername());
+                startActivity(intent);
+        }
+    }
+
+    private void getLocation() {
+        Intent intent = new Intent(LoggedUserActivity.getLoggedUserActivity(), MapsActivity.class);
+        startActivity(intent);
+    }
+
+    public void setUserLocation(final String city, final String country) {
+
+        if (country != null) {
+            UsersService usersService = ServiceGenerator.createService(UsersService.class, LoggedUserActivity.getToken());
+            SetUserLocationRequest setUserLocationRequest = new SetUserLocationRequest(city, country);
+            Call<Object> httpRequest = usersService.setUserLocation(setUserLocationRequest);
+
+            httpRequest.enqueue(new Callback<Object>() {
+                @Override
+                public void onResponse(Call<Object> call, Response<Object> response) {
+                    if (response.isSuccessful()) {
+
+                        if (city == null && country != null) {
+                            locationTextView.setText("@" + country);
+                        } else if (city != null && country != null) {
+                            locationTextView.setText("@" + city + ", " + country);
+                        }
+                        setLocationButton.setVisibility(View.GONE);
+                        locationTextView.setVisibility(View.VISIBLE);
+                        LoggedUserActivity.getSocket().emit("refresh");
+
+                    } else {
+                        Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Object> call, Throwable t) {
+                    Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            });
+        }
     }
 
     public PostsListFragment getProfilePostsFragment(String username) {
@@ -164,7 +236,7 @@ public class ProfileFragment extends Fragment {
     public ImagesListFragment getProfileImagesFragment(String username) {
 
         if (this.profileImagesFragment == null) {
-            this.profileImagesFragment = new ImagesListFragment();
+            this.profileImagesFragment = ImagesListFragment.newInstance(username);
         }
 
         return profileImagesFragment;
@@ -188,7 +260,7 @@ public class ProfileFragment extends Fragment {
         return commentFormFragment;
     }
 
-    private void userDataBinding(String username) {
+    public void userDataBinding(String username) {
 
         UsersService usersService = ServiceGenerator.createService(UsersService.class, LoggedUserActivity.getToken());
         Call<GetUserByUsernameResponse> httpRequest = usersService.getUserByUsername(username);
@@ -197,9 +269,10 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onResponse(Call<GetUserByUsernameResponse> call, Response<GetUserByUsernameResponse> response) {
                 if (response.isSuccessful()) {
+
                     user = response.body().getUserFoundByUsername();
 
-                    String urlImageCoverUser = basicUrlImage + user.getCoverImageVersion() + "/"
+                    final String urlImageCoverUser = basicUrlImage + user.getCoverImageVersion() + "/"
                             + user.getCoverImageId();
 
                     Glide.with(LoggedUserActivity.getLoggedUserActivity())
@@ -207,7 +280,7 @@ public class ProfileFragment extends Fragment {
                             .load(urlImageCoverUser)
                             .into(coverImage);
 
-                    String urlImageProfileUser = basicUrlImage + user.getProfileImageVersion() + "/"
+                    final String urlImageProfileUser = basicUrlImage + user.getProfileImageVersion() + "/"
                             + user.getProfileImageId();
 
                     Glide.with(LoggedUserActivity.getLoggedUserActivity())
@@ -218,11 +291,31 @@ public class ProfileFragment extends Fragment {
                     usernameTextView.setText(user.getUsername());
                     emailTextView.setText(user.getEmail());
 
-                    if (user.getCity()!=null && user.getCountry()!=null){
+                    if (user.getCity() != null && user.getCountry() != null) {
                         locationTextView.setText("@" + user.getCity() + ", " + user.getCountry());
-                    }else {
-                        locationTextView.setText("SET LOCATION");
+                    } else {
+                        locationTextView.setVisibility(View.GONE);
+                        setLocationButton.setVisibility(View.VISIBLE);
                     }
+
+                    profileImage.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Intent intent = new Intent(LoggedUserActivity.getLoggedUserActivity(), ImageViewerActivity.class);
+                            intent.putExtra("urlImage", urlImageProfileUser);
+                            LoggedUserActivity.getLoggedUserActivity().startActivity(intent);
+                        }
+                    });
+
+                    coverImage.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Intent intent = new Intent(LoggedUserActivity.getLoggedUserActivity(), ImageViewerActivity.class);
+                            intent.putExtra("urlImage", urlImageCoverUser);
+                            LoggedUserActivity.getLoggedUserActivity().startActivity(intent);
+                        }
+                    });
+
                 } else {
                     Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                 }
