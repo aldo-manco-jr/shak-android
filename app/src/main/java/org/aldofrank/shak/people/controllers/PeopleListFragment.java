@@ -2,6 +2,7 @@ package org.aldofrank.shak.people.controllers;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,11 +27,11 @@ import retrofit2.Response;
 
 public class PeopleListFragment extends Fragment {
 
-    private List<User> listUsers;
-
+    protected static List<User> listUsers;
     private static User user;
+    protected static User userConnected = null;
     private static String type;
-    private static PeopleListAdapter adapter;
+    private static PeopleListAdapter adapter = null;
 
     private static View view;
 
@@ -52,6 +53,14 @@ public class PeopleListFragment extends Fragment {
         if (peopleListFragment == null){
             peopleListFragment = new PeopleListFragment();
         }
+
+        return peopleListFragment;
+    }
+
+    protected static PeopleListFragment getUserFollowers(User user) {
+        assert peopleListFragment != null;
+
+        peopleListFragment.getAllUsers();
 
         return peopleListFragment;
     }
@@ -151,6 +160,14 @@ public class PeopleListFragment extends Fragment {
 
                     listUsers = response.body().getAllUsers();
 
+                    Log.v("dddddd", listUsers.get(0).getId().toString());
+
+                    if (userConnected == null) {
+                        userConnected = selectUserConnectedFromList(listUsers);
+                    }
+
+                    Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), "AGGIORNO MA NON é PROPOOo", Toast.LENGTH_SHORT).show();
+
                     initializeRecyclerView();
                 }
             }
@@ -162,12 +179,24 @@ public class PeopleListFragment extends Fragment {
         });
     }
 
+    private User selectUserConnectedFromList(List<User> listUsers){
+        for (User user : listUsers) {
+            if (user.getId().equals(LoggedUserActivity.getIdLoggedUser())) {
+                return user;
+            }
+        }
+
+        return null;
+    }
+
     /**
      * Viene collegata la recycler view con l'adapter
      */
     private void initializeRecyclerView() {
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.list_users);
-        PeopleListFragment.adapter = new PeopleListAdapter(this.listUsers);
+        if (adapter == null) {
+            adapter = new PeopleListAdapter(listUsers);
+        }
 
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));

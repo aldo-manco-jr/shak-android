@@ -6,4 +6,6 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="new_post_image_dimension">100dp</dimen>
     <dimen name="edit_text_padding">12dp</dimen>
+    <dimen name="connection_problems">20dp</dimen>
+    <dimen name="try_again_connect_margin_padding">12dp</dimen>
 </resources>

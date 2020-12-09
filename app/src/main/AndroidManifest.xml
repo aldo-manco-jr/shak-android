@@ -30,6 +30,10 @@
         <activity android:name=".profile.controllers.MapsActivity" />
 
         <activity
+            android:name=".authentication.controllers.ConnectionProblems"
+            android:label="@string/title_connection_problems"
+            android:windowSoftInputMode="adjustNothing" />
+        <activity
             android:name=".streams.controllers.LoggedUserActivity"
             android:label="@string/title_activity_logged_user"
             android:windowSoftInputMode="adjustNothing" />
@@ -56,6 +60,7 @@
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 

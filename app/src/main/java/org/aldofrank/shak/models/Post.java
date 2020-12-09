@@ -44,7 +44,7 @@ public class Post {
     @SerializedName("created_at")
     private String createdAt;
 
-    public String getPostId() {
+    public String getPostCreatedAt() {
         return postId.getAsString();
     }
 

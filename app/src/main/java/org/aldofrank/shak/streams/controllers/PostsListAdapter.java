@@ -27,6 +27,7 @@ import org.ocpsoft.prettytime.PrettyTime;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -44,14 +45,18 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
 
     private List<Post> listPosts;
     private String type;
+    private PostsListFragment postsListFragment;
+    private View fragmentView;
 
     private final String basicUrlImage = "http://res.cloudinary.com/dfn8llckr/image/upload/v";
 
-    public PostsListAdapter(List<Post> listPosts, String type) {
+    public PostsListAdapter(List<Post> listPosts, String type, PostsListFragment postsListFragment, View view) {
         this.listPosts = listPosts;
         this.type = type;
+        this.postsListFragment = postsListFragment;
+        this.fragmentView = view;
 
-        LoggedUserActivity.getSocket().on("refreshPage", updatePostsList);
+        //LoggedUserActivity.getSocket().on("refreshPage", updatePostsList);
     }
 
     /**
@@ -66,14 +71,21 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
 
                     @Override
                     public void run() {
+                        Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), "lancia da Adapter", Toast.LENGTH_LONG).show();
                         // quando un post viene pubblicato la socket avvisa del necessario aggiornmento
-                        HomeFragment.getHomeFragment().getStreamsFragment().getAllPosts();
-                        HomeFragment.getHomeFragment().getFavouritesFragment().getAllPosts();
+                        //TODO FA DUE CHIAMATE PER LO STESSO DATO???
+                        //HomeFragment.getHomeFragment().getStreamsFragment().getAllNewPosts();
+                        //HomeFragment.getHomeFragment().getFavouritesFragment().getAllNewPosts();
+                        //HomeFragment.getHomeFragment().getStreamsFragment().getAllPosts();
+                        //HomeFragment.getHomeFragment().getFavouritesFragment().getAllPosts();
                         // TODO QUESTA MODIFICA IMPEDISCE IL CRASH DEL PROGRAMMA NEL CASO IN CUI
                         //  LO SMARTPHONE NON SIA CONNESSO
                         ProfileFragment profileFragment = ProfileFragment.getProfileFragment();
                         if (profileFragment != null) {
-                            profileFragment.getProfilePostsFragment(type).getAllPosts();
+                            //era getAllpost
+                            //TODO NON SO SE è GIUSTO
+                            //profileFragment.getProfilePostsFragment(type).getAllPosts();
+                            //profileFragment.getProfilePostsFragment(type).getAllNewPosts();
                         }
                     }
                 });
@@ -146,13 +158,16 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
 
         if (!isLiked(post)) {
             holder.likeButton.setImageResource(R.drawable.ic_favorite_border_black_24dp);
+            holder.likeButton.setTag("unlike");
         } else {
             holder.likeButton.setImageResource(R.drawable.ic_favorite_real_black_24dp);
+            holder.likeButton.setTag("like");
         }
 
         holder.likeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //todo potrebbe perdere delle funzionalità dopo la cancellazione o l'aggiunta di nuovi post
                 likeOrUnlike(listPosts.get(position), holder);
             }
         });
@@ -178,7 +193,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
             holder.deletePostButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    deletePost(post);
+                    deletePost(post, view);
                 }
             });
         } else {
@@ -187,12 +202,25 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
     }
 
     /**
+     * TODO
+     */
+    private int getPostPosition(Post post){
+        for (int i = 0; i < listPosts.size(); i++){
+            if (listPosts.get(i) == post){
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    /**
      * @param dateString una data in formato UDC contenuta nel database remoto
      *
      * @return un valore di tipo Date convertito da UTC (formato atteso dal server) nel fuso orario
      *         usato dall'utente
      */
-    private Date localTimeToUtc(String dateString) throws ParseException {
+    protected Date localTimeToUtc(String dateString) throws ParseException {
         TimeZone timeZone = TimeZone.getDefault();
         String[] timeZoneSplitStrings = timeZone.getID().split("(/)");
         String CurrentTimeZone = timeZoneSplitStrings[timeZoneSplitStrings.length - 1];
@@ -208,6 +236,21 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
     @Override
     public int getItemCount() {
         return listPosts.size();
+    }
+
+    public void addPosts(List<Post> newListPosts) {
+        assert newListPosts.size() > 0: "newLIstPost doveva avere almeno un elemento";
+
+        List<Post> newAndOldPost = new ArrayList<>();
+        newAndOldPost.addAll(newListPosts);
+        newAndOldPost.addAll(this.listPosts);
+
+        int originaListPostSize = this.listPosts.size() - 1;
+        this.listPosts = newAndOldPost;
+        //singolo post nofityiteminserted
+        postsListFragment.adapter.notifyItemInserted(0);
+        //multiple post notifyitemrangechanged
+        postsListFragment.adapter.notifyItemRangeChanged(originaListPostSize, listPosts.size());
     }
 
     /**
@@ -242,8 +285,27 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
                 @Override
                 public void onResponse(Call<Object> call, Response<Object> response) {
                     if (response.isSuccessful()) {
-                        holder.likeButton.setImageResource(R.drawable.ic_favorite_real_black_24dp);
-                        LoggedUserActivity.getSocket().emit("refresh");
+
+                        //TODO occorre chiedere tramite una socket di avere i risultati dai socket
+                        // specie nel caso di like inseriti da altri utenti, per cui non si conosceva l'esistenza
+                        String likeIdentifier = (String)  holder.likeButton.getTag();
+                        int numberOfLike = Integer.parseInt(holder.likesCounter.getText().toString());
+                        if (likeIdentifier.equals("like")) {
+                            // l'utente ha rimosso la sua preferenza
+                            holder.likeButton.setImageResource(R.drawable.ic_favorite_border_black_24dp);
+                            holder.likesCounter.setText(String.valueOf(numberOfLike - 1));
+                            holder.likeButton.setTag("unlike");
+                        } else {
+                            holder.likeButton.setImageResource(R.drawable.ic_favorite_real_black_24dp);
+                            holder.likesCounter.setText(String.valueOf(numberOfLike + 1));
+                            holder.likeButton.setTag("like");
+                        }
+
+                        //TODO OCCORRE AGGIORNARE I NUOVI POST PIACIUTI, NON FARE EMIT(),
+                        // SONO SOLO LIKE, occorre sfruttare la logica degli update
+                        Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), "boom", Toast.LENGTH_SHORT).show();
+                        HomeFragment.getHomeFragment().getFavouritesFragment().getAllPosts();
+                        //LoggedUserActivity.getSocket().emit("refresh");
                     } else {
                         Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                     }
@@ -262,7 +324,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
                 public void onResponse(Call<Object> call, Response<Object> response) {
                     if (response.isSuccessful()) {
                         holder.likeButton.setImageResource(R.drawable.ic_favorite_border_black_24dp);
-                        LoggedUserActivity.getSocket().emit("refresh");
+                        //LoggedUserActivity.getSocket().emit("refresh");
                     } else {
                         Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                     }
@@ -280,7 +342,10 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
      * Questa funzione è accesibile solo per i post dell'utente autenticato e invia una richiesta
      * http in cui richieste la cancellazione del post.
      */
-    private void deletePost(Post post) {
+    private void deletePost(final Post post, final View view) {
+
+        //TODO SE SI CANELLA UN MESSAGGIO LA POSZIONE DEGLI ALTRI ALLì'INTERNO DELL'ARRAY CAMBIA, QUINDI OCCORRE CAMBIARE POSITION
+        // altrimenti va in crash perchè non trova una posizione valida
         StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
         Call<Object> httpRequest = streamsService.deletePost(post);
 
@@ -288,7 +353,10 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
             @Override
             public void onResponse(Call<Object> call, Response<Object> response) {
                 if (response.isSuccessful()) {
-                    LoggedUserActivity.getSocket().emit("refresh");
+                    final int position = getPostPosition(post);
+
+                    removePostFromRecyclerView(position, view);
+                    listPosts.remove(position);
                 } else {
                     Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                 }
@@ -299,6 +367,14 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
                 Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    private void removePostFromRecyclerView(int position, View view){
+        RecyclerView recyclerView = fragmentView.findViewById(R.id.listPosts);
+
+        recyclerView.removeView(view);//recyclerView.removeViewAt(position);
+        postsListFragment.adapter.notifyItemRemoved(position);
+        postsListFragment.adapter.notifyItemRangeChanged(position, listPosts.size());
     }
 
     public class PostItemHolder extends RecyclerView.ViewHolder {

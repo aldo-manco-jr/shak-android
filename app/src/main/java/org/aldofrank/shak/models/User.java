@@ -114,7 +114,7 @@ public class User {
     }
 
     public class Following{
-
+/*
         @SerializedName("_id")
         private Object id;
 
@@ -124,6 +124,16 @@ public class User {
         // TODO QUESTO GENERA UN ERRORE NON è USERFOLLOWED
         public Object getFollowingId() {
             return followingId;
+        }*/
+        @SerializedName("userFollowed")
+        private JsonElement followingId;
+
+        public JsonArray getFollowingId() {
+            if (followingId != null) {
+                return followingId.getAsJsonObject().get("following").getAsJsonArray();
+            } else {
+                return null;
+            }
         }
     }
 
@@ -135,7 +145,6 @@ public class User {
 
         public JsonArray getFollowerId() {
             return followerId.getAsJsonObject().get("followers").getAsJsonArray();
-            //return followerId.getAsJsonObject().get("followers").getAsJsonArray().get(0).getAsJsonArray();
         }
     }
 

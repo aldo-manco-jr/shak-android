@@ -4,6 +4,7 @@
     <string name="base_url_aws_api">http://ec2-15-237-74-79.eu-west-3.compute.amazonaws.com/api/shak</string>
     <string name="base_url_localhost">http://10.0.2.2:3000/</string>
     <string name="base_url_localhost_api">http://10.0.2.2:3000/api/shak</string>
+    <string name="title_connection_problems">Connection problems</string>
     <string name="title_activity_logged_user">LoggedUserActivity</string>
     <string name="title_send_mail">SendMail</string>
 
@@ -23,6 +24,9 @@
 
     <string name="auth_login">Already registered? Log in now.</string>
     <string name="auth_signup">Not registered yet? Sign up now.</string>
+
+    <string name="connection_problems">You have some connection problems!</string>
+    <string name="try_connect_again">Try connect again!</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

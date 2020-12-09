@@ -11,6 +11,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import com.github.nkzawa.emitter.Emitter;
+import com.github.nkzawa.socketio.client.Ack;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -20,6 +22,8 @@ import org.aldofrank.shak.notifications.controllers.NotificationsFragment;
 import org.aldofrank.shak.people.controllers.PeopleListFragment;
 import org.aldofrank.shak.profile.controllers.ProfileFragment;
 import org.aldofrank.shak.settings.controllers.SettingsFragment;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.net.URISyntaxException;
 
@@ -33,6 +37,7 @@ public class LoggedUserActivity extends AppCompatActivity {
     private static String token;
     private static String usernameLoggedUser;
     private static String idLoggedUser;
+    private static boolean isSocketCorrectlyCreate = false;
 
     private Fragment homeFragment;
     private Fragment profileFragment;
@@ -59,28 +64,64 @@ public class LoggedUserActivity extends AppCompatActivity {
 
         loggedUserActivity = this;
 
-        socket.connect();
-
         BottomNavigationView navbarLoggedUser = findViewById(R.id.logged_user_navbar);
-        homeFragment =  new HomeFragment();
-        profileFragment = ProfileFragment.newInstance("Aldo");
-
-        sharedPreferences = getSharedPreferences(getString(R.string.sharedpreferences_authentication), Context.MODE_PRIVATE);
 
         navbarLoggedUser.setOnNavigationItemSelectedListener(navbarListener);
-
-        // sostituisce il fragment attuale con un HomeFragment
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.logged_user_fragment, homeFragment).commit();
 
         try {
             token = getIntent().getExtras().getString("authToken");
             usernameLoggedUser = getIntent().getExtras().getString("username");
             idLoggedUser = getIntent().getExtras().getString("_id");
+
+            JSONObject infoSocketConnection = new JSONObject();
+            try {
+                infoSocketConnection.put("username", usernameLoggedUser);
+                //infoSocketConnection.put("room", "global");
+            } catch (JSONException ignored) {}
+
+            // occorre registrare l'esito della connessione per verificare se la connessione è stata
+            // stabilita correttamente
+            socket.on("online", onLoginEmitter);
+            socket.connect();
+            // invio tramite acknowledgement, per stabilire se l'utente ha impostato i dati del
+            // socket correttamente
+            socket.emit("online", infoSocketConnection, new Ack() {
+                @Override
+                public void call(Object... args) {
+//                Toast.makeText(LoggedUserActivity.this, "sendMessage IOAcknowledge" + args.toString(), Toast.LENGTH_LONG).show();
+                    if (args != null) {
+                        assert args[0] != null: "arg doveva essere un array non vuoto";
+
+                        isSocketCorrectlyCreate = true;
+                        System.out.println("sendMessage IOAcknowledge" + args[0].toString());
+                        socket.emit("refreshPosts");
+                    }
+                }
+            });
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        sharedPreferences = getSharedPreferences(getString(R.string.sharedpreferences_authentication), Context.MODE_PRIVATE);
+        profileFragment = ProfileFragment.newInstance(usernameLoggedUser);
+        homeFragment =  new HomeFragment();
+        // sostituisce il fragment attuale con un HomeFragment
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.logged_user_fragment, homeFragment).commit();
     }
+
+    private Emitter.Listener onLoginEmitter = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            LoggedUserActivity.this.runOnUiThread(new Runnable() {
+
+                @Override
+                public void run() {
+                    // ignorare, non ha azione da effettuare sui messaggi in arrivo
+                }
+            });
+        }
+    };
 
     private BottomNavigationView.OnNavigationItemSelectedListener navbarListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
 

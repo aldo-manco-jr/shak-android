@@ -1,15 +1,9 @@
 package org.aldofrank.shak.streams.controllers;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-
-import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.fragment.app.Fragment;
-
 import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -22,9 +16,11 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.Fragment;
+
 import com.github.nkzawa.emitter.Emitter;
-import com.github.nkzawa.socketio.client.IO;
-import com.github.nkzawa.socketio.client.Socket;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.JsonObject;
@@ -34,7 +30,6 @@ import org.aldofrank.shak.services.ServiceGenerator;
 import org.aldofrank.shak.services.StreamsService;
 
 import java.io.ByteArrayOutputStream;
-import java.net.URISyntaxException;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -71,7 +66,8 @@ public class PostFormFragment extends Fragment implements View.OnClickListener {
 
         imageEncoded = null;
 
-        LoggedUserActivity.getSocket().on("refreshPage", updatePostsList);
+        //LoggedUserActivity.getSocket().on("refreshPage", updatePostsList);
+        LoggedUserActivity.getSocket().on("refreshListPosts", updatePostsList);
     }
 
     @Override
@@ -146,7 +142,9 @@ public class PostFormFragment extends Fragment implements View.OnClickListener {
                     Snackbar.make(getView(), "Post Added Successfully!!", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
 
-                    LoggedUserActivity.getSocket().emit("refresh");
+                    //LoggedUserActivity.getSocket().emit("refresh");
+                    LoggedUserActivity.getSocket().emit("refreshPosts");
+
 
                     // ripristino stato iniziale del contenitore
                     ConstraintLayout.LayoutParams layoutParams =
@@ -261,7 +259,8 @@ public class PostFormFragment extends Fragment implements View.OnClickListener {
                     @Override
                     public void run() {
                         // quando un post viene pubblicato la socket avvisa del necessario aggiornmento
-                        HomeFragment.getHomeFragment().getStreamsFragment().getAllPosts();
+                        // HomeFragment.getHomeFragment().getStreamsFragment().getAllPosts();
+                        HomeFragment.getHomeFragment().getStreamsFragment().getAllNewPosts();
                     }
                 });
             }

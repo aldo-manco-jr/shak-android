@@ -1,15 +1,14 @@
 package org.aldofrank.shak.streams.controllers;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -71,7 +70,7 @@ public class CommentsListFragment extends Fragment {
         // circleimageview = wrap images in a circle
         view = inflater.inflate(R.layout.fragment_comments_list, container, false);
 
-        CommentsListAdapter.postId = post.getPostId();
+        CommentsListAdapter.postId = post.getPostCreatedAt();
 
         buttonAddComment = view.findViewById(R.id.fab_add_comment);
 
@@ -108,6 +107,7 @@ public class CommentsListFragment extends Fragment {
 
                 if (response.isSuccessful()) {
 
+                    //TODO ERA NULL
                     listPostComments = response.body().getPost().getArrayComments();
                     initializeRecyclerView();
 

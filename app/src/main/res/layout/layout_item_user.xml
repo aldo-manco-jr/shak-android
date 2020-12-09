@@ -40,7 +40,7 @@
 
                 <LinearLayout
                     android:id="@+id/layoutUserData_comment"
-                    android:layout_width="wrap_content"
+                    android:layout_width="140dp"
                     android:layout_height="match_parent"
                     android:layout_marginLeft="15dp"
                     android:layout_marginTop="0dp"
@@ -50,28 +50,31 @@
 
                     <TextView
                         android:id="@+id/username_comment_text"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Username"
                         android:textColor="@color/black"
                         android:textSize="22sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        style="@style/autoscroll"/>
 
                     <TextView
                         android:id="@+id/email_comment_text"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Email"
                         android:textColor="@color/black"
-                        android:textSize="17sp" />
+                        android:textSize="17sp"
+                        style="@style/autoscroll"/>
 
-                    <TextView
+                     <TextView
                         android:id="@+id/location_comment_text"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Location"
                         android:textColor="@color/black"
-                        android:textSize="17sp" />
+                        android:textSize="17sp"
+                         style="@style/autoscroll"/>
 
                 </LinearLayout>
 

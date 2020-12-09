@@ -39,7 +39,7 @@
 
             <LinearLayout
                 android:id="@+id/layoutUserData"
-                android:layout_width="wrap_content"
+                android:layout_width="250dp"
                 android:layout_height="80dp"
                 android:layout_marginLeft="15dp"
                 android:layout_marginTop="15dp"
@@ -54,7 +54,8 @@
                     android:text="Username"
                     android:textColor="@color/black"
                     android:textSize="22sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    style="@style/autoscroll"/>
 
                 <TextView
                     android:id="@+id/location_text"
@@ -62,7 +63,8 @@
                     android:layout_height="wrap_content"
                     android:text="Location"
                     android:textColor="@color/black"
-                    android:textSize="17sp" />
+                    android:textSize="17sp"
+                    style="@style/autoscroll"/>
 
                 <TextView
                     android:id="@+id/date_post_text"
@@ -70,7 +72,8 @@
                     android:layout_height="wrap_content"
                     android:text="Date"
                     android:textColor="@color/black"
-                    android:textSize="17sp" />
+                    android:textSize="17sp"
+                    style="@style/autoscroll"/>
 
             </LinearLayout>
 

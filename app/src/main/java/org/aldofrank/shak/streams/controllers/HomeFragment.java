@@ -17,7 +17,6 @@ import com.google.android.material.tabs.TabLayout;
 
 import org.aldofrank.shak.R;
 import org.aldofrank.shak.models.Post;
-import org.aldofrank.shak.models.User;
 import org.aldofrank.shak.people.controllers.PeopleListFragment;
 
 import java.util.LinkedList;
