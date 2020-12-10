@@ -26,6 +26,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URISyntaxException;
+import java.util.List;
 
 /**
  * Permette di accedere alle varie funzionalità del programma.
@@ -39,11 +40,11 @@ public class LoggedUserActivity extends AppCompatActivity {
     private static String idLoggedUser;
     private static boolean isSocketCorrectlyCreate = false;
 
-    private Fragment homeFragment;
-    private Fragment profileFragment;
-    private Fragment peopleFragment;
-    private Fragment notificationsFragment;
-    private Fragment settingsFragment;
+    private HomeFragment homeFragment;
+    private ProfileFragment profileFragment;
+    private PeopleListFragment peopleFragment;
+    private NotificationsFragment notificationsFragment;
+    private SettingsFragment settingsFragment;
 
     private SharedPreferences sharedPreferences;
 
@@ -94,7 +95,6 @@ public class LoggedUserActivity extends AppCompatActivity {
 
                         isSocketCorrectlyCreate = true;
                         System.out.println("sendMessage IOAcknowledge" + args[0].toString());
-                        socket.emit("refreshPosts");
                     }
                 }
             });
@@ -103,8 +103,8 @@ public class LoggedUserActivity extends AppCompatActivity {
         }
 
         sharedPreferences = getSharedPreferences(getString(R.string.sharedpreferences_authentication), Context.MODE_PRIVATE);
+        homeFragment = new HomeFragment();
         profileFragment = ProfileFragment.newInstance(usernameLoggedUser);
-        homeFragment =  new HomeFragment();
         // sostituisce il fragment attuale con un HomeFragment
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.logged_user_fragment, homeFragment).commit();
@@ -133,7 +133,7 @@ public class LoggedUserActivity extends AppCompatActivity {
 
             switch (navigationSectionIdentifier) {
                 case R.id.navigation_home:
-                    if (homeFragment == null) {
+                    if (homeFragment == null){
                         homeFragment = new HomeFragment();
                     }
 
@@ -141,14 +141,14 @@ public class LoggedUserActivity extends AppCompatActivity {
                     break;
                 case R.id.navigation_profile:
                     if (profileFragment == null) {
-                        profileFragment = new ProfileFragment();
+                        profileFragment = ProfileFragment.newInstance(LoggedUserActivity.getUsernameLoggedUser());
                     }
 
                     selectedFragment = profileFragment;
                     break;
                 case R.id.navigation_users:
                     if (peopleFragment == null) {
-                        peopleFragment = new PeopleListFragment();
+                        peopleFragment = PeopleListFragment.newInstance("all");
                     }
 
                     selectedFragment = peopleFragment;
@@ -190,7 +190,7 @@ public class LoggedUserActivity extends AppCompatActivity {
         return LoggedUserActivity.idLoggedUser;
     }
 
-    @Override
+    /*@Override
     public void onBackPressed()
     {
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -198,13 +198,32 @@ public class LoggedUserActivity extends AppCompatActivity {
         editor.commit();
 
         super.onBackPressed();  // optional depending on your needs
-    }
+    }*/
 
     @Override
     public void onDestroy() {
         socket.disconnect();
         super.onDestroy();
         //socket.off("disconnect");
+    }
+
+    @Override
+    public void onBackPressed() {
+        tellFragments();
+        super.onBackPressed();
+    }
+
+    private void tellFragments(){
+        List<Fragment> fragments = getSupportFragmentManager().getFragments();
+        for(Fragment fragment : fragments){
+            if(fragment != null && fragment instanceof PostFormFragment)
+                ((PostFormFragment)fragment).onBackPressed();
+            else if (fragment != null && fragment instanceof CommentsListFragment){
+                ((CommentsListFragment)fragment).onBackPressed();
+            }else if (fragment != null && fragment instanceof CommentFormFragment){
+                ((CommentFormFragment)fragment).onBackPressed();
+            }
+        }
     }
 
     public static Socket getSocket() {
@@ -214,4 +233,6 @@ public class LoggedUserActivity extends AppCompatActivity {
     public static LoggedUserActivity getLoggedUserActivity() {
         return loggedUserActivity;
     }
+
+
 }

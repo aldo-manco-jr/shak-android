@@ -44,7 +44,7 @@ import retrofit2.Response;
 
 import static org.aldofrank.shak.streams.controllers.CommentsListAdapter.postId;
 
-public class CommentFormFragment extends Fragment implements View.OnClickListener {
+public class CommentFormFragment extends Fragment implements View.OnClickListener, OnBackPressed {
 
     private EditText commentContentField;
 
@@ -196,5 +196,10 @@ public class CommentFormFragment extends Fragment implements View.OnClickListene
                 closeCommentBox();
                 break;
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        getFragmentManager().beginTransaction().remove(HomeFragment.getHomeFragment().getCommentFormFragment()).commitAllowingStateLoss();
     }
 }

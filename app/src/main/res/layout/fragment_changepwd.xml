@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/changePwdFragment"
+    android:background="@color/colorSHAK"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".settings.controllers.ChangePwdFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+         <EditText
+            android:id="@+id/oldPassword"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/field_wrap"
+            android:drawableLeft="@drawable/password_drawable_left"
+            android:drawableRight="@drawable/eye_open_drawable_right"
+            android:drawablePadding="6dp"
+            android:ems="10"
+            android:hint="Old password"
+            android:inputType="textPassword"
+            android:paddingLeft="8dip"
+            android:paddingRight="8dip"
+            android:singleLine="true"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#FFFFFF"
+            android:textSize="14dip" />
+
+        <TextView
+            android:id="@+id/alert_oldPassword_invalid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="24dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginRight="16dp"
+            android:text="Password should be of 8-64 characters."
+            android:visibility="gone"/>
+
+        <EditText
+            android:id="@+id/newPassword"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/field_wrap"
+            android:drawableLeft="@drawable/password_drawable_left"
+            android:drawableRight="@drawable/eye_open_drawable_right"
+            android:drawablePadding="6dp"
+            android:ems="10"
+            android:hint="New password"
+            android:inputType="textPassword"
+            android:paddingLeft="8dip"
+            android:paddingRight="8dip"
+            android:singleLine="true"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#FFFFFF"
+            android:textSize="14dip" />
+
+        <TextView
+            android:id="@+id/alert_newPassword_invalid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="24dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginRight="16dp"
+            android:text="Password should be of 8-64 characters."
+            android:visibility="gone"/>
+
+        <EditText
+            android:id="@+id/confirmPassword"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/field_wrap"
+            android:drawableLeft="@drawable/password_drawable_left"
+            android:drawableRight="@drawable/eye_open_drawable_right"
+            android:drawablePadding="6dp"
+            android:ems="10"
+            android:hint="Confirm new password"
+            android:inputType="textPassword"
+            android:paddingLeft="8dip"
+            android:paddingRight="8dip"
+            android:singleLine="true"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#FFFFFF"
+            android:textSize="14dip" />
+
+        <TextView
+            android:id="@+id/alert_confirmPassword_invalid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="24dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginRight="16dp"
+            android:text="Password should be of 8-64 characters."
+            android:visibility="gone"/>
+
+        <Button
+            android:id="@+id/changeButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:backgroundTint="#FFFFFF"
+            android:text="Send"
+            android:textColor="#015D17" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

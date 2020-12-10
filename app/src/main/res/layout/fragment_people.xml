@@ -16,7 +16,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/title_users_list"
-                android:textAlignment="center"
+                android:textSize="36sp"
+                android:textAlignment="textStart"
                 style="@style/Base.TextAppearance.AppCompat.Title"
                 app:layout_constraintTop_toTopOf="parent" />
 

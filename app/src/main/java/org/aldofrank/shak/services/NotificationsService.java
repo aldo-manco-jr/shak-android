@@ -7,7 +7,7 @@ import retrofit2.http.Body;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 
-interface NotificationsService {
+public interface NotificationsService {
 
     // frank
     @POST("change-password")

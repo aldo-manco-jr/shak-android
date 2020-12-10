@@ -24,6 +24,8 @@
 
     <string name="auth_login">Already registered? Log in now.</string>
     <string name="auth_signup">Not registered yet? Sign up now.</string>
+    <string name="password_changed">Password is changed</string>
+    <string name="password_changed_error">Insert valid passwords</string>
 
     <string name="connection_problems">You have some connection problems!</string>
     <string name="try_connect_again">Try connect again!</string>

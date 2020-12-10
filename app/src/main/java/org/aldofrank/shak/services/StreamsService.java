@@ -48,7 +48,4 @@ public interface StreamsService {
 
     @POST("post/remove-comment")
     Call<Object> deleteComment(@Body DeleteCommentRequest deleteCommentRequest);
-
-    @GET("username/{username}")
-    Call<GetUserByUsernameResponse> getUserByUsername(@Path("username") String username);
 }

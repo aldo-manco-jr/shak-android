@@ -52,6 +52,8 @@ public class ImagesListFragment extends Fragment implements View.OnClickListener
 
     private View view;
 
+    private String username;
+
     private FloatingActionButton addUserImageButton;
 
     private String imageEncoded;
@@ -108,6 +110,12 @@ public class ImagesListFragment extends Fragment implements View.OnClickListener
         addUserImageButton.setOnClickListener(this);
 
         getAllUserImages();
+
+        if (username.equals(LoggedUserActivity.getUsernameLoggedUser())){
+            addUserImageButton.setVisibility(View.VISIBLE);
+        }else {
+            addUserImageButton.setVisibility(View.GONE);
+        }
 
         return view;
     }
@@ -174,7 +182,10 @@ public class ImagesListFragment extends Fragment implements View.OnClickListener
             return;
         }
 
-        Call<Object> httpRequest = imagesService.uploadImage("data:image/png;base64," + imageEncoded);
+        JsonObject imageData = new JsonObject();
+        imageData.addProperty("image", "data:image/png;base64," + imageEncoded);
+
+        Call<Object> httpRequest = imagesService.uploadImage(imageData);
 
         httpRequest.enqueue(new Callback<Object>() {
             @Override
@@ -213,7 +224,7 @@ public class ImagesListFragment extends Fragment implements View.OnClickListener
             return;
         }
 
-        final String username = getArguments().getString("username");
+         username = getArguments().getString("username");
         UsersService usersService = ServiceGenerator.createService(UsersService.class, LoggedUserActivity.getToken());
 
         Call<GetUserByUsernameResponse> httpRequest = usersService.getUserByUsername(username);
@@ -243,7 +254,7 @@ public class ImagesListFragment extends Fragment implements View.OnClickListener
      */
     private void initializeRecyclerView() {
         RecyclerView recyclerView = view.findViewById(R.id.listImages);
-        ImagesListAdapter adapter = new ImagesListAdapter(this.listImages);
+        ImagesListAdapter adapter = new ImagesListAdapter(this.listImages, this.username);
 
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new GridLayoutManager(LoggedUserActivity.getLoggedUserActivity(), 2));

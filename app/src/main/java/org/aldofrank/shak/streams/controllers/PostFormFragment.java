@@ -38,7 +38,7 @@ import retrofit2.Response;
 /**
  * Permette all'utente di pubblicare un post con un'immagine collegata.
  */
-public class PostFormFragment extends Fragment implements View.OnClickListener {
+public class PostFormFragment extends Fragment implements View.OnClickListener, OnBackPressed {
 
     private String imageEncoded;
 
@@ -285,5 +285,10 @@ public class PostFormFragment extends Fragment implements View.OnClickListener {
                 deleteImagePost();
                 break;
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        getFragmentManager().beginTransaction().remove(HomeFragment.getHomeFragment().getPostFormFragment()).commitAllowingStateLoss();
     }
 }

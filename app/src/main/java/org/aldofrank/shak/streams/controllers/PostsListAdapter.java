@@ -55,43 +55,11 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
         this.type = type;
         this.postsListFragment = postsListFragment;
         this.fragmentView = view;
-
-        //LoggedUserActivity.getSocket().on("refreshPage", updatePostsList);
     }
 
-    /**
-     * Quando un post viene pubblicato la home page viene aggiornata.
-     */
-    private Emitter.Listener updatePostsList = new Emitter.Listener() {
-
-        @Override
-        public void call(final Object... args) {
-            if (LoggedUserActivity.getLoggedUserActivity() != null) {
-                LoggedUserActivity.getLoggedUserActivity().runOnUiThread(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), "lancia da Adapter", Toast.LENGTH_LONG).show();
-                        // quando un post viene pubblicato la socket avvisa del necessario aggiornmento
-                        //TODO FA DUE CHIAMATE PER LO STESSO DATO???
-                        //HomeFragment.getHomeFragment().getStreamsFragment().getAllNewPosts();
-                        //HomeFragment.getHomeFragment().getFavouritesFragment().getAllNewPosts();
-                        //HomeFragment.getHomeFragment().getStreamsFragment().getAllPosts();
-                        //HomeFragment.getHomeFragment().getFavouritesFragment().getAllPosts();
-                        // TODO QUESTA MODIFICA IMPEDISCE IL CRASH DEL PROGRAMMA NEL CASO IN CUI
-                        //  LO SMARTPHONE NON SIA CONNESSO
-                        ProfileFragment profileFragment = ProfileFragment.getProfileFragment();
-                        if (profileFragment != null) {
-                            //era getAllpost
-                            //TODO NON SO SE è GIUSTO
-                            //profileFragment.getProfilePostsFragment(type).getAllPosts();
-                            //profileFragment.getProfilePostsFragment(type).getAllNewPosts();
-                        }
-                    }
-                });
-            }
-        }
-    };
+    public List<Post> getListPosts() {
+        return listPosts;
+    }
 
     @NonNull
     @Override
@@ -168,7 +136,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
             @Override
             public void onClick(View view) {
                 //todo potrebbe perdere delle funzionalità dopo la cancellazione o l'aggiunta di nuovi post
-                likeOrUnlike(listPosts.get(position), holder);
+                likeOrUnlike(listPosts.get(position), holder, view, type);
             }
         });
 
@@ -190,10 +158,11 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
         holder.commentsCounter.setText(listPosts.get(position).getArrayComments().size() + "");
 
         if (post.getUsernamePublisher().equals(LoggedUserActivity.getUsernameLoggedUser())) {
+            holder.deletePostButton.setVisibility(View.VISIBLE);
             holder.deletePostButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    deletePost(post, view);
+                    postsListFragment.deletePost(post, view, holder, type);
                 }
             });
         } else {
@@ -206,7 +175,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
      */
     private int getPostPosition(Post post){
         for (int i = 0; i < listPosts.size(); i++){
-            if (listPosts.get(i) == post){
+            if (listPosts.get(i).equals(post)){
                 return i;
             }
         }
@@ -275,37 +244,25 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
      * In base ai dati ricavati da {{@link #isLiked(Post)}} viene inviata una richiesta http di
      * "like" o di "unlike" verso il post.
      */
-    private void likeOrUnlike(Post post, final PostItemHolder holder) {
+
+    private void likeOrUnlike(final Post post, final PostItemHolder holder, final View view, final String type) {
         StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
 
         if (!isLiked(post)) {
+            // viene aggiunto ai preferiti
             Call<Object> httpRequest = streamsService.likePost(post);
 
             httpRequest.enqueue(new Callback<Object>() {
                 @Override
                 public void onResponse(Call<Object> call, Response<Object> response) {
                     if (response.isSuccessful()) {
+                        holder.likeButton.setImageResource(R.drawable.ic_favorite_real_black_24dp);
+                        holder.likeButton.setTag("like");
 
-                        //TODO occorre chiedere tramite una socket di avere i risultati dai socket
-                        // specie nel caso di like inseriti da altri utenti, per cui non si conosceva l'esistenza
-                        String likeIdentifier = (String)  holder.likeButton.getTag();
-                        int numberOfLike = Integer.parseInt(holder.likesCounter.getText().toString());
-                        if (likeIdentifier.equals("like")) {
-                            // l'utente ha rimosso la sua preferenza
-                            holder.likeButton.setImageResource(R.drawable.ic_favorite_border_black_24dp);
-                            holder.likesCounter.setText(String.valueOf(numberOfLike - 1));
-                            holder.likeButton.setTag("unlike");
-                        } else {
-                            holder.likeButton.setImageResource(R.drawable.ic_favorite_real_black_24dp);
-                            holder.likesCounter.setText(String.valueOf(numberOfLike + 1));
-                            holder.likeButton.setTag("like");
-                        }
+                        post.addLiketoArray(LoggedUserActivity.getUsernameLoggedUser());
+                        postsListFragment.adapter.notifyItemChanged(holder.getAdapterPosition());
 
-                        //TODO OCCORRE AGGIORNARE I NUOVI POST PIACIUTI, NON FARE EMIT(),
-                        // SONO SOLO LIKE, occorre sfruttare la logica degli update
-                        Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), "boom", Toast.LENGTH_SHORT).show();
-                        HomeFragment.getHomeFragment().getFavouritesFragment().getAllPosts();
-                        //LoggedUserActivity.getSocket().emit("refresh");
+                        HomeFragment.getHomeFragment().getFavouritesFragment().pushOnFavoritesList(post);
                     } else {
                         Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                     }
@@ -317,14 +274,27 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
                 }
             });
         } else {
+            // viene rimosso dai preferiti
             Call<Object> httpRequest = streamsService.unlikePost(post);
 
             httpRequest.enqueue(new Callback<Object>() {
                 @Override
                 public void onResponse(Call<Object> call, Response<Object> response) {
                     if (response.isSuccessful()) {
+                        Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), "LO FACIIO======??", Toast.LENGTH_SHORT).show();
                         holder.likeButton.setImageResource(R.drawable.ic_favorite_border_black_24dp);
-                        //LoggedUserActivity.getSocket().emit("refresh");
+                        holder.likeButton.setTag("unlike");
+
+                        PostsListFragment favouritesFragment = HomeFragment.getHomeFragment().getFavouritesFragment();
+                        PostsListFragment streamsFragment =  HomeFragment.getHomeFragment().getStreamsFragment();
+
+                        if (type.equals("all")) {
+                            post.removeLikeFromArray(LoggedUserActivity.getUsernameLoggedUser());
+                            HomeFragment.getHomeFragment().getStreamsFragment().adapter.notifyItemChanged(holder.getAdapterPosition());
+                            favouritesFragment.removeLikeFromFavoritesList(post);
+                        } else {
+                            postsListFragment.removeLikeFromStreamsList(post, holder, streamsFragment, favouritesFragment);
+                        }
                     } else {
                         Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                     }
@@ -336,37 +306,6 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
                 }
             });
         }
-    }
-
-    /**
-     * Questa funzione è accesibile solo per i post dell'utente autenticato e invia una richiesta
-     * http in cui richieste la cancellazione del post.
-     */
-    private void deletePost(final Post post, final View view) {
-
-        //TODO SE SI CANELLA UN MESSAGGIO LA POSZIONE DEGLI ALTRI ALLì'INTERNO DELL'ARRAY CAMBIA, QUINDI OCCORRE CAMBIARE POSITION
-        // altrimenti va in crash perchè non trova una posizione valida
-        StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
-        Call<Object> httpRequest = streamsService.deletePost(post);
-
-        httpRequest.enqueue(new Callback<Object>() {
-            @Override
-            public void onResponse(Call<Object> call, Response<Object> response) {
-                if (response.isSuccessful()) {
-                    final int position = getPostPosition(post);
-
-                    removePostFromRecyclerView(position, view);
-                    listPosts.remove(position);
-                } else {
-                    Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Object> call, Throwable t) {
-                Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        });
     }
 
     private void removePostFromRecyclerView(int position, View view){

@@ -26,7 +26,9 @@ import org.aldofrank.shak.R;
 import org.aldofrank.shak.models.Post;
 import org.aldofrank.shak.models.User;
 import org.aldofrank.shak.people.controllers.PeopleListFragment;
+import org.aldofrank.shak.people.http.FollowOrUnfollowRequest;
 import org.aldofrank.shak.people.http.GetUserByUsernameResponse;
+import org.aldofrank.shak.people.http.IsFollowingResponse;
 import org.aldofrank.shak.people.http.SetUserLocationRequest;
 import org.aldofrank.shak.services.ServiceGenerator;
 import org.aldofrank.shak.services.UsersService;
@@ -63,6 +65,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private TabLayout profileTabs;
 
     private PostsListFragment profilePostsFragment;
+    private PeopleListFragment profileAllUsersFragment;
     private PeopleListFragment profileFollowingFragment;
     private PeopleListFragment profileFollowersFragment;
     private ImagesListFragment profileImagesFragment;
@@ -82,7 +85,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     public Emitter.Listener updateProfilePage = new Emitter.Listener() {
         @Override
         public void call(Object... args) {
-            userDataBinding(LoggedUserActivity.getUsernameLoggedUser());
+            userDataBinding(getArguments().getString("username"));
         }
     };
 
@@ -103,34 +106,36 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         emailTextView = profileFragmentView.findViewById(R.id.email_profile);
         locationTextView = profileFragmentView.findViewById(R.id.location_profile);
         setLocationButton = profileFragmentView.findViewById(R.id.button_set_location);
+        followButton = profileFragmentView.findViewById(R.id.followUser);
 
         userDataBinding(getArguments().getString("username"));
 
         emailTextView.setOnClickListener(this);
         locationTextView.setOnClickListener(this);
         setLocationButton.setOnClickListener(this);
+        followButton.setOnClickListener(this);
 
         viewPager = profileFragmentView.findViewById(R.id.view_pager_profile);
         profileTabs = profileFragmentView.findViewById(R.id.profile_tabs);
 
         getProfilePostsFragment(getArguments().getString("username"));
-        //getProfileFollowingFragment(getArguments().getString("username"));
-        //getProfileFollowersFragment(getArguments().getString("username"));
+        getProfileFollowingFragment(getArguments().getString("username"));
+        getProfileFollowersFragment(getArguments().getString("username"));
         getProfileImagesFragment(getArguments().getString("username"));
 
         ProfileFragment.ViewPagerAdapter viewPagerAdapter = new ProfileFragment.ViewPagerAdapter(getChildFragmentManager(), 0);
         viewPagerAdapter.addFragment(profilePostsFragment, "Streams");
-        //viewPagerAdapter.addFragment(profileFollowingFragment, "Following");
-        //viewPagerAdapter.addFragment(profileFollowersFragment, "Followers");
+        viewPagerAdapter.addFragment(profileFollowingFragment, "Following");
+        viewPagerAdapter.addFragment(profileFollowersFragment, "Followers");
         viewPagerAdapter.addFragment(profileImagesFragment, "Images");
         viewPager.setAdapter(viewPagerAdapter);
 
         profileTabs.setupWithViewPager(viewPager);
 
         profileTabs.getTabAt(0).setIcon(R.drawable.ic_library_books_black_24dp);
-        //profileTabs.getTabAt(1).setIcon(R.drawable.ic_group_black_24dp);
-        //profileTabs.getTabAt(2).setIcon(R.drawable.ic_baseline_people_outline_white_24);
-        profileTabs.getTabAt(1).setIcon(R.drawable.ic_baseline_photo_library_white_24);
+        profileTabs.getTabAt(1).setIcon(R.drawable.ic_group_black_24dp);
+        profileTabs.getTabAt(2).setIcon(R.drawable.ic_baseline_people_outline_white_24);
+        profileTabs.getTabAt(3).setIcon(R.drawable.ic_baseline_photo_library_white_24);
 
         return profileFragmentView;
     }
@@ -143,7 +148,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
         ProfileFragment profileFragment = new ProfileFragment();
 
-        System.out.println(username);
         Bundle args = new Bundle();
         args.putString("username", username);
         profileFragment.setArguments(args);
@@ -156,7 +160,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
         switch (view.getId()) {
             case R.id.button_set_location:
-            case R.id.location_profile:
                 getLocation();
                 break;
             case R.id.email_profile:
@@ -164,7 +167,77 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 intent.putExtra("email", user.getEmail());
                 intent.putExtra("username", user.getUsername());
                 startActivity(intent);
+                break;
+            case R.id.followUser:
+                followOrUnfollow(user, followButton);
+                break;
         }
+    }
+
+    /**
+     * In base ai dati ricavati da {{@link #isFollow(User)}} viene inviata una richiesta http di
+     * "follow" o di "unfollow" verso il post.
+     */
+    public void followOrUnfollow(User user, final Button followButton) {
+        UsersService usersService = ServiceGenerator.createService(UsersService.class, LoggedUserActivity.getToken());
+
+        Call<Object> httpRequest;
+
+        if (followButton.getText().equals("unfollow")) {
+            // l'utente che ha effettuato l'accesso è un follower dell'utente considerato
+            httpRequest = usersService.unfollowUser(new FollowOrUnfollowRequest(user.getId()));
+        } else {
+            httpRequest = usersService.followUser(new FollowOrUnfollowRequest(user.getId()));
+        }
+
+        httpRequest.enqueue(new Callback<Object>() {
+            @Override
+            public void onResponse(Call<Object> call, Response<Object> response) {
+                if (response.isSuccessful()) {
+                    LoggedUserActivity.getSocket().emit("refresh");
+                } else {
+                    Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + "   " + response.message(), Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Object> call, Throwable t) {
+                Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    /**
+     * un user generico in input
+     *
+     * @return true se l'utente selezionato è un follower, false altrimenti
+     */
+    public void isFollow(User user, final Button followButton) {
+
+        followButton.setText("follow");
+
+        UsersService usersService = ServiceGenerator.createService(UsersService.class, LoggedUserActivity.getToken());
+
+        Call<IsFollowingResponse> httpRequest = usersService.isFollowing(user.getUsername());
+
+        httpRequest.enqueue(new Callback<IsFollowingResponse>() {
+            @Override
+            public void onResponse(Call<IsFollowingResponse> call, Response<IsFollowingResponse> response) {
+                if (response.isSuccessful()) {
+                    if (response.body().getMessage().equals("yes")) {
+                        followButton.setText("unfollow");
+                    }
+                    LoggedUserActivity.getSocket().emit("refresh");
+                } else {
+                    Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<IsFollowingResponse> call, Throwable t) {
+                Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private void getLocation() {
@@ -233,6 +306,15 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         return profileFollowingFragment;
     }
 
+    public PeopleListFragment getAllUsersFragment() {
+
+        if (this.profileAllUsersFragment == null) {
+            this.profileAllUsersFragment = PeopleListFragment.newInstance("all");
+        }
+
+        return profileAllUsersFragment;
+    }
+
     public ImagesListFragment getProfileImagesFragment(String username) {
 
         if (this.profileImagesFragment == null) {
@@ -293,9 +375,39 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
                     if (user.getCity() != null && user.getCountry() != null) {
                         locationTextView.setText("@" + user.getCity() + ", " + user.getCountry());
+                        if (user.getUsername().equals(LoggedUserActivity.getUsernameLoggedUser())){
+                            locationTextView.setVisibility(View.VISIBLE);
+                            setLocationButton.setVisibility(View.GONE);
+
+                            locationTextView.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    getLocation();
+                                }
+                            });
+                        }else {
+                            locationTextView.setVisibility(View.VISIBLE);
+                            setLocationButton.setVisibility(View.GONE);
+                        }
                     } else {
-                        locationTextView.setVisibility(View.GONE);
-                        setLocationButton.setVisibility(View.VISIBLE);
+                        if (user.getUsername().equals(LoggedUserActivity.getUsernameLoggedUser())){
+                            locationTextView.setVisibility(View.GONE);
+                            setLocationButton.setVisibility(View.VISIBLE);
+
+                            locationTextView.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    getLocation();
+                                }
+                            });
+                        }else {
+                            locationTextView.setVisibility(View.VISIBLE);
+                            locationTextView.setText("Unknown Location");
+                        }
+                    }
+
+                    if (user.getUsername().equals(LoggedUserActivity.getUsernameLoggedUser())){
+                        followButton.setVisibility(View.GONE);
                     }
 
                     profileImage.setOnClickListener(new View.OnClickListener() {
@@ -315,6 +427,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                             LoggedUserActivity.getLoggedUserActivity().startActivity(intent);
                         }
                     });
+
+                    isFollow(user, followButton);
 
                 } else {
                     Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();

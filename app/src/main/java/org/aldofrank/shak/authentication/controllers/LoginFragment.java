@@ -91,6 +91,9 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
                 } else {
                     // errore a livello di applicazione
                     // response.code() == (401) -> token expired
+                    /*SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.remove(getString(R.string.sharedpreferences_token));
+                    editor.commit();*/
                     Toast.makeText(getActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
 
                     loadingBar.setVisibility(View.GONE);

@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.Target;
 import com.github.nkzawa.emitter.Emitter;
+import com.google.android.gms.dynamic.IFragmentWrapper;
 
 import org.aldofrank.shak.R;
 import org.aldofrank.shak.models.User;
@@ -34,10 +35,13 @@ public class ImagesListAdapter extends RecyclerView.Adapter<ImagesListAdapter.Im
 
     private List<User.Image> listImages;
 
+    private String username;
+
     private final String basicUrlImage = "http://res.cloudinary.com/dfn8llckr/image/upload/v";
 
-    public ImagesListAdapter(List<User.Image> listImages) {
+    public ImagesListAdapter(List<User.Image> listImages, String username) {
         this.listImages = listImages;
+        this.username = username;
 
         LoggedUserActivity.getSocket().on("refreshPage", updateImagesList);
     }
@@ -99,19 +103,27 @@ public class ImagesListAdapter extends RecyclerView.Adapter<ImagesListAdapter.Im
             }
         });
 
-        holder.setAsDefaultImageButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                setAsDefaultImage(listImages.get(position).getImageVersion(), listImages.get(position).getImageId(), holder);
-            }
-        });
+        if (!username.equals(LoggedUserActivity.getUsernameLoggedUser())){
+            holder.setAsCoverImageButton.setVisibility(View.GONE);
+            holder.setAsDefaultImageButton.setVisibility(View.GONE);
+        }else{
+            holder.setAsCoverImageButton.setVisibility(View.VISIBLE);
+            holder.setAsDefaultImageButton.setVisibility(View.VISIBLE);
 
-        holder.setAsCoverImageButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                setAsCoverImage(listImages.get(position).getImageVersion(), listImages.get(position).getImageId(), holder);
-            }
-        });
+            holder.setAsDefaultImageButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    setAsDefaultImage(listImages.get(position).getImageVersion(), listImages.get(position).getImageId(), holder);
+                }
+            });
+
+            holder.setAsCoverImageButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    setAsCoverImage(listImages.get(position).getImageVersion(), listImages.get(position).getImageId(), holder);
+                }
+            });
+        }
     }
 
     @Override

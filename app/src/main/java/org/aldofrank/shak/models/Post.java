@@ -44,6 +44,37 @@ public class Post {
     @SerializedName("created_at")
     private String createdAt;
 
+    public boolean addLiketoArray(String usernamePublisher) {
+        Like like = new Like(usernamePublisher);
+        boolean isAdded = arrayLikes.add(like);
+        if (isAdded){
+            totalLikes++;
+        }
+
+        return isAdded;
+    }
+
+    public boolean removeLikeFromArray(String usernamePublisher) {
+        Like removeLike = null;
+        boolean isRemoved = false;
+
+        for (Like like: arrayLikes) {
+            if (like.getUsernamePublisher().equals(usernamePublisher)) {
+                removeLike = like;
+            }
+        }
+
+        if (removeLike != null){
+            isRemoved = arrayLikes.remove(removeLike);
+
+            if (isRemoved){
+                totalLikes--;
+            }
+        }
+
+        return isRemoved;
+    }
+
     public String getPostCreatedAt() {
         return postId.getAsString();
     }
@@ -163,6 +194,11 @@ public class Post {
 
         @SerializedName("username")
         private String usernamePublisher;
+
+        private Like(String usernamePublisher){
+            this.usernamePublisher = usernamePublisher;
+            this.likeId = -1;
+        }
 
         public Object getLikeId() {
             return likeId;

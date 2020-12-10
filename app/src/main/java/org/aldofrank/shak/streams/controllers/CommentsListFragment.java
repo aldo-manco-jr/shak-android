@@ -27,7 +27,7 @@ import retrofit2.Response;
 
 import static org.aldofrank.shak.streams.controllers.CommentsListAdapter.postId;
 
-public class CommentsListFragment extends Fragment {
+public class CommentsListFragment extends Fragment implements OnBackPressed {
     private List<Post.Comment> listPostComments;
 
     private View view;
@@ -132,5 +132,10 @@ public class CommentsListFragment extends Fragment {
 
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+    }
+
+    @Override
+    public void onBackPressed() {
+        getFragmentManager().beginTransaction().remove(HomeFragment.getHomeFragment().getCommentsListFragment()).commitAllowingStateLoss();
     }
 }

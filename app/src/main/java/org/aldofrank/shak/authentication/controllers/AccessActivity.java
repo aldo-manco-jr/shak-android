@@ -49,7 +49,7 @@ public class AccessActivity extends AppCompatActivity implements View.OnClickLis
         if (view.getId() == R.id.switchButton) {
             // Azione sul frammento "auth_signup" per cambiare la scritta a seconda del contesto
             String switchButtonText = switchButton.getText().toString().trim();
-            Boolean isAuthSignupString = switchButtonText.equals(getString(R.string.auth_signup));
+            boolean isAuthSignupString = switchButtonText.equals(getString(R.string.auth_signup));
 
             if (isAuthSignupString) {
                 // imposta frammento di registrazione

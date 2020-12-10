@@ -2,23 +2,30 @@ package org.aldofrank.shak.people.controllers;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.github.nkzawa.emitter.Emitter;
+
 import org.aldofrank.shak.R;
 import org.aldofrank.shak.models.User;
 import org.aldofrank.shak.people.http.GetAllUsersResponse;
+import org.aldofrank.shak.people.http.GetFollowersResponse;
+import org.aldofrank.shak.people.http.GetFollowingResponse;
+import org.aldofrank.shak.people.http.GetUserByUsernameResponse;
+import org.aldofrank.shak.profile.controllers.ProfileFragment;
 import org.aldofrank.shak.services.ServiceGenerator;
 import org.aldofrank.shak.services.UsersService;
 import org.aldofrank.shak.streams.controllers.LoggedUserActivity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -27,41 +34,22 @@ import retrofit2.Response;
 
 public class PeopleListFragment extends Fragment {
 
-    protected static List<User> listUsers;
-    private static User user;
-    protected static User userConnected = null;
-    private static String type;
-    private static PeopleListAdapter adapter = null;
+    private List<User> listUsers;
 
-    private static View view;
+    private PeopleListAdapter adapter;
 
-    @SuppressLint("StaticFieldLeak")
+    private String username;
+
+    private TextView titleTextView;
+
+    private View view;
+
     private static PeopleListFragment peopleListFragment;
 
-    public PeopleListFragment() { }
-
-    protected static PeopleListFragment getPeopleListFragment() {
-        if (peopleListFragment == null){
-            peopleListFragment = new PeopleListFragment();
-        }
-
-        return peopleListFragment;
+    public PeopleListFragment() {
     }
 
-    protected static PeopleListFragment getPeopleListFragment(User user) {
-        //TODO posizione specifica
-        if (peopleListFragment == null){
-            peopleListFragment = new PeopleListFragment();
-        }
-
-        return peopleListFragment;
-    }
-
-    protected static PeopleListFragment getUserFollowers(User user) {
-        assert peopleListFragment != null;
-
-        peopleListFragment.getAllUsers();
-
+    public static PeopleListFragment getPeopleListFragment() {
         return peopleListFragment;
     }
 
@@ -98,35 +86,6 @@ public class PeopleListFragment extends Fragment {
         return fragment;
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @return A new instance of fragment PostsListFragment.
-     */
-    public static PeopleListFragment newInstance(User user) {
-        PeopleListFragment fragment = new PeopleListFragment();
-
-        PeopleListFragment.user = user;
-
-        return fragment;
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @return A new instance of fragment PostsListFragment.
-     */
-    public static PeopleListFragment newInstance(User user, String type) {
-        PeopleListFragment fragment = new PeopleListFragment();
-
-        PeopleListFragment.user = user;
-        PeopleListFragment.type = type;
-
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -137,68 +96,156 @@ public class PeopleListFragment extends Fragment {
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_people, container, false);
 
-        getAllUsers();
+        peopleListFragment = this;
+
+        titleTextView = view.findViewById(R.id.title_users_list);
+
+        newGetAllUsers();
 
         return view;
     }
 
-    /**
-     * Consente di recuperare tutti i post:
-     *  - streams: lista dei post dell'utente e dei suoi following
-     *  - favorites: sono i post a cui l'utente ha espresso la preferenza
-     * Viene mandata una richiesta http per recuperati i dal server.
-     */
-    public void getAllUsers() {
-        UsersService usersService = ServiceGenerator.createService(UsersService.class, LoggedUserActivity.getToken());
-        Call<GetAllUsersResponse> httpRequest = usersService.getAllUsers();
+     Emitter.Listener updateUsersList = new Emitter.Listener() {
 
-        httpRequest.enqueue(new Callback<GetAllUsersResponse>() {
-            @Override
-            public void onResponse(Call<GetAllUsersResponse> call, Response<GetAllUsersResponse> response) {
-                if (response.isSuccessful()) {
-                    assert response.body() != null : "body() non doveva essere null";
+        @Override
+        public void call(final Object... args) {
+            if (LoggedUserActivity.getLoggedUserActivity() != null) {
+                LoggedUserActivity.getLoggedUserActivity().runOnUiThread(new Runnable() {
 
-                    listUsers = response.body().getAllUsers();
-
-                    Log.v("dddddd", listUsers.get(0).getId().toString());
-
-                    if (userConnected == null) {
-                        userConnected = selectUserConnectedFromList(listUsers);
+                    @Override
+                    public void run() {
+                        // quando un follow viene aggiunto/rimosso la socket avvisa del necessario aggiornmento
+                        //ProfileFragment.getProfileFragment().getAllUsersFragment().newGetAllUsers();
+                        //ProfileFragment.getProfileFragment().getProfileFollowingFragment(username).newGetAllUsers();
+                        //ProfileFragment.getProfileFragment().getProfileFollowersFragment(username).newGetAllUsers();
                     }
-
-                    Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), "AGGIORNO MA NON é PROPOOo", Toast.LENGTH_SHORT).show();
-
-                    initializeRecyclerView();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<GetAllUsersResponse> call, Throwable t) {
-                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        });
-    }
-
-    private User selectUserConnectedFromList(List<User> listUsers){
-        for (User user : listUsers) {
-            if (user.getId().equals(LoggedUserActivity.getIdLoggedUser())) {
-                return user;
+                });
             }
         }
+    };
 
-        return null;
+    /**
+     * Consente di recuperare tutti i post:
+     * - streams: lista dei post dell'utente e dei suoi following
+     * - favorites: sono i post a cui l'utente ha espresso la preferenza
+     * Viene mandata una richiesta http per recuperati i dal server.
+     */
+    public void newGetAllUsers() {
+
+        if (getArguments() == null) {
+            return;
+        }
+
+        final String type = getArguments().getString("type");
+        username = getArguments().getString("username");
+
+        UsersService usersService = ServiceGenerator.createService(UsersService.class, LoggedUserActivity.getToken());
+
+        if (type.equals("all")) {
+
+            titleTextView.setVisibility(View.VISIBLE);
+
+            Call<GetAllUsersResponse> httpRequest = usersService.getAllUsers();
+
+            httpRequest.enqueue(new Callback<GetAllUsersResponse>() {
+                @Override
+                public void onResponse(Call<GetAllUsersResponse> call, Response<GetAllUsersResponse> response) {
+                    if (response.isSuccessful()) {
+                        assert response.body() != null : "body() non doveva essere null";
+
+                        listUsers = response.body().getAllUsers();
+
+                        User loggedUser = null;
+
+                        for (User u : listUsers) {
+                            if (u.getUsername().equals(LoggedUserActivity.getUsernameLoggedUser())){
+                                loggedUser = u;
+                            }
+                        }
+
+                        listUsers.remove(loggedUser);
+
+                        initializeRecyclerView();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<GetAllUsersResponse> call, Throwable t) {
+                    Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            });
+        } else if (type.equals("following") && !username.isEmpty()) {
+
+            titleTextView.setVisibility(View.GONE);
+
+            Call<GetFollowingResponse> httpRequest = usersService.getFollowing(username);
+
+            httpRequest.enqueue(new Callback<GetFollowingResponse>() {
+                @Override
+                public void onResponse(Call<GetFollowingResponse> call, Response<GetFollowingResponse> response) {
+                    if (response.isSuccessful()) {
+                        assert response.body() != null : "body() non doveva essere null";
+
+                        if (response.body().getFollowingList() != null) {
+                            listUsers = response.body().getFollowingList();
+                        }
+
+                        initializeRecyclerView();
+                    }else {
+                        Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<GetFollowingResponse> call, Throwable t) {
+                    Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            });
+        } else if (type.equals("followers") && !username.isEmpty()) {
+
+            titleTextView.setVisibility(View.GONE);
+
+            Call<GetFollowersResponse> httpRequest = usersService.getFollowers(username);
+
+            httpRequest.enqueue(new Callback<GetFollowersResponse>() {
+                @Override
+                public void onResponse(Call<GetFollowersResponse> call, Response<GetFollowersResponse> response) {
+                    if (response.isSuccessful()) {
+                        assert response.body() != null : "body() non doveva essere null";
+
+                        if (response.body().getFollowersList() != null) {
+                            listUsers = response.body().getFollowersList();
+                        }
+
+                        initializeRecyclerView();
+                    }else {
+                        Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<GetFollowersResponse> call, Throwable t) {
+                    Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            });
+        }
     }
 
     /**
      * Viene collegata la recycler view con l'adapter
      */
     private void initializeRecyclerView() {
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.list_users);
-        if (adapter == null) {
-            adapter = new PeopleListAdapter(listUsers);
+        RecyclerView recyclerView = view.findViewById(R.id.list_users);
+        if (adapter == null){
+            adapter = new PeopleListAdapter(this.listUsers);
         }
 
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
+
+   /* private void clearRecyclerView() {
+        recyclerView.getRecycledViewPool().clear();
+        adapter.notifyDataSetChanged();
+    }*/
 }

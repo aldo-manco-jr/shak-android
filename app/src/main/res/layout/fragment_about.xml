@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".settings.controllers.AboutFragment"
+    android:id="@+id/AboutFragment"
+    android:background="@color/colorSHAK">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/copertinaAbout"
+            android:layout_width="352dp"
+            android:layout_height="191dp"
+            android:layout_marginTop="40dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@drawable/shak_logo_shadow" />
+
+        <ScrollView
+            android:layout_width="356dp"
+            android:layout_height="302dp"
+            app:layout_constraintBottom_toTopOf="@+id/exit"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/copertinaAbout"
+            app:layout_constraintVertical_bias="0.148">
+
+            <TextView
+                android:id="@+id/storiaAbout"
+
+                android:layout_width="355dp"
+                android:layout_height="338dp"
+                android:layout_marginTop="28dp"
+                android:text="TextView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+        </ScrollView>
+
+        <Button
+            android:id="@+id/exit"
+            android:layout_width="374dp"
+            android:layout_height="59dp"
+            android:background="@color/colorSHAK"
+            android:text="Exit"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>
