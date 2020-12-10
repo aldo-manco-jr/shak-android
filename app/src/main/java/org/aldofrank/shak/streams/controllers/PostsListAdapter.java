@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.Target;
-import com.github.nkzawa.emitter.Emitter;
 
 import org.aldofrank.shak.R;
 import org.aldofrank.shak.models.Post;
@@ -91,7 +90,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
 
         Date date = null;
         try {
-            date = localTimeToUtc(listPosts.get(position).getCreatedAt());
+            date = localTimeToUtc(post.getCreatedAt());
         } catch (ParseException ignored) {}
 
         PrettyTime formattedDateTime = new PrettyTime();
@@ -136,7 +135,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
             @Override
             public void onClick(View view) {
                 //todo potrebbe perdere delle funzionalità dopo la cancellazione o l'aggiunta di nuovi post
-                likeOrUnlike(listPosts.get(position), holder, view, type);
+                likeOrUnlike(post, holder, view, type);
             }
         });
 
@@ -146,16 +145,16 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
 
                 if (type.equals("all") || type.equals("favourites")) {
                     HomeFragment.getHomeFragment().getFragmentManager().beginTransaction()
-                            .replace(R.id.home_fragment, HomeFragment.getHomeFragment().getCommentsListFragment(listPosts.get(position))).commit();
+                            .replace(R.id.home_fragment, HomeFragment.getHomeFragment().getCommentsListFragment(post)).commit();
                 } else if (type.equals("profile")) {
                     ProfileFragment.getProfileFragment().getFragmentManager().beginTransaction()
-                            .replace(R.id.profile_fragment, ProfileFragment.getProfileFragment().getCommentsListFragment(listPosts.get(position))).commit();
+                            .replace(R.id.profile_fragment, ProfileFragment.getProfileFragment().getCommentsListFragment(post)).commit();
                 }
             }
         });
 
-        holder.likesCounter.setText(listPosts.get(position).getTotalLikes() + "");
-        holder.commentsCounter.setText(listPosts.get(position).getArrayComments().size() + "");
+        holder.likesCounter.setText(post.getTotalLikes() + "");
+        holder.commentsCounter.setText(post.getArrayComments().size() + "");
 
         if (post.getUsernamePublisher().equals(LoggedUserActivity.getUsernameLoggedUser())) {
             holder.deletePostButton.setVisibility(View.VISIBLE);
@@ -216,10 +215,15 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
 
         int originaListPostSize = this.listPosts.size() - 1;
         this.listPosts = newAndOldPost;
+        //HomeFragment.getHomeFragment().getStreamsFragment().adapter.notifyDataSetChanged();
+        //TODO USARE QUESTO HomeFragment.getHomeFragment().getStreamsFragment().adapter.notifyItemInserted(0);
         //singolo post nofityiteminserted
-        postsListFragment.adapter.notifyItemInserted(0);
+        //this.notifyItemInserted(0);
+        //this.notifyDataSetChanged();
+        //postsListFragment.adapter.notifyDataSetChanged();
+        //postsListFragment.adapter.notifyItemInserted(0);
         //multiple post notifyitemrangechanged
-        postsListFragment.adapter.notifyItemRangeChanged(originaListPostSize, listPosts.size());
+        //postsListFragment.adapter.notifyItemRangeChanged(originaListPostSize, listPosts.size());
     }
 
     /**
@@ -260,8 +264,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
                         holder.likeButton.setTag("like");
 
                         post.addLiketoArray(LoggedUserActivity.getUsernameLoggedUser());
-                        postsListFragment.adapter.notifyItemChanged(holder.getAdapterPosition());
-
+                        postsListFragment.adapter.notifyDataSetChanged();
                         HomeFragment.getHomeFragment().getFavouritesFragment().pushOnFavoritesList(post);
                     } else {
                         Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
@@ -290,7 +293,8 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
 
                         if (type.equals("all")) {
                             post.removeLikeFromArray(LoggedUserActivity.getUsernameLoggedUser());
-                            HomeFragment.getHomeFragment().getStreamsFragment().adapter.notifyItemChanged(holder.getAdapterPosition());
+                            //HomeFragment.getHomeFragment().getStreamsFragment().adapter.notifyItemChanged(holder.getAdapterPosition());
+                            HomeFragment.getHomeFragment().getStreamsFragment().adapter.notifyDataSetChanged();
                             favouritesFragment.removeLikeFromFavoritesList(post);
                         } else {
                             postsListFragment.removeLikeFromStreamsList(post, holder, streamsFragment, favouritesFragment);
@@ -306,14 +310,6 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
                 }
             });
         }
-    }
-
-    private void removePostFromRecyclerView(int position, View view){
-        RecyclerView recyclerView = fragmentView.findViewById(R.id.listPosts);
-
-        recyclerView.removeView(view);//recyclerView.removeViewAt(position);
-        postsListFragment.adapter.notifyItemRemoved(position);
-        postsListFragment.adapter.notifyItemRangeChanged(position, listPosts.size());
     }
 
     public class PostItemHolder extends RecyclerView.ViewHolder {

@@ -1,18 +1,13 @@
 package org.aldofrank.shak.models;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.gson.annotations.SerializedName;
 
-import org.json.JSONObject;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Post {
+public class Post implements Comparable<Post> {
 
     @SerializedName("_id")
     private JsonElement postId;
@@ -129,6 +124,31 @@ public class Post {
 
     public String getCreatedAt() {
         return createdAt;
+    }
+
+    @Override
+    public int hashCode() {
+        return this.usernamePublisher.hashCode() + this.createdAt.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Post))
+            return false;
+        Post anotherElement = (Post) o;
+        return this.createdAt.equals(anotherElement.createdAt)
+                && this.usernamePublisher.equals(anotherElement.usernamePublisher);
+    }
+
+    @Override
+    public int compareTo(Post post) {
+        int usernameComparationResult = this.usernamePublisher.compareTo(post.usernamePublisher);
+        int createdAtComparationResult = this.createdAt.compareTo(post.createdAt);
+
+        if (usernameComparationResult == 0 && createdAtComparationResult == 0)
+            return 0;
+        else
+            return createdAtComparationResult;
     }
 
     public class Comment{

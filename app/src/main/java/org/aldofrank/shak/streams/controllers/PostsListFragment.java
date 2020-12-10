@@ -174,7 +174,7 @@ public class PostsListFragment extends Fragment {
                     } else {
                         //TODO nel caso in cui non sia possibile accedere a internet usare response.code
                         // e response.message causa il crash dell'applicazione
-                        //Toast.makeText(getActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                     }
                 }
 
@@ -204,29 +204,7 @@ public class PostsListFragment extends Fragment {
         StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
 
         if (type.equals("all") || type.equals("favourites")) {
-            //home: streams fragment e fovourites fragment
-            //Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), "--- " + lastPostDate, Toast.LENGTH_SHORT).show();
-
-            //TODO, FORSE OCCORRE METTERE NON IL PRIMO POST MA L'ULTIMO
-            Call<GetNewPostsListResponse> httpRequest = null;
-            /*JsonObject lastPostDateObject = new JsonObject();
-            lastPostDateObject.addProperty("created_at", lastPostDate);*/
-/*
-            try {
-               // httpRequest = streamsService.getAllNewPosts(PostsListAdapter.localTimeToUtc(lastPostDate));
-                httpRequest = streamsService.getAllNewPosts(PostsListAdapter.localTimeToUtc(lastPostDate));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            };
-*/
-            httpRequest = streamsService.getAllNewPosts(lastPostDate);
-            /*if (lastPostDate != null) {
-                JsonObject lastPostDateObject = new JsonObject();
-                lastPostDateObject.addProperty("created_at", lastPostDate);
-                httpRequest = streamsService.getAllNewPosts(lastPostDateObject);
-            } else {
-                //httpRequest = streamsService.getAllPosts();
-            }*/
+            Call<GetNewPostsListResponse> httpRequest = streamsService.getAllNewPosts(lastPostDate);
 
             httpRequest.enqueue(new Callback<GetNewPostsListResponse>() {
                 @Override
@@ -234,22 +212,11 @@ public class PostsListFragment extends Fragment {
                     if (response.isSuccessful()) {
                         assert response.body() != null : "body() non doveva essere null";
 
-                        //Toast.makeText(getActivity(), "Success getAllNewResponse", Toast.LENGTH_SHORT).show();
-
-                        /*List<Post> newListPosts = null;
-
-                        if (type.equals("all")) {
-                            newListPosts = response.body().getArrayPosts();
-                        } else if (type.equals("favourites")) {
-                            newListPosts = response.body().getArrayPosts();
-                        }*/
                         Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), "QUANTI===??"+response.body().getArrayPosts().size(), Toast.LENGTH_SHORT).show();
-                        //Toast.makeText(getActivity(),  response.body().getMessage().toString(), Toast.LENGTH_SHORT).show();
-                        //Toast.makeText(getActivity(),  response.body().toString(), Toast.LENGTH_SHORT).show();
-                        //Toast.makeText(getActivity(),  response.body().getArrayPosts().toString(), Toast.LENGTH_SHORT).show();
+
                         List<Post> newListPosts = response.body().getArrayPosts();
-                        //Toast.makeText(getActivity(), "NEW POST", Toast.LENGTH_LONG).show();
                         boolean isNewPostExist = (newListPosts != null && newListPosts.size() > 0);
+
                         if (isNewPostExist) {
                             lastPostDate = newListPosts.get(0).getCreatedAt();
 
@@ -291,7 +258,7 @@ public class PostsListFragment extends Fragment {
                     } else {
                         //TODO nel caso in cui non sia possibile accedere a internet usare response.code
                         // e response.message causa il crash dell'applicazione
-                        //Toast.makeText(getActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                     }
                 }
 
@@ -329,6 +296,8 @@ public class PostsListFragment extends Fragment {
         Log.v("update", String.valueOf(newListPosts.size()));
 
         adapter.addPosts(newListPosts);
+
+        HomeFragment.getHomeFragment().getStreamsFragment().adapter.notifyItemInserted(0);
     }
 
     void pushOnFavoritesList(Post post){
@@ -343,6 +312,7 @@ public class PostsListFragment extends Fragment {
                                     PostsListFragment streamsFragment,
                                     PostsListFragment favouritesFragment){
         List<Post> listPosts = streamsFragment.adapter.getListPosts();
+
         for (int i = 0; i < listPosts.size(); i++) {
             if (listPosts.get(i).equals(post)){
                 listPosts.get(i).removeLikeFromArray(LoggedUserActivity.getUsernameLoggedUser());
@@ -357,9 +327,10 @@ public class PostsListFragment extends Fragment {
         RecyclerView recyclerView = favoritesView.findViewById(R.id.listPosts);
         recyclerView.removeView(recyclerView);
 
-        favouritesFragment.adapter.notifyItemRemoved(holder.getAdapterPosition());
-        favouritesFragment.adapter.notifyItemRangeChanged(holder.getAdapterPosition(), listPosts.size());
+        //favouritesFragment.adapter.notifyItemRemoved(holder.getAdapterPosition());
+        //favouritesFragment.adapter.notifyItemRangeChanged(holder.getAdapterPosition(), listPosts.size());
         favouritesFragment.adapter.getListPosts().remove(post);
+        favouritesFragment.adapter.notifyItemRemoved(holder.getAdapterPosition());
     }
 
     void removeLikeFromFavoritesList(Post post){
@@ -382,23 +353,6 @@ public class PostsListFragment extends Fragment {
         }
     }
 
-    void updateUnlikeOnStreamsList(Post post, View v){
-        int position = getPostPosition(post);
-        PostsListFragment favouritesFragment = HomeFragment.getHomeFragment().getFavouritesFragment();
-
-        if (position > -1) {
-            // la posizione del post è valida
-            View favoritesView =  HomeFragment.getHomeFragment().getFavouritesFragment().getView();
-            RecyclerView recyclerView = favoritesView.findViewById(R.id.listPosts);
-            recyclerView.removeView(v);
-
-            favouritesFragment.adapter.notifyItemRemoved(position);
-            favouritesFragment.adapter.notifyItemRangeChanged(position, listPosts.size());
-
-            favouritesFragment.listPosts.remove(post);
-        }
-    }
-
     /**
      * TODO
      */
@@ -413,26 +367,13 @@ public class PostsListFragment extends Fragment {
     }
 
     /**
-     * @param position Indica la posizione di un elemento nella recycler view
-     *
-     * Rimuove un oggetto nella posizione specificata dalla recycler view
-     */
-    //TODO non più usato perchò usato dall'altra class
-    /*protected void removeItemByPositionFromRecyclerView(int position) {
-        RecyclerView recyclerView = view.findViewById(R.id.listPosts);
-
-        recyclerView.removeViewAt(position);
-        adapter.notifyItemRemoved(position);
-        adapter.notifyItemRangeChanged(position, listPosts.size());
-    }*/
-
-
-    /**
      * Questa funzione è accesibile solo per i post dell'utente autenticato e invia una richiesta
      * http in cui richieste la cancellazione del post.
      */
-    void deletePost(final Post selectPost, final View view,
-                    final PostsListAdapter.PostItemHolder holder, final String type) {
+    void deletePost(final Post selectPost,
+                    final View view,
+                    final PostsListAdapter.PostItemHolder holder,
+                    final String type) {
         StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
         Call<Object> httpRequest = streamsService.deletePost(selectPost);
 
@@ -451,6 +392,7 @@ public class PostsListFragment extends Fragment {
                         removePostFromPrimaryTab(favouritesFragment, selectPost, view, favouritesRecyclerView, holder);
                         removePostFromSecondaryTab(streamsFragment, selectPost);
                     } else {
+                        Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), "rimuovo anche da favourites", Toast.LENGTH_SHORT).show();
                         removePostFromPrimaryTab(streamsFragment, selectPost, view, streamsRecyclerView, holder);
                         removePostFromSecondaryTab(favouritesFragment, selectPost);
                     }
@@ -468,18 +410,19 @@ public class PostsListFragment extends Fragment {
 
     /**
      * @param postListFragment
-     * @param selectPost
+     * @param post
      * @param view
      * @param recyclerView
+     * @param holder
      *
      *TODO COMMENTARE
      */
-    private static void removePostFromPrimaryTab(PostsListFragment postListFragment, Post selectPost,
+    private static void removePostFromPrimaryTab(PostsListFragment postListFragment, Post post,
                                                  View view, RecyclerView recyclerView, PostsListAdapter.PostItemHolder holder){
         recyclerView.removeView(view);
-        postListFragment.adapter.getListPosts().remove(selectPost);
+
+        postListFragment.adapter.getListPosts().remove(post);
         postListFragment.adapter.notifyItemRemoved(holder.getAdapterPosition());
-        postListFragment.adapter.notifyItemRangeChanged(holder.getAdapterPosition(), postListFragment.adapter.getListPosts().size());
     }
 
     /**
@@ -489,17 +432,43 @@ public class PostsListFragment extends Fragment {
      *TODO COMMENTARE
      */
     private static void removePostFromSecondaryTab(PostsListFragment postsListFragment, Post selectPost){
-        for (int i = 0; i < postsListFragment.adapter.getListPosts().size(); i++) {
-            Post post = postsListFragment.adapter.getListPosts().get(i);
-
-            if (post.equals(selectPost)){
+        List<Post> listPosts = postsListFragment.adapter.getListPosts();
+        for (int i = 0; i < listPosts.size(); i++) {
+            if (listPosts.get(i).equals(selectPost)){
                 // rimuovo il post
-                postsListFragment.adapter.getListPosts().remove(post);
+                postsListFragment.adapter.getListPosts().remove(listPosts.get(i));
                 postsListFragment.adapter.notifyItemRemoved(i);
-                postsListFragment.adapter.notifyItemRangeChanged(i, postsListFragment.adapter.getListPosts().size());
+                postsListFragment.adapter.notifyItemRangeChanged(i, listPosts.size());
 
                 break;
             }
         }
+        Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), "ITERATOOO????::: " + listPosts.size(), Toast.LENGTH_SHORT).show();
+
+    }
+
+    //TODO IMPLEMENTATO per recuperare l'istanza se non è più in memoria
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        // Save UI state changes to the savedInstanceState.
+        // This bundle will be passed to onCreate if the process is
+        // killed and restarted.
+        /*savedInstanceState.putBoolean("MyBoolean", true);
+        savedInstanceState.putDouble("myDouble", 1.9);
+        savedInstanceState.putInt("MyInt", 1);
+        savedInstanceState.putString("MyString", "Welcome back to Android");*/
+        // etc.
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        // Restore UI state from the savedInstanceState.
+        // This bundle has also been passed to onCreate.
+        /*boolean myBoolean = savedInstanceState.getBoolean("MyBoolean");
+        double myDouble = savedInstanceState.getDouble("myDouble");
+        int myInt = savedInstanceState.getInt("MyInt");
+        String myString = savedInstanceState.getString("MyString");*/
     }
 }
