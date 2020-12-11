@@ -196,7 +196,13 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
             @Override
             public void onResponse(Call<Object> call, Response<Object> response) {
                 if (response.isSuccessful()) {
-                    LoggedUserActivity.getSocket().emit("refresh");
+
+                    if (followButton.getText().equals("unfollow")){
+                        followButton.setText("follow");
+                    }else if (followButton.getText().equals("follow")){
+                        followButton.setText("unfollow");
+                    }
+                    //LoggedUserActivity.getSocket().emit("refresh");
                 } else {
                     Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + "   " + response.message(), Toast.LENGTH_LONG).show();
                 }
@@ -229,7 +235,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
                     if (response.body().getMessage().equals("yes")) {
                         followButton.setText("unfollow");
                     }
-                    LoggedUserActivity.getSocket().emit("refresh");
+                    //LoggedUserActivity.getSocket().emit("refresh");
                 } else {
                     Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                 }

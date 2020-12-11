@@ -144,7 +144,13 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
             @Override
             public void onResponse(Call<Object> call, Response<Object> response) {
                 if (response.isSuccessful()) {
-                    LoggedUserActivity.getSocket().emit("refresh");
+
+                    if (holder.followButton.getText().equals("unfollow")){
+                        holder.followButton.setText("follow");
+                    }else if (holder.followButton.getText().equals("follow")){
+                        holder.followButton.setText("unfollow");
+                    }
+                    //LoggedUserActivity.getSocket().emit("refresh");
                 } else {
                     Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + "   " + response.message(), Toast.LENGTH_LONG).show();
                 }
@@ -177,7 +183,7 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
                     if (response.body().getMessage().equals("yes")) {
                             holder.followButton.setText("unfollow");
                     }
-                    LoggedUserActivity.getSocket().emit("refresh");
+                    //LoggedUserActivity.getSocket().emit("refresh");
                 } else {
                     Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                 }
