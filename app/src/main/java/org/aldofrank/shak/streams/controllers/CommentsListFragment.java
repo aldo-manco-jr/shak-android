@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.github.nkzawa.emitter.Emitter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.aldofrank.shak.R;
@@ -60,6 +61,8 @@ public class CommentsListFragment extends Fragment implements OnBackPressed {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        LoggedUserActivity.getSocket().on("refreshPage", updatePostCommentsList);
     }
 
     @Override
@@ -79,10 +82,9 @@ public class CommentsListFragment extends Fragment implements OnBackPressed {
             public void onClick(View view) {
                 if (getArguments().getString("type").equals("home")){
                     LoggedUserActivity.getLoggedUserActivity().getSupportFragmentManager().beginTransaction().replace(R.id.logged_user_fragment, HomeFragment.getHomeFragment().getCommentFormFragment()).commit();
-                    //LoggedUserActivity.getLoggedUserActivity().changeFragment(HomeFragment.getHomeFragment().getCommentFormFragment());
+                    //LoggedUserActivity.getLoggedUserActivity().changeFragment();
                 }else if (getArguments().getString("type").equals("profile")){
                     LoggedUserActivity.getLoggedUserActivity().getSupportFragmentManager().beginTransaction().replace(R.id.logged_user_fragment, ProfileFragment.getProfileFragment().getCommentFormFragment()).commit();
-                    //LoggedUserActivity.getLoggedUserActivity().changeFragment(ProfileFragment.getProfileFragment().getCommentFormFragment());
                 }
             }
         });
@@ -91,6 +93,32 @@ public class CommentsListFragment extends Fragment implements OnBackPressed {
 
         return view;
     }
+
+    /**
+     * Quando un post viene pubblicato la home page viene aggiornata.
+     */
+    private Emitter.Listener updatePostCommentsList = new Emitter.Listener() {
+
+        @Override
+        public void call(final Object... args) {
+            if (LoggedUserActivity.getLoggedUserActivity() != null) {
+                LoggedUserActivity.getLoggedUserActivity().runOnUiThread(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        // quando un post viene pubblicato la socket avvisa del necessario aggiornmento
+                        if (getArguments().getString("type").equals("home")){
+                            Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), "home", Toast.LENGTH_LONG).show();
+                            HomeFragment.getHomeFragment().getCommentsListFragment().getAllPostComments();
+                        }else if (getArguments().getString("type").equals("profile")){
+                            Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), "profile", Toast.LENGTH_LONG).show();
+                            ProfileFragment.getProfileFragment().getCommentsListFragment().getAllPostComments();
+                        }
+                    }
+                });
+            }
+        }
+    };
 
     public void getAllPostComments() {
 

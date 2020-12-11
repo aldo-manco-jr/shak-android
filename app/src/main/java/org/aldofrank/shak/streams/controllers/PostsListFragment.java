@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import org.aldofrank.shak.R;
 import org.aldofrank.shak.models.Post;
+import org.aldofrank.shak.profile.controllers.ProfileFragment;
 import org.aldofrank.shak.services.ServiceGenerator;
 import org.aldofrank.shak.services.StreamsService;
 import org.aldofrank.shak.streams.http.GetAllUserPostsResponse;
@@ -333,6 +334,23 @@ public class PostsListFragment extends Fragment {
         favouritesFragment.adapter.notifyItemRemoved(holder.getAdapterPosition());
     }
 
+    void  removeLikeFromProfilePostsList(Post post,
+                                    PostsListAdapter.PostItemHolder holder,
+                                    PostsListFragment profilePostsFragment){
+
+        List<Post> listPosts = profilePostsFragment.adapter.getListPosts();
+
+        for (int i = 0; i < listPosts.size(); i++) {
+            if (listPosts.get(i).equals(post)){
+                listPosts.get(i).removeLikeFromArray(LoggedUserActivity.getUsernameLoggedUser());
+
+                profilePostsFragment.adapter.notifyItemChanged(i, listPosts.get(i));
+
+                break;
+            }
+        }
+    }
+
     void removeLikeFromFavoritesList(Post post){
         //devo aggiornare il post di streams e levarlo da favourites
         PostsListFragment favouritesFragment = HomeFragment.getHomeFragment().getFavouritesFragment();
@@ -381,21 +399,33 @@ public class PostsListFragment extends Fragment {
             @Override
             public void onResponse(Call<Object> call, Response<Object> response) {
                 if (response.isSuccessful()) {
-                    PostsListFragment favouritesFragment = HomeFragment.getHomeFragment().getFavouritesFragment();
-                    RecyclerView favouritesRecyclerView = favouritesFragment.getView().findViewById(R.id.listPosts);
 
-                    PostsListFragment streamsFragment = HomeFragment.getHomeFragment().getStreamsFragment();
-                    RecyclerView streamsRecyclerView = streamsFragment.getView().findViewById(R.id.listPosts);
+                    if (!type.equals("profile")) {
 
-                    if (type.equals("favourites")){
-                        // il post da riuovere è stato selezionato dal pannello favourites
-                        removePostFromPrimaryTab(favouritesFragment, selectPost, view, favouritesRecyclerView, holder);
-                        removePostFromSecondaryTab(streamsFragment, selectPost);
-                    } else {
-                        Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), "rimuovo anche da favourites", Toast.LENGTH_SHORT).show();
-                        removePostFromPrimaryTab(streamsFragment, selectPost, view, streamsRecyclerView, holder);
-                        removePostFromSecondaryTab(favouritesFragment, selectPost);
+                        PostsListFragment favouritesFragment = HomeFragment.getHomeFragment().getFavouritesFragment();
+                        RecyclerView favouritesRecyclerView = favouritesFragment.getView().findViewById(R.id.listPosts);
+
+                        PostsListFragment streamsFragment = HomeFragment.getHomeFragment().getStreamsFragment();
+                        RecyclerView streamsRecyclerView = streamsFragment.getView().findViewById(R.id.listPosts);
+
+                        if (type.equals("favourites")) {
+                            // il post da riuovere è stato selezionato dal pannello favourites
+                            removePostFromPrimaryTab(favouritesFragment, selectPost, view, favouritesRecyclerView, holder);
+                            removePostFromSecondaryTab(streamsFragment, selectPost);
+                        } else if (type.equals("all")) {
+                            Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), "rimuovo anche da favourites", Toast.LENGTH_SHORT).show();
+                            removePostFromPrimaryTab(streamsFragment, selectPost, view, streamsRecyclerView, holder);
+                            removePostFromSecondaryTab(favouritesFragment, selectPost);
+                        }
+
+                    }else{
+
+                        PostsListFragment profilePostsFragment = ProfileFragment.getProfileFragment().getProfilePostsFragment(selectPost.getUsernamePublisher());
+                        RecyclerView profilePostsRecyclerView = profilePostsFragment.getView().findViewById(R.id.listPosts);
+
+                        removePostFromPrimaryTab(profilePostsFragment, selectPost, view, profilePostsRecyclerView, holder);
                     }
+
                 } else {
                     Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                 }

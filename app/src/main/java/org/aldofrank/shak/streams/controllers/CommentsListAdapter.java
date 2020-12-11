@@ -31,6 +31,7 @@ import org.ocpsoft.prettytime.PrettyTime;
 
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -45,44 +46,18 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
 
     public static String postId;
 
-    private String type;
-
     private final String basicUrlImage = "http://res.cloudinary.com/dfn8llckr/image/upload/v";
 
     private User user;
 
     public CommentsListAdapter(List<Post.Comment> listComments, String type) {
-        this.listComments = listComments;
-        this.type = type;
 
-        LoggedUserActivity.getSocket().on("refreshPage", updatePostCommentsList);
-    }
+        this.listComments = new ArrayList<>();
 
-    /**
-     * Quando un post viene pubblicato la home page viene aggiornata.
-     */
-    private Emitter.Listener updatePostCommentsList = new Emitter.Listener() {
-
-        @Override
-        public void call(final Object... args) {
-            if (LoggedUserActivity.getLoggedUserActivity() != null) {
-                LoggedUserActivity.getLoggedUserActivity().runOnUiThread(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        // quando un post viene pubblicato la socket avvisa del necessario aggiornmento
-                        if (type.equals("home")){
-                            Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), "home", Toast.LENGTH_LONG).show();
-                            HomeFragment.getHomeFragment().getCommentsListFragment().getAllPostComments();
-                        }else if (type.equals("profile")){
-                            Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), "profile", Toast.LENGTH_LONG).show();
-                            ProfileFragment.getProfileFragment().getCommentsListFragment().getAllPostComments();
-                        }
-                    }
-                });
-            }
+        for (int i = listComments.size()-1; i >= 0; i--) {
+            this.listComments.add(listComments.get(i));
         }
-    };
+    }
 
     @NonNull
     @Override

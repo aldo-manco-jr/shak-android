@@ -221,17 +221,17 @@ public class LoggedUserActivity extends AppCompatActivity {
     private void tellFragments(){
         List<Fragment> fragments = getSupportFragmentManager().getFragments();
         for(Fragment fragment : fragments){
-            if(fragment != null && fragment instanceof PostFormFragment)
+            if(fragment instanceof PostFormFragment)
                 ((PostFormFragment)fragment).onBackPressed();
-            else if (fragment != null && fragment instanceof CommentsListFragment){
+            else if (fragment instanceof CommentsListFragment){
                 ((CommentsListFragment)fragment).onBackPressed();
-            }else if (fragment != null && fragment instanceof CommentFormFragment){
+            }else if (fragment instanceof CommentFormFragment){
                 ((CommentFormFragment)fragment).onBackPressed();
-            }else if(fragment!=null && fragment instanceof ProfileFragment){
+            }else if(fragment instanceof ProfileFragment){
                 ((ProfileFragment)fragment).onBackPressed();
-            }else if(fragment!=null && fragment instanceof ChangePwdFragment){
+            }else if(fragment instanceof ChangePwdFragment){
                 ((ChangePwdFragment)fragment).onBackPressed();
-            }else if(fragment!=null && fragment instanceof AboutFragment){
+            }else if(fragment instanceof AboutFragment){
                 ((AboutFragment)fragment).onBackPressed();
             }
         }

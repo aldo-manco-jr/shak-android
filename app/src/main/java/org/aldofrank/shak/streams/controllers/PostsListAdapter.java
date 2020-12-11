@@ -144,12 +144,8 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
             public void onClick(View view) {
 
                 if (type.equals("all") || type.equals("favourites")) {
-                    /*HomeFragment.getHomeFragment().getFragmentManager().beginTransaction()
-                            .replace(R.id.home_fragment, ).commit();*/
                     LoggedUserActivity.getLoggedUserActivity().changeFragment(HomeFragment.getHomeFragment().getCommentsListFragment(post));
                 } else if (type.equals("profile")) {
-                    /*ProfileFragment.getProfileFragment().getFragmentManager().beginTransaction()
-                            .replace(R.id.profile_fragment, ).commit();*/
                     LoggedUserActivity.getLoggedUserActivity().changeFragment(ProfileFragment.getProfileFragment().getCommentsListFragment(post));
                 }
             }
@@ -290,18 +286,21 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
                         holder.likeButton.setImageResource(R.drawable.ic_favorite_border_black_24dp);
                         holder.likeButton.setTag("unlike");
 
-                        PostsListFragment favouritesFragment = HomeFragment.getHomeFragment().getFavouritesFragment();
-                        PostsListFragment streamsFragment =  HomeFragment.getHomeFragment().getStreamsFragment();
+                        if (!type.equals("profile")){
+                            PostsListFragment streamsFragment =  HomeFragment.getHomeFragment().getStreamsFragment();
+                            PostsListFragment favouritesFragment = HomeFragment.getHomeFragment().getFavouritesFragment();
 
-                        if (type.equals("all")) {
-                            post.removeLikeFromArray(LoggedUserActivity.getUsernameLoggedUser());
-                            //HomeFragment.getHomeFragment().getStreamsFragment().adapter.notifyItemChanged(holder.getAdapterPosition());
-                            HomeFragment.getHomeFragment().getStreamsFragment().adapter.notifyDataSetChanged();
-                            favouritesFragment.removeLikeFromFavoritesList(post);
-                        } else if (type.equals("favourites")){
-                            postsListFragment.removeLikeFromStreamsList(post, holder, streamsFragment, favouritesFragment);
-                        }else if (type.equals("profile")){
-
+                            if (type.equals("all")) {
+                                post.removeLikeFromArray(LoggedUserActivity.getUsernameLoggedUser());
+                                //HomeFragment.getHomeFragment().getStreamsFragment().adapter.notifyItemChanged(holder.getAdapterPosition());
+                                HomeFragment.getHomeFragment().getStreamsFragment().adapter.notifyDataSetChanged();
+                                favouritesFragment.removeLikeFromFavoritesList(post);
+                            } else if (type.equals("favourites")){
+                                postsListFragment.removeLikeFromStreamsList(post, holder, streamsFragment, favouritesFragment);
+                            }
+                        }else{
+                            PostsListFragment profilePostsFragment = ProfileFragment.getProfileFragment().getProfilePostsFragment(post.getUsernamePublisher());
+                            postsListFragment.removeLikeFromProfilePostsList(post, holder, profilePostsFragment);
                         }
                     } else {
                         Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
