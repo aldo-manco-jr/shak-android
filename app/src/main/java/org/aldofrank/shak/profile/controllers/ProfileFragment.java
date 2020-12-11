@@ -34,7 +34,9 @@ import org.aldofrank.shak.services.ServiceGenerator;
 import org.aldofrank.shak.services.UsersService;
 import org.aldofrank.shak.streams.controllers.CommentFormFragment;
 import org.aldofrank.shak.streams.controllers.CommentsListFragment;
+import org.aldofrank.shak.streams.controllers.HomeFragment;
 import org.aldofrank.shak.streams.controllers.LoggedUserActivity;
+import org.aldofrank.shak.streams.controllers.OnBackPressed;
 import org.aldofrank.shak.streams.controllers.PostsListFragment;
 
 import java.util.LinkedList;
@@ -45,7 +47,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class ProfileFragment extends Fragment implements View.OnClickListener {
+public class ProfileFragment extends Fragment implements View.OnClickListener, OnBackPressed {
 
     private User user;
 
@@ -440,6 +442,11 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        LoggedUserActivity.getLoggedUserActivity().changeFragment(HomeFragment.getHomeFragment());
     }
 
     private class ViewPagerAdapter extends FragmentPagerAdapter {

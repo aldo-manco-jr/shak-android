@@ -37,6 +37,8 @@ public class SettingsFragment extends Fragment {
 
     SharedPreferences sharedPreferences;
 
+    private static SettingsFragment settingsFragment;
+
     ListView listView;
     String mTitle[] = {"Change Password", "About", "Logout"};
     int images[] = {R.drawable.ic_change_password_white_24dp,R.drawable.ic_about_white_24dp, R.drawable.ic_logout_white_24dp};
@@ -47,6 +49,8 @@ public class SettingsFragment extends Fragment {
                             @Nullable Bundle savedInstanceState){
 
         View view = inflater.inflate(R.layout.fragment_settings, container, false);
+
+        sharedPreferences = LoggedUserActivity.getLoggedUserActivity().getSharedPreferences(getString(R.string.sharedpreferences_authentication), Context.MODE_PRIVATE);
 
         listView = view.findViewById(R.id.settingmenu);
 
@@ -59,33 +63,33 @@ public class SettingsFragment extends Fragment {
                 if (position == 0){
                        getChangePwdFragment();
                        // sostituisce il fragment attuale con un nuovo fragment
-                       getChildFragmentManager()
+                       /*getChildFragmentManager()
                                .beginTransaction()
                                .replace(R.id.settings, changePwdFragment)
-                               .addToBackStack("openChangePwdFragment")
-                               .commit();
+                               .commit();*/
+                    LoggedUserActivity.getLoggedUserActivity().changeFragment(changePwdFragment);
                 }
                 if (position == 1){
                     getAboutFragment();
                     // sostituisce il fragment attuale con un nuovo fragment
-                    getChildFragmentManager()
+                    /*getChildFragmentManager()
                             .beginTransaction()
                             .replace(R.id.settings, aboutFragment)
-                            .addToBackStack("openAboutFragment")
-                            .commit();
+                            .commit();*/
+                    LoggedUserActivity.getLoggedUserActivity().changeFragment(aboutFragment);
                 }
                 if (position == 2){
 
                     SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.remove(getString(R.string.sharedpreferences_authentication));
+                    editor.remove("authToken");
                     editor.commit();
 
                     LoggedUserActivity.getSocket().disconnect();
 
-                    LoggedUserActivity.getLoggedUserActivity().finish();
-
                     Intent intent = new Intent(getActivity(), MainActivity.class);
                     startActivity(intent);
+
+                    LoggedUserActivity.getLoggedUserActivity().finish();
                 }
             }
         });
@@ -139,6 +143,13 @@ public class SettingsFragment extends Fragment {
             }
             return aboutFragment;
         }
+
+    public static SettingsFragment getSettingsFragment() {
+        if (settingsFragment == null) {
+            settingsFragment = new SettingsFragment();
+        }
+        return settingsFragment;
+    }
 
     }
 

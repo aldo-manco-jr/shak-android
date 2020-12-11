@@ -87,10 +87,10 @@ public class CommentFormFragment extends Fragment implements View.OnClickListene
 
         @Override
         public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            if (charSequence.toString().isEmpty()){
+            if (charSequence.toString().isEmpty()) {
                 // quando il campo di testo del post è vuoto
                 buttonSubmitComment.setVisibility(View.GONE);
-            }else {
+            } else {
                 buttonSubmitComment.setVisibility(View.VISIBLE);
             }
         }
@@ -111,7 +111,7 @@ public class CommentFormFragment extends Fragment implements View.OnClickListene
         return fragment;
     }
 
-    private void submitComment(){
+    private void submitComment() {
 
         StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
 
@@ -148,16 +148,18 @@ public class CommentFormFragment extends Fragment implements View.OnClickListene
     /**
      * Il post viene chiuso e le informazioni scritte dall'utente vengono cancellate
      */
-    private void closeCommentBox(){
+    private void closeCommentBox() {
 
-        if (getArguments().getString("type").equals("home")){
-            getFragmentManager().beginTransaction().replace(R.id.home_fragment, HomeFragment.getHomeFragment().getCommentsListFragment()).addToBackStack("backCommentsListFragment").commit();
-        }else if (getArguments().getString("type").equals("profile")){
-            getFragmentManager().beginTransaction().replace(R.id.profile_fragment, ProfileFragment.getProfileFragment().getCommentsListFragment()).commit();
+        if (getArguments().getString("type").equals("home")) {
+            //LoggedUserActivity.getLoggedUserActivity().getSupportFragmentManager().beginTransaction().replace(R.id.logged_user_fragment, HomeFragment.getHomeFragment().getCommentsListFragment()).commit();
+            LoggedUserActivity.getLoggedUserActivity().changeFragment(HomeFragment.getHomeFragment().getCommentsListFragment());
+        } else if (getArguments().getString("type").equals("profile")) {
+            //LoggedUserActivity.getLoggedUserActivity().getSupportFragmentManager().beginTransaction().replace(R.id.logged_user_fragment, ProfileFragment.getProfileFragment().getCommentsListFragment()).commit();
+            LoggedUserActivity.getLoggedUserActivity().changeFragment(ProfileFragment.getProfileFragment().getCommentsListFragment());
         }
 
         commentContentField.setText("");
-        getFragmentManager().beginTransaction().remove(HomeFragment.getHomeFragment().getCommentFormFragment()).commitAllowingStateLoss();
+        //getFragmentManager().beginTransaction().remove(HomeFragment.getHomeFragment().getCommentFormFragment()).commitAllowingStateLoss();
     }
 
     /**
@@ -167,15 +169,15 @@ public class CommentFormFragment extends Fragment implements View.OnClickListene
 
         @Override
         public void call(final Object... args) {
-            if (getActivity() != null){
+            if (getActivity() != null) {
                 getActivity().runOnUiThread(new Runnable() {
 
                     @Override
                     public void run() {
                         // quando un post viene pubblicato la socket avvisa del necessario aggiornamento
-                        if (getArguments().getString("type").equals("home")){
+                        if (getArguments().getString("type").equals("home")) {
                             HomeFragment.getHomeFragment().getCommentsListFragment().getAllPostComments();
-                        }else if (getArguments().getString("type").equals("profile")){
+                        } else if (getArguments().getString("type").equals("profile")) {
                             ProfileFragment.getProfileFragment().getCommentsListFragment().getAllPostComments();
                         }
                     }
@@ -188,7 +190,7 @@ public class CommentFormFragment extends Fragment implements View.OnClickListene
     public void onClick(View view) {
         int idButtonPressed = view.getId();
 
-        switch (idButtonPressed){
+        switch (idButtonPressed) {
             case R.id.fab_submit_comment_button:
                 submitComment();
                 break;
@@ -200,6 +202,6 @@ public class CommentFormFragment extends Fragment implements View.OnClickListene
 
     @Override
     public void onBackPressed() {
-        getFragmentManager().beginTransaction().remove(HomeFragment.getHomeFragment().getCommentFormFragment()).commitAllowingStateLoss();
+        closeCommentBox();
     }
 }

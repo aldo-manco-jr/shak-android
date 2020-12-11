@@ -30,7 +30,9 @@ import org.aldofrank.shak.services.NotificationsService;
 import org.aldofrank.shak.services.ServiceGenerator;
 import org.aldofrank.shak.services.UsersService;
 import org.aldofrank.shak.settings.http.ChangePasswordRequest;
+import org.aldofrank.shak.streams.controllers.HomeFragment;
 import org.aldofrank.shak.streams.controllers.LoggedUserActivity;
+import org.aldofrank.shak.streams.controllers.OnBackPressed;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -44,7 +46,7 @@ import retrofit2.Response;
  *  ChangePwdFragment è il fragment che ci permette di utilizzare la funzione di cambio password
  *  dell'utente loggato
  */
-public class ChangePwdFragment extends Fragment implements View.OnClickListener, View.OnTouchListener {
+public class ChangePwdFragment extends Fragment implements View.OnClickListener, View.OnTouchListener, OnBackPressed {
 
     private EditText oldPwd;
     private EditText newPwd;
@@ -54,7 +56,6 @@ public class ChangePwdFragment extends Fragment implements View.OnClickListener,
 
     private ProgressBar loadingBar;
     private User user;
-    private SettingsFragment settings;
 
     private Button changeButton;
 
@@ -119,20 +120,22 @@ public class ChangePwdFragment extends Fragment implements View.OnClickListener,
             @Override
             public void onResponse(Call<Object> call, Response<Object> response) {
                 if (response.isSuccessful()){
-                    getSettingsFragment();
-                    getChildFragmentManager()
+                    SettingsFragment.getSettingsFragment();
+                    /*getChildFragmentManager()
                             .beginTransaction()
                             .replace(R.id.changePwdFragment, settings)
                             .addToBackStack("openChangePwdFragment")
-                            .commit();
+                            .commit();*/
+                    LoggedUserActivity.getLoggedUserActivity().changeFragment(SettingsFragment.getSettingsFragment());
                     Toast.makeText(getActivity(), R.string.password_changed, Toast.LENGTH_LONG).show();
                 }else {
-                    getSettingsFragment();
-                    getChildFragmentManager()
+                    SettingsFragment.getSettingsFragment();
+                    /*getChildFragmentManager()
                             .beginTransaction()
                             .replace(R.id.changePwdFragment, settings)
                             .addToBackStack("openChangePwdFragment")
-                            .commit();
+                            .commit();*/
+                    LoggedUserActivity.getLoggedUserActivity().changeFragment(SettingsFragment.getSettingsFragment());
                     Toast.makeText(getActivity(), R.string.password_changed_error, Toast.LENGTH_LONG).show();
 //                    loadingBar.setVisibility(View.GONE);
                 }
@@ -219,11 +222,8 @@ public class ChangePwdFragment extends Fragment implements View.OnClickListener,
         }
     }
 
-    public SettingsFragment getSettingsFragment() {
-        if (this.settings == null) {
-            this.settings = new SettingsFragment();
-        }
-        return settings;
+    @Override
+    public void onBackPressed() {
+        LoggedUserActivity.getLoggedUserActivity().changeFragment(SettingsFragment.getSettingsFragment());
     }
-
 }

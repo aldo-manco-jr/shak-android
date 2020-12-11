@@ -78,9 +78,11 @@ public class CommentsListFragment extends Fragment implements OnBackPressed {
             @Override
             public void onClick(View view) {
                 if (getArguments().getString("type").equals("home")){
-                    HomeFragment.getHomeFragment().getFragmentManager().beginTransaction().replace(R.id.home_fragment, HomeFragment.getHomeFragment().getCommentFormFragment()).addToBackStack("openCommentFormFragment").commit();
+                    LoggedUserActivity.getLoggedUserActivity().getSupportFragmentManager().beginTransaction().replace(R.id.logged_user_fragment, HomeFragment.getHomeFragment().getCommentFormFragment()).commit();
+                    //LoggedUserActivity.getLoggedUserActivity().changeFragment(HomeFragment.getHomeFragment().getCommentFormFragment());
                 }else if (getArguments().getString("type").equals("profile")){
-                    ProfileFragment.getProfileFragment().getFragmentManager().beginTransaction().replace(R.id.profile_fragment, ProfileFragment.getProfileFragment().getCommentFormFragment()).commit();
+                    LoggedUserActivity.getLoggedUserActivity().getSupportFragmentManager().beginTransaction().replace(R.id.logged_user_fragment, ProfileFragment.getProfileFragment().getCommentFormFragment()).commit();
+                    //LoggedUserActivity.getLoggedUserActivity().changeFragment(ProfileFragment.getProfileFragment().getCommentFormFragment());
                 }
             }
         });
@@ -136,6 +138,7 @@ public class CommentsListFragment extends Fragment implements OnBackPressed {
 
     @Override
     public void onBackPressed() {
-        getFragmentManager().beginTransaction().remove(HomeFragment.getHomeFragment().getCommentsListFragment()).commitAllowingStateLoss();
+        //getFragmentManager().beginTransaction().remove(HomeFragment.getHomeFragment().getCommentsListFragment()).commitAllowingStateLoss();
+        LoggedUserActivity.getLoggedUserActivity().changeFragment(HomeFragment.getHomeFragment());
     }
 }

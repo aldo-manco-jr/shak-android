@@ -112,7 +112,8 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
             @Override
             public void onClick(View view) {
                 ProfileFragment profileFragment = ProfileFragment.newInstance(holder.usernameText.getText().toString().trim());
-                LoggedUserActivity.getLoggedUserActivity().getSupportFragmentManager().beginTransaction().replace(R.id.logged_user_fragment, profileFragment).commit();
+                LoggedUserActivity.getLoggedUserActivity().changeFragment(profileFragment);
+                //LoggedUserActivity.getLoggedUserActivity().getSupportFragmentManager().beginTransaction().replace(R.id.logged_user_fragment, profileFragment).commit();
             }
         });
     }
@@ -156,14 +157,12 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
         });
     }
 
-    private static boolean isFollowing;
-
     /**
      * un user generico in input
      *
      * @return true se l'utente selezionato è un follower, false altrimenti
      */
-    private boolean isFollow(User user, final UserItemHolder holder) {
+    private void isFollow(User user, final UserItemHolder holder) {
 
         holder.followButton.setText("follow");
 
@@ -189,8 +188,9 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
                 Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
-        return isFollowing;
     }
+
+
 
     public class UserItemHolder extends RecyclerView.ViewHolder {
         //TODO METTERE I DATI CHE SI HANNO SUL RECYCLER VIEW

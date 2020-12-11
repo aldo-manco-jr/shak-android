@@ -10,6 +10,8 @@ import android.view.MenuItem;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.Ack;
@@ -21,6 +23,8 @@ import org.aldofrank.shak.R;
 import org.aldofrank.shak.notifications.controllers.NotificationsFragment;
 import org.aldofrank.shak.people.controllers.PeopleListFragment;
 import org.aldofrank.shak.profile.controllers.ProfileFragment;
+import org.aldofrank.shak.settings.controllers.AboutFragment;
+import org.aldofrank.shak.settings.controllers.ChangePwdFragment;
 import org.aldofrank.shak.settings.controllers.SettingsFragment;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -104,10 +108,11 @@ public class LoggedUserActivity extends AppCompatActivity {
 
         sharedPreferences = getSharedPreferences(getString(R.string.sharedpreferences_authentication), Context.MODE_PRIVATE);
         homeFragment = new HomeFragment();
-        profileFragment = ProfileFragment.newInstance(usernameLoggedUser);
+        //profileFragment = ProfileFragment.newInstance(usernameLoggedUser);
         // sostituisce il fragment attuale con un HomeFragment
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.logged_user_fragment, homeFragment).commit();
+        /*getSupportFragmentManager().beginTransaction()
+                .replace(R.id.logged_user_fragment, homeFragment).commit();*/
+        changeFragment(homeFragment);
     }
 
     private Emitter.Listener onLoginEmitter = new Emitter.Listener() {
@@ -171,8 +176,9 @@ public class LoggedUserActivity extends AppCompatActivity {
 
             // sostituisce il fragment attuale con un fragment scelto
             assert selectedFragment != null : "selectedFragment non poteva essere null";
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.logged_user_fragment, selectedFragment).commit();
+            changeFragment(selectedFragment);
+            /*       getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.logged_user_fragment, selectedFragment).commit();*/
 
             return true;
         }
@@ -210,7 +216,6 @@ public class LoggedUserActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         tellFragments();
-        super.onBackPressed();
     }
 
     private void tellFragments(){
@@ -222,7 +227,32 @@ public class LoggedUserActivity extends AppCompatActivity {
                 ((CommentsListFragment)fragment).onBackPressed();
             }else if (fragment != null && fragment instanceof CommentFormFragment){
                 ((CommentFormFragment)fragment).onBackPressed();
+            }else if(fragment!=null && fragment instanceof ProfileFragment){
+                ((ProfileFragment)fragment).onBackPressed();
+            }else if(fragment!=null && fragment instanceof ChangePwdFragment){
+                ((ChangePwdFragment)fragment).onBackPressed();
+            }else if(fragment!=null && fragment instanceof AboutFragment){
+                ((AboutFragment)fragment).onBackPressed();
             }
+        }
+    }
+
+    public void changeFragment(Fragment newFragment){
+
+        Fragment oldFragment = getSupportFragmentManager().findFragmentById(R.id.logged_user_fragment);
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transactionsManager = fragmentManager.beginTransaction();
+
+        if (oldFragment!=null){
+            transactionsManager
+                    .replace(R.id.logged_user_fragment, newFragment)
+                    .remove(oldFragment)
+                    .commit();
+        }else {
+            transactionsManager
+                    .replace(R.id.logged_user_fragment, newFragment)
+                    .commit();
         }
     }
 

@@ -12,17 +12,15 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import org.aldofrank.shak.R;
+import org.aldofrank.shak.streams.controllers.LoggedUserActivity;
+import org.aldofrank.shak.streams.controllers.OnBackPressed;
 import org.w3c.dom.Text;
 
-public class AboutFragment extends Fragment {
-
-
-    private SettingsFragment settings;
+public class AboutFragment extends Fragment implements OnBackPressed {
 
     public AboutFragment() {
         // Required empty public constructor
     }
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -50,21 +48,19 @@ public class AboutFragment extends Fragment {
 
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                getSettingsFragment();
-                getChildFragmentManager()
+                SettingsFragment.getSettingsFragment();
+                /*getChildFragmentManager()
                         .beginTransaction()
                         .replace(R.id.AboutFragment, settings)
-                        .addToBackStack("openChangePwdFragment")
-                        .commit();
+                        .commit();*/
+                LoggedUserActivity.getLoggedUserActivity().changeFragment(SettingsFragment.getSettingsFragment());
             }
         });
         return view;
     }
 
-    public SettingsFragment getSettingsFragment() {
-        if (this.settings == null) {
-            this.settings = new SettingsFragment();
-        }
-        return settings;
+    @Override
+    public void onBackPressed() {
+        LoggedUserActivity.getLoggedUserActivity().changeFragment(SettingsFragment.getSettingsFragment());
     }
 }

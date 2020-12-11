@@ -144,11 +144,13 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
             public void onClick(View view) {
 
                 if (type.equals("all") || type.equals("favourites")) {
-                    HomeFragment.getHomeFragment().getFragmentManager().beginTransaction()
-                            .replace(R.id.home_fragment, HomeFragment.getHomeFragment().getCommentsListFragment(post)).commit();
+                    /*HomeFragment.getHomeFragment().getFragmentManager().beginTransaction()
+                            .replace(R.id.home_fragment, ).commit();*/
+                    LoggedUserActivity.getLoggedUserActivity().changeFragment(HomeFragment.getHomeFragment().getCommentsListFragment(post));
                 } else if (type.equals("profile")) {
-                    ProfileFragment.getProfileFragment().getFragmentManager().beginTransaction()
-                            .replace(R.id.profile_fragment, ProfileFragment.getProfileFragment().getCommentsListFragment(post)).commit();
+                    /*ProfileFragment.getProfileFragment().getFragmentManager().beginTransaction()
+                            .replace(R.id.profile_fragment, ).commit();*/
+                    LoggedUserActivity.getLoggedUserActivity().changeFragment(ProfileFragment.getProfileFragment().getCommentsListFragment(post));
                 }
             }
         });
@@ -296,8 +298,10 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
                             //HomeFragment.getHomeFragment().getStreamsFragment().adapter.notifyItemChanged(holder.getAdapterPosition());
                             HomeFragment.getHomeFragment().getStreamsFragment().adapter.notifyDataSetChanged();
                             favouritesFragment.removeLikeFromFavoritesList(post);
-                        } else {
+                        } else if (type.equals("favourites")){
                             postsListFragment.removeLikeFromStreamsList(post, holder, streamsFragment, favouritesFragment);
+                        }else if (type.equals("profile")){
+
                         }
                     } else {
                         Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();

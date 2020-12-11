@@ -172,7 +172,8 @@ public class PostFormFragment extends Fragment implements View.OnClickListener, 
      * Il post viene chiuso e le informazioni scritte dall'utente vengono cancellate
      */
     private void closePost(){
-        getFragmentManager().beginTransaction().remove(HomeFragment.getHomeFragment().getPostFormFragment()).commitAllowingStateLoss();
+        //getFragmentManager().beginTransaction().remove(HomeFragment.getHomeFragment().getPostFormFragment()).commitAllowingStateLoss();
+        LoggedUserActivity.getLoggedUserActivity().changeFragment(HomeFragment.getHomeFragment());
         postContentField.setText("");
     }
 
@@ -289,6 +290,7 @@ public class PostFormFragment extends Fragment implements View.OnClickListener, 
 
     @Override
     public void onBackPressed() {
-        getFragmentManager().beginTransaction().remove(HomeFragment.getHomeFragment().getPostFormFragment()).commitAllowingStateLoss();
+        //getFragmentManager().beginTransaction().remove(HomeFragment.getHomeFragment().getPostFormFragment()).commitAllowingStateLoss();
+        closePost();
     }
 }

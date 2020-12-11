@@ -88,8 +88,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
             getPostFormFragment();
 
             // sostituisce il fragment attuale con un nuovo fragment
-            getChildFragmentManager().beginTransaction()
-                    .replace(R.id.home_fragment, postFormFragment).addToBackStack("openPostFormFragment").commit();
+            //getChildFragmentManager().beginTransaction()
+              //      .replace(R.id.home_fragment, postFormFragment).addToBackStack("openPostFormFragment").commit();
+            LoggedUserActivity.getLoggedUserActivity().changeFragment(postFormFragment);
         }
     }
 

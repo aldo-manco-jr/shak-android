@@ -1,8 +1,11 @@
 package org.aldofrank.shak.models;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
+
+import org.aldofrank.shak.services.StreamsService;
 
 import java.util.List;
 
@@ -113,6 +116,29 @@ public class User {
         return arrayImages;
     }
 
+    public boolean addFollowtoFollowings(String userId) {
+        User.Following userFollowed = new User.Following(userId);
+        boolean isAdded = arrayFollowing.add(userFollowed);
+        return isAdded;
+    }
+
+    public boolean removeLikeFromArray(String userId) {
+        User.Following userFollowRemoved = null;
+        boolean isRemoved = false;
+
+        for (User.Following following : arrayFollowing) {
+            if (following.getFollowingId().equals(userId)) {
+                userFollowRemoved = following;
+            }
+        }
+
+        if (userFollowRemoved != null){
+            isRemoved = arrayFollowing.remove(userFollowRemoved);
+        }
+
+        return isRemoved;
+    }
+
     public class Following{
 /*
         @SerializedName("_id")
@@ -127,6 +153,10 @@ public class User {
         }*/
         @SerializedName("userFollowed")
         private JsonElement followingId;
+
+        public Following(String followingId) {
+            this.followingId = new Gson().fromJson(followingId, JsonElement.class);
+        }
 
         public JsonArray getFollowingId() {
             if (followingId != null) {
