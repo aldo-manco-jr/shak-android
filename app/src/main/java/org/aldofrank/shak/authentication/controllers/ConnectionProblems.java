@@ -12,6 +12,11 @@ import androidx.core.app.ActivityCompat;
 
 import org.aldofrank.shak.R;
 
+/**
+ * L'activity gestisce una schermata che informa l'utente della presenza di errori dovuti alla
+ * connessione (connessione assente) e invita tramite la pressione di un bottone a l'utente a
+ * ritentare, rimandandolo a {@link MainActivity}
+ */
 public class ConnectionProblems extends AppCompatActivity implements View.OnClickListener {
 
     private Button tryAgainButton;
@@ -34,13 +39,11 @@ public class ConnectionProblems extends AppCompatActivity implements View.OnClic
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.try_connect_again) {
-            // avvio nuovamente di MainaAtivity per provare ad effettuare la connessione
-            Intent intentFirstActivity = new Intent(this, ConnectionProblems.class);
+            Intent intentFirstActivity = new Intent(this, MainActivity.class);
 
             intentFirstActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intentFirstActivity);
             ActivityCompat.finishAffinity(this);
         }
     }
-
 }

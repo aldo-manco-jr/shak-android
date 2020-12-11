@@ -8,148 +8,178 @@
     android:id="@+id/profile_fragment"
     tools:context=".profile.controllers.ProfileFragment">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        tools:context=".authentication.controllers.ScrollingActivity">
 
-        <ImageView
-            android:id="@+id/profile_cover_image"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:adjustViewBounds="true"
-            android:scaleType="fitXY"
-            android:layout_marginTop="0dp"
-            android:layout_marginLeft="0dp"
-            android:layout_marginRight="0dp"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            tools:src="@tools:sample/backgrounds/scenic" />
-
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/image_profile_circle"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:layout_marginTop="140dp"
-            app:layout_constraintCircleRadius="0dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/profile_cover_image"
-            android:src="@mipmap/ic_launcher"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <LinearLayout
-            android:id="@+id/profile_data_group"
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/app_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/image_profile_circle"
-            app:layout_constraintCircleRadius="0dp"
-            app:layout_constraintHorizontal_bias="0.5">
+            android:background="@color/transparent"
+            android:fitsSystemWindows="true"
+            android:theme="@style/AppBarOverlay">
 
-            <TextView
-                android:id="@+id/username_profile"
+            <com.google.android.material.appbar.CollapsingToolbarLayout
+                android:id="@+id/toolbar_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="pietro.branzolini"
-                android:textColor="@color/white"
-                android:textAlignment="center"
-                android:textSize="24sp"
-                android:textStyle="bold"/>
+                android:layout_height="match_parent"
+                android:fitsSystemWindows="true"
+                app:layout_scrollFlags="scroll|exitUntilCollapsed"
+                app:toolbarId="@+id/toolbar">
 
-            <TextView
-                android:id="@+id/email_profile"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="pietro.branzolini@studenti.unimol.it"
-                android:textColor="@color/white"
-                android:textAlignment="center"
-                android:textSize="18sp"/>
+                <androidx.appcompat.widget.Toolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    app:layout_collapseMode="pin"
+                    app:layout_scrollFlags="scroll|exitUntilCollapsed"
+                    app:popupTheme="@style/PopupOverlay" />
 
-            <TextView
-                android:id="@+id/location_profile"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Isernia, Italy"
-                android:textAlignment="center"
-                android:textSize="18sp"/>
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
 
-            <Button
-                android:id="@+id/button_set_location"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="SET LOCATION"
-                android:background="@color/colorSHAK"
-                android:gravity="center"
-                android:layout_gravity="center_horizontal"
-                android:visibility="gone"/>
+                    <ImageView
+                        android:id="@+id/profile_cover_image"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        android:layout_marginLeft="0dp"
+                        android:layout_marginTop="0dp"
+                        android:layout_marginRight="0dp"
+                        android:adjustViewBounds="true"
+                        android:scaleType="fitXY"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:src="@tools:sample/backgrounds/scenic" />
 
-            <Button
-                android:id="@+id/followUser"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="FOLLOW"
-                android:background="@color/colorSHAK"
-                android:gravity="center"
-                android:layout_gravity="center_horizontal" />
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/image_profile_circle"
+                        android:layout_width="120dp"
+                        android:layout_height="120dp"
+                        android:layout_marginTop="140dp"
+                        android:src="@mipmap/ic_launcher"
+                        app:layout_constraintCircleRadius="0dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0.5"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/profile_cover_image"
+                        app:layout_constraintTop_toTopOf="parent" />
 
-        </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/profile_data_group"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        app:layout_constraintCircleRadius="0dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0.5"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/image_profile_circle">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:orientation="vertical"
-            android:layout_marginBottom="0dp"
-            android:layout_marginLeft="0dp"
-            android:layout_marginRight="0dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/profile_data_group">
+                        <TextView
+                            android:id="@+id/username_profile"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="pietro.branzolini"
+                            android:textAlignment="center"
+                            android:textColor="@color/white"
+                            android:textSize="24sp"
+                            android:textStyle="bold" />
 
-            <com.google.android.material.tabs.TabLayout
-                android:id="@+id/profile_tabs"
-                app:tabTextAppearance="@style/ReducedTextSizeProfileTabs"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                        <TextView
+                            android:id="@+id/email_profile"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="pietro.branzolini@studenti.unimol.it"
+                            android:textAlignment="center"
+                            android:textColor="@color/white"
+                            android:textSize="18sp" />
 
-                <com.google.android.material.tabs.TabItem
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:icon="@drawable/ic_library_books_black_24dp"
-                    android:text="Streams" />
+                        <TextView
+                            android:id="@+id/location_profile"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Isernia, Italy"
+                            android:textAlignment="center"
+                            android:textSize="18sp" />
 
-                <com.google.android.material.tabs.TabItem
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:icon="@drawable/ic_group_black_24dp"
-                    android:text="Following" />
+                        <Button
+                            android:id="@+id/button_set_location"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:background="@color/colorSHAK"
+                            android:gravity="center"
+                            android:text="SET LOCATION"
+                            android:visibility="gone" />
 
-                <com.google.android.material.tabs.TabItem
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:icon="@drawable/ic_baseline_people_outline_white_24"
-                    android:text="Followers" />
+                        <Button
+                            android:id="@+id/followUser"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:background="@color/colorSHAK"
+                            android:gravity="center"
+                            android:text="FOLLOW" />
 
-                <com.google.android.material.tabs.TabItem
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:icon="@drawable/ic_favorite_black_24dp"
-                    android:text="Images" />
+                    </LinearLayout>
 
-            </com.google.android.material.tabs.TabLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_marginLeft="0dp"
+                        android:layout_marginRight="0dp"
+                        android:layout_marginBottom="0dp"
+                        android:orientation="vertical"
+                        app:layout_constraintTop_toBottomOf="@id/profile_data_group">
 
-            <androidx.viewpager.widget.ViewPager
-                android:id="@+id/view_pager_profile"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior" />
-        </LinearLayout>
+                        <com.google.android.material.tabs.TabLayout
+                            android:id="@+id/profile_tabs"
+                            android:layout_width="match_parent"
+                            android:layout_height="?attr/actionBarSize"
+                            app:tabTextAppearance="@style/ReducedTextSizeProfileTabs">
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+                            <com.google.android.material.tabs.TabItem
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:icon="@drawable/ic_library_books_black_24dp"
+                                android:text="Streams" />
 
+                            <com.google.android.material.tabs.TabItem
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:icon="@drawable/ic_group_black_24dp"
+                                android:text="Following" />
+
+                            <com.google.android.material.tabs.TabItem
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:icon="@drawable/ic_baseline_people_outline_white_24"
+                                android:text="Followers" />
+
+                            <com.google.android.material.tabs.TabItem
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:icon="@drawable/ic_baseline_photo_library_white_24"
+                                android:text="Images" />
+
+                        </com.google.android.material.tabs.TabLayout>
+
+
+                    </LinearLayout>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <include layout="@layout/netested_profile_content_scrolling" />
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </FrameLayout>

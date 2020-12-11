@@ -89,11 +89,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
                     startActivity(intentLoggedUser);
                     ActivityCompat.finishAffinity(getActivity());
                 } else {
-                    // errore a livello di applicazione
-                    // response.code() == (401) -> token expired
-                    /*SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.remove(getString(R.string.sharedpreferences_token));
-                    editor.commit();*/
                     Toast.makeText(getActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
 
                     loadingBar.setVisibility(View.GONE);
@@ -103,8 +98,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
             @Override
             public void onFailure(Call<LoginResponse> call, Throwable t) {
                 // errore a livello di rete
-                // network error, establishing connection with server, error creating http request, response
-                // when there is an exception
                 Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
 
                 loadingBar.setVisibility(View.GONE);

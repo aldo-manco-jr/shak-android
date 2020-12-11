@@ -2,14 +2,6 @@ package org.aldofrank.shak.profile.controllers;
 
 import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.viewpager.widget.ViewPager;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,8 +10,18 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.viewpager.widget.ViewPager;
+
 import com.bumptech.glide.Glide;
 import com.github.nkzawa.emitter.Emitter;
+import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.tabs.TabLayout;
 
 import org.aldofrank.shak.R;
@@ -53,6 +55,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
 
     private final String basicUrlImage = "http://res.cloudinary.com/dfn8llckr/image/upload/v";
 
+    private CollapsingToolbarLayout toolBarLayout;
     private ImageView coverImage;
     private CircleImageView profileImage;
     private TextView usernameTextView;
@@ -98,34 +101,40 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
             @Nullable ViewGroup container,
             @Nullable Bundle savedInstanceState
     ) {
-        View profileFragmentView = inflater.inflate(R.layout.fragment_profile, container, false);
+        return inflater.inflate(R.layout.fragment_profile, container, false);
+    }
 
-        profileFragment = this;
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        view.setVisibility(View.GONE);
+        Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
+        toolbar.setTitle("");
+        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+        toolBarLayout = (CollapsingToolbarLayout) view.findViewById(R.id.toolbar_layout);
 
-        coverImage = profileFragmentView.findViewById(R.id.profile_cover_image);
-        profileImage = profileFragmentView.findViewById(R.id.image_profile_circle);
-        usernameTextView = profileFragmentView.findViewById(R.id.username_profile);
-        emailTextView = profileFragmentView.findViewById(R.id.email_profile);
-        locationTextView = profileFragmentView.findViewById(R.id.location_profile);
-        setLocationButton = profileFragmentView.findViewById(R.id.button_set_location);
-        followButton = profileFragmentView.findViewById(R.id.followUser);
-
-        userDataBinding(getArguments().getString("username"));
+        coverImage = view.findViewById(R.id.profile_cover_image);
+        profileImage = view.findViewById(R.id.image_profile_circle);
+        usernameTextView = view.findViewById(R.id.username_profile);
+        emailTextView = view.findViewById(R.id.email_profile);
+        locationTextView = view.findViewById(R.id.location_profile);
+        setLocationButton = view.findViewById(R.id.button_set_location);
+        followButton = view.findViewById(R.id.followUser);
+        viewPager = view.findViewById(R.id.view_pager_profile);
+        profileTabs = view.findViewById(R.id.profile_tabs);
 
         emailTextView.setOnClickListener(this);
         locationTextView.setOnClickListener(this);
         setLocationButton.setOnClickListener(this);
         followButton.setOnClickListener(this);
 
-        viewPager = profileFragmentView.findViewById(R.id.view_pager_profile);
-        profileTabs = profileFragmentView.findViewById(R.id.profile_tabs);
+        userDataBinding(getArguments().getString("username"));
 
         getProfilePostsFragment(getArguments().getString("username"));
         getProfileFollowingFragment(getArguments().getString("username"));
         getProfileFollowersFragment(getArguments().getString("username"));
         getProfileImagesFragment(getArguments().getString("username"));
 
-        ProfileFragment.ViewPagerAdapter viewPagerAdapter = new ProfileFragment.ViewPagerAdapter(getChildFragmentManager(), 0);
+        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getChildFragmentManager(), 0);
         viewPagerAdapter.addFragment(profilePostsFragment, "Streams");
         viewPagerAdapter.addFragment(profileFollowingFragment, "Following");
         viewPagerAdapter.addFragment(profileFollowersFragment, "Followers");
@@ -133,13 +142,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
         viewPager.setAdapter(viewPagerAdapter);
 
         profileTabs.setupWithViewPager(viewPager);
-
-        profileTabs.getTabAt(0).setIcon(R.drawable.ic_library_books_black_24dp);
-        profileTabs.getTabAt(1).setIcon(R.drawable.ic_group_black_24dp);
-        profileTabs.getTabAt(2).setIcon(R.drawable.ic_baseline_people_outline_white_24);
-        profileTabs.getTabAt(3).setIcon(R.drawable.ic_baseline_photo_library_white_24);
-
-        return profileFragmentView;
     }
 
     public static ProfileFragment getProfileFragment() {
@@ -177,8 +179,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
     }
 
     /**
-     * In base ai dati ricavati da {{@link #isFollow(User)}} viene inviata una richiesta http di
-     * "follow" o di "unfollow" verso il post.
+     * In base ai dati ricavati da {@link #isFollow(User, Button)} viene inviata una richiesta http
+     * di "follow" o di "unfollow" verso il post.
      */
     public void followOrUnfollow(User user, final Button followButton) {
         UsersService usersService = ServiceGenerator.createService(UsersService.class, LoggedUserActivity.getToken());
@@ -202,7 +204,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
                     }else if (followButton.getText().equals("follow")){
                         followButton.setText("unfollow");
                     }
-                    //LoggedUserActivity.getSocket().emit("refresh");
                 } else {
                     Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + "   " + response.message(), Toast.LENGTH_LONG).show();
                 }
@@ -438,6 +439,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
 
                     isFollow(user, followButton);
 
+                    getView().setVisibility(View.VISIBLE);
                 } else {
                     Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                 }
