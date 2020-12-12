@@ -91,7 +91,8 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
         Date date = null;
         try {
             date = localTimeToUtc(post.getCreatedAt());
-        } catch (ParseException ignored) {}
+        } catch (ParseException ignored) {
+        }
 
         PrettyTime formattedDateTime = new PrettyTime();
         holder.datePostText.setText(formattedDateTime.format(date));
@@ -120,6 +121,22 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
             holder.imagePost.setVisibility(View.GONE);
         }
 
+        holder.usernameText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ProfileFragment profileFragment = ProfileFragment.newInstance(holder.usernameText.getText().toString().trim());
+                LoggedUserActivity.getLoggedUserActivity().changeFragment(profileFragment);
+            }
+        });
+
+        holder.imageProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ProfileFragment profileFragment = ProfileFragment.newInstance(holder.usernameText.getText().toString().trim());
+                LoggedUserActivity.getLoggedUserActivity().changeFragment(profileFragment);
+            }
+        });
+
         holder.usernameText.setText(post.getUsernamePublisher());
         holder.postContent.setText(post.getPostContent());
 
@@ -142,12 +159,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
         holder.commentButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                if (type.equals("all") || type.equals("favourites")) {
-                    LoggedUserActivity.getLoggedUserActivity().changeFragment(HomeFragment.getHomeFragment().getCommentsListFragment(post));
-                } else if (type.equals("profile")) {
-                    LoggedUserActivity.getLoggedUserActivity().changeFragment(ProfileFragment.getProfileFragment().getCommentsListFragment(post));
-                }
+                LoggedUserActivity.getLoggedUserActivity().changeFragment(LoggedUserActivity.getLoggedUserActivity().getCommentsListFragment(post));
             }
         });
 
@@ -168,23 +180,9 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
     }
 
     /**
-     * TODO
-     */
-    private int getPostPosition(Post post){
-        for (int i = 0; i < listPosts.size(); i++){
-            if (listPosts.get(i).equals(post)){
-                return i;
-            }
-        }
-
-        return -1;
-    }
-
-    /**
      * @param dateString una data in formato UDC contenuta nel database remoto
-     *
      * @return un valore di tipo Date convertito da UTC (formato atteso dal server) nel fuso orario
-     *         usato dall'utente
+     * usato dall'utente
      */
     protected Date localTimeToUtc(String dateString) throws ParseException {
         TimeZone timeZone = TimeZone.getDefault();
@@ -205,7 +203,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
     }
 
     public void addPosts(List<Post> newListPosts) {
-        assert newListPosts.size() > 0: "newLIstPost doveva avere almeno un elemento";
+        assert newListPosts.size() > 0 : "newLIstPost doveva avere almeno un elemento";
 
         List<Post> newAndOldPost = new ArrayList<>();
         newAndOldPost.addAll(newListPosts);
@@ -286,8 +284,8 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
                         holder.likeButton.setImageResource(R.drawable.ic_favorite_border_black_24dp);
                         holder.likeButton.setTag("unlike");
 
-                        if (!type.equals("profile")){
-                            PostsListFragment streamsFragment =  HomeFragment.getHomeFragment().getStreamsFragment();
+                        if (!type.equals("profile")) {
+                            PostsListFragment streamsFragment = HomeFragment.getHomeFragment().getStreamsFragment();
                             PostsListFragment favouritesFragment = HomeFragment.getHomeFragment().getFavouritesFragment();
 
                             if (type.equals("all")) {
@@ -295,10 +293,10 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
                                 //HomeFragment.getHomeFragment().getStreamsFragment().adapter.notifyItemChanged(holder.getAdapterPosition());
                                 HomeFragment.getHomeFragment().getStreamsFragment().adapter.notifyDataSetChanged();
                                 favouritesFragment.removeLikeFromFavoritesList(post);
-                            } else if (type.equals("favourites")){
+                            } else if (type.equals("favourites")) {
                                 postsListFragment.removeLikeFromStreamsList(post, holder, streamsFragment, favouritesFragment);
                             }
-                        }else{
+                        } else {
                             PostsListFragment profilePostsFragment = ProfileFragment.getProfileFragment().getProfilePostsFragment(post.getUsernamePublisher());
                             postsListFragment.removeLikeFromProfilePostsList(post, holder, profilePostsFragment);
                         }

@@ -70,19 +70,19 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
     private TabLayout profileTabs;
 
     private PostsListFragment profilePostsFragment;
-    private PeopleListFragment profileAllUsersFragment;
     private PeopleListFragment profileFollowingFragment;
     private PeopleListFragment profileFollowersFragment;
     private ImagesListFragment profileImagesFragment;
 
-    private CommentsListFragment commentsListFragment;
-    private CommentFormFragment commentFormFragment;
-
     private static ProfileFragment profileFragment;
+
+    private View view;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        profileFragment = this;
 
         LoggedUserActivity.getSocket().on("refreshPage", updateProfilePage);
     }
@@ -101,15 +101,17 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
             @Nullable ViewGroup container,
             @Nullable Bundle savedInstanceState
     ) {
-        return inflater.inflate(R.layout.fragment_profile, container, false);
+         view = inflater.inflate(R.layout.fragment_profile, container, false);
+        return view;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+
         view.setVisibility(View.GONE);
         Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
         toolbar.setTitle("");
-        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         toolBarLayout = (CollapsingToolbarLayout) view.findViewById(R.id.toolbar_layout);
 
         coverImage = view.findViewById(R.id.profile_cover_image);
@@ -199,9 +201,9 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
             public void onResponse(Call<Object> call, Response<Object> response) {
                 if (response.isSuccessful()) {
 
-                    if (followButton.getText().equals("unfollow")){
+                    if (followButton.getText().equals("unfollow")) {
                         followButton.setText("follow");
-                    }else if (followButton.getText().equals("follow")){
+                    } else if (followButton.getText().equals("follow")) {
                         followButton.setText("unfollow");
                     }
                 } else {
@@ -315,15 +317,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
         return profileFollowingFragment;
     }
 
-    public PeopleListFragment getAllUsersFragment() {
-
-        if (this.profileAllUsersFragment == null) {
-            this.profileAllUsersFragment = PeopleListFragment.newInstance("all");
-        }
-
-        return profileAllUsersFragment;
-    }
-
     public ImagesListFragment getProfileImagesFragment(String username) {
 
         if (this.profileImagesFragment == null) {
@@ -331,24 +324,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
         }
 
         return profileImagesFragment;
-    }
-
-    public CommentsListFragment getCommentsListFragment() {
-        return commentsListFragment;
-    }
-
-    public CommentsListFragment getCommentsListFragment(Post post) {
-        this.commentsListFragment = CommentsListFragment.newInstance("profile", post);
-        return commentsListFragment;
-    }
-
-    public CommentFormFragment getCommentFormFragment() {
-
-        if (this.commentFormFragment == null) {
-            this.commentFormFragment = CommentFormFragment.newInstance("profile");
-        }
-
-        return commentFormFragment;
     }
 
     public void userDataBinding(String username) {
@@ -384,7 +359,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
 
                     if (user.getCity() != null && user.getCountry() != null) {
                         locationTextView.setText("@" + user.getCity() + ", " + user.getCountry());
-                        if (user.getUsername().equals(LoggedUserActivity.getUsernameLoggedUser())){
+                        if (user.getUsername().equals(LoggedUserActivity.getUsernameLoggedUser())) {
                             locationTextView.setVisibility(View.VISIBLE);
                             setLocationButton.setVisibility(View.GONE);
 
@@ -394,12 +369,12 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
                                     getLocation();
                                 }
                             });
-                        }else {
+                        } else {
                             locationTextView.setVisibility(View.VISIBLE);
                             setLocationButton.setVisibility(View.GONE);
                         }
                     } else {
-                        if (user.getUsername().equals(LoggedUserActivity.getUsernameLoggedUser())){
+                        if (user.getUsername().equals(LoggedUserActivity.getUsernameLoggedUser())) {
                             locationTextView.setVisibility(View.GONE);
                             setLocationButton.setVisibility(View.VISIBLE);
 
@@ -409,13 +384,13 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
                                     getLocation();
                                 }
                             });
-                        }else {
+                        } else {
                             locationTextView.setVisibility(View.VISIBLE);
                             locationTextView.setText("Unknown Location");
                         }
                     }
 
-                    if (user.getUsername().equals(LoggedUserActivity.getUsernameLoggedUser())){
+                    if (user.getUsername().equals(LoggedUserActivity.getUsernameLoggedUser())) {
                         followButton.setVisibility(View.GONE);
                     }
 
@@ -439,7 +414,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
 
                     isFollow(user, followButton);
 
-                    getView().setVisibility(View.VISIBLE);
+                    view.setVisibility(View.VISIBLE);
                 } else {
                     Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                 }

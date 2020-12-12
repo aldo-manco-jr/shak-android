@@ -36,10 +36,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     private PostsListFragment favouritesFragment;
     private PostFormFragment postFormFragment;
 
-    private CommentsListFragment commentsListFragment;
-    private CommentFormFragment commentFormFragment;
-    private PeopleListFragment peopleListFragment;
-
     private static HomeFragment homeFragment;
 
     @Nullable
@@ -84,13 +80,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.fab_switch_to_post_form) {
-
-            getPostFormFragment();
-
-            // sostituisce il fragment attuale con un nuovo fragment
-            //getChildFragmentManager().beginTransaction()
-              //      .replace(R.id.home_fragment, postFormFragment).addToBackStack("openPostFormFragment").commit();
-            LoggedUserActivity.getLoggedUserActivity().changeFragment(postFormFragment);
+            LoggedUserActivity.getLoggedUserActivity().changeFragment(getPostFormFragment());
         }
     }
 
@@ -123,24 +113,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         }
 
         return postFormFragment;
-    }
-
-    public CommentsListFragment getCommentsListFragment() {
-        return commentsListFragment;
-    }
-
-    public CommentsListFragment getCommentsListFragment(Post post) {
-        this.commentsListFragment = CommentsListFragment.newInstance("home", post);
-        return commentsListFragment;
-    }
-
-    public CommentFormFragment getCommentFormFragment() {
-
-        if (this.commentFormFragment == null) {
-            this.commentFormFragment = CommentFormFragment.newInstance("home");
-        }
-
-        return commentFormFragment;
     }
 
     private class ViewPagerAdapter extends FragmentPagerAdapter {

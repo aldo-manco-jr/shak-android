@@ -1,11 +1,15 @@
 package org.aldofrank.shak.authentication.controllers;
 
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -24,6 +28,8 @@ public class AccessActivity extends AppCompatActivity implements View.OnClickLis
 
     private Button switchButton;
 
+    private SharedPreferences sharedPreferences;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,6 +44,31 @@ public class AccessActivity extends AppCompatActivity implements View.OnClickLis
         switchButton.setOnClickListener(this);
 
         setFragment(loginFragment);
+
+        sharedPreferences = getSharedPreferences("lawsRead", Context.MODE_PRIVATE);
+        String areLawsRead = sharedPreferences.getString("lawsRead", null);
+
+        if (areLawsRead == null) {
+            new AlertDialog.Builder(this)
+                    .setIcon(android.R.drawable.btn_star)
+                    .setTitle("Informativa dell'Utente:")
+                    .setMessage("COSE CHE PIACCIONO ALLA TRONCARELLI")
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putString("lawsRead", "yes");
+                            editor.commit();
+                        }
+                    })
+                    .setNegativeButton("EXIT", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            finishAffinity();
+                        }
+                    })
+                    .show();
+        }
     }
 
     /**

@@ -30,10 +30,13 @@ import org.aldofrank.shak.streams.http.GetPostResponse;
 import org.ocpsoft.prettytime.PrettyTime;
 
 import java.net.URISyntaxException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import retrofit2.Call;
@@ -48,9 +51,7 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
 
     private final String basicUrlImage = "http://res.cloudinary.com/dfn8llckr/image/upload/v";
 
-    private User user;
-
-    public CommentsListAdapter(List<Post.Comment> listComments, String type) {
+    public CommentsListAdapter(List<Post.Comment> listComments) {
 
         this.listComments = new ArrayList<>();
 
@@ -66,7 +67,6 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
                 .inflate(R.layout.layout_item_comment, parent, false);
 
         CommentsListAdapter.CommentItemHolder viewHolder = new CommentsListAdapter.CommentItemHolder(itemView);
-
         return viewHolder;
     }
 
@@ -79,24 +79,15 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
 
         final Post.Comment comment = listComments.get(position);
 
-        getUserByUsername(comment.getUsernamePublisher());
-
-        /*String urlImageProfileUser = this.basicUrlImage + user.getProfileImageVersion() + "/" + user.getProfileImageId();
-
-        Glide.with(LoggedUserActivity.getLoggedUserActivity())
-                .asBitmap()
-                .load(urlImageProfileUser)
-                .into(holder.imageProfile);*/
+        setProfileImage(comment.getUsernamePublisher(), holder);
 
         holder.usernameText.setText(listComments.get(position).getUsernamePublisher());
 
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" );
-        Date date = new Date();
-
+        Date date = null;
         try {
-            date = formatter.parse(listComments.get(position).getCreatedAt());
-            date.setTime(date.getTime()+3_600_000);
-        }catch (Exception ignored){}
+            date = localTimeToUtc(comment.getCreatedAt());
+        } catch (ParseException ignored) {
+        }
 
         PrettyTime formattedDateTime = new PrettyTime();
         holder.dateCommentText.setText(formattedDateTime.format(date));
@@ -120,7 +111,25 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
         return listComments.size();
     }
 
-    private void getUserByUsername(final String username){
+    /**
+     * @param dateString una data in formato UDC contenuta nel database remoto
+     * @return un valore di tipo Date convertito da UTC (formato atteso dal server) nel fuso orario
+     * usato dall'utente
+     */
+    protected Date localTimeToUtc(String dateString) throws ParseException {
+        TimeZone timeZone = TimeZone.getDefault();
+        String[] timeZoneSplitStrings = timeZone.getID().split("(/)");
+        String CurrentTimeZone = timeZoneSplitStrings[timeZoneSplitStrings.length - 1];
+
+        SimpleDateFormat dateFormat =
+                new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
+        dateFormat.setTimeZone(TimeZone.getTimeZone(CurrentTimeZone));
+        Date correctDateForUserDevice = dateFormat.parse(dateString);
+
+        return correctDateForUserDevice;
+    }
+
+    private void setProfileImage(final String username, final CommentItemHolder holder){
 
         UsersService usersService = ServiceGenerator.createService(UsersService.class, LoggedUserActivity.getToken());
         Call<GetUserByUsernameResponse> httpRequest = usersService.getUserByUsername(username);
@@ -129,7 +138,16 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
             @Override
             public void onResponse(Call<GetUserByUsernameResponse> call, Response<GetUserByUsernameResponse> response) {
                 if (response.isSuccessful()) {
-                    user = response.body().getUserFoundByUsername();
+
+                    String profileImageId = response.body().getUserFoundByUsername().getProfileImageId();
+                    String profileImageVersion = response.body().getUserFoundByUsername().getProfileImageVersion();
+
+                    String urlImageProfileUser = basicUrlImage + profileImageVersion + "/" + profileImageId;
+
+                    Glide.with(LoggedUserActivity.getLoggedUserActivity())
+                            .asBitmap()
+                            .load(urlImageProfileUser)
+                            .into(holder.imageProfile);
                 } else {
                     Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                 }
@@ -148,7 +166,7 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
      */
     private void deleteComment(String postId, Post.Comment comment) {
 
-        DeleteCommentRequest deleteCommentRequest = new DeleteCommentRequest(CommentsListAdapter.postId, comment);
+        DeleteCommentRequest deleteCommentRequest = new DeleteCommentRequest(postId, comment);
 
         StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
         Call<Object> httpRequest = streamsService.deleteComment(deleteCommentRequest);

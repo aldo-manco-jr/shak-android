@@ -101,6 +101,12 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
 
         isFollow(user, holder);
 
+        if (user.getUsername().equals(LoggedUserActivity.getUsernameLoggedUser())){
+            holder.followButton.setVisibility(View.GONE);
+        }else {
+            holder.followButton.setVisibility(View.VISIBLE);
+        }
+
         holder.followButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -113,14 +119,12 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
             public void onClick(View view) {
                 ProfileFragment profileFragment = ProfileFragment.newInstance(holder.usernameText.getText().toString().trim());
                 LoggedUserActivity.getLoggedUserActivity().changeFragment(profileFragment);
-                //LoggedUserActivity.getLoggedUserActivity().getSupportFragmentManager().beginTransaction().replace(R.id.logged_user_fragment, profileFragment).commit();
             }
         });
     }
 
     @Override
     public int getItemCount() {
-        System.out.println(listUsers.size() + "");
         return listUsers.size();
     }
 

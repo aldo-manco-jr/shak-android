@@ -59,7 +59,7 @@ public class CommentFormFragment extends Fragment implements View.OnClickListene
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        LoggedUserActivity.getSocket().on("refreshPage", updateCommentsList);
+        LoggedUserActivity.getSocket().on("refreshPage", CommentsListFragment.updatePostCommentsList);
     }
 
     @Override
@@ -100,17 +100,6 @@ public class CommentFormFragment extends Fragment implements View.OnClickListene
         }
     };
 
-    public static CommentFormFragment newInstance(String type) {
-
-        CommentFormFragment fragment = new CommentFormFragment();
-
-        Bundle args = new Bundle();
-        args.putString("type", type);
-        fragment.setArguments(args);
-
-        return fragment;
-    }
-
     private void submitComment() {
 
         StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
@@ -132,7 +121,7 @@ public class CommentFormFragment extends Fragment implements View.OnClickListene
                     // il fragment chiude se stesso
                     closeCommentBox();
 
-                    LoggedUserActivity.getSocket().emit("refresh");
+                    //LoggedUserActivity.getSocket().emit("refresh");
                 } else {
                     Toast.makeText(getActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                 }
@@ -150,41 +139,11 @@ public class CommentFormFragment extends Fragment implements View.OnClickListene
      */
     private void closeCommentBox() {
 
-        if (getArguments().getString("type").equals("home")) {
-            //LoggedUserActivity.getLoggedUserActivity().getSupportFragmentManager().beginTransaction().replace(R.id.logged_user_fragment, HomeFragment.getHomeFragment().getCommentsListFragment()).commit();
-            LoggedUserActivity.getLoggedUserActivity().changeFragment(HomeFragment.getHomeFragment().getCommentsListFragment());
-        } else if (getArguments().getString("type").equals("profile")) {
-            //LoggedUserActivity.getLoggedUserActivity().getSupportFragmentManager().beginTransaction().replace(R.id.logged_user_fragment, ProfileFragment.getProfileFragment().getCommentsListFragment()).commit();
-            LoggedUserActivity.getLoggedUserActivity().changeFragment(ProfileFragment.getProfileFragment().getCommentsListFragment());
-        }
+            LoggedUserActivity.getLoggedUserActivity().changeFragment(LoggedUserActivity.getLoggedUserActivity().getCommentsListFragment());
 
         commentContentField.setText("");
         //getFragmentManager().beginTransaction().remove(HomeFragment.getHomeFragment().getCommentFormFragment()).commitAllowingStateLoss();
     }
-
-    /**
-     * Quando un post viene pubblicato la home page viene aggiornata.
-     */
-    private Emitter.Listener updateCommentsList = new Emitter.Listener() {
-
-        @Override
-        public void call(final Object... args) {
-            if (getActivity() != null) {
-                getActivity().runOnUiThread(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        // quando un post viene pubblicato la socket avvisa del necessario aggiornamento
-                        if (getArguments().getString("type").equals("home")) {
-                            HomeFragment.getHomeFragment().getCommentsListFragment().getAllPostComments();
-                        } else if (getArguments().getString("type").equals("profile")) {
-                            ProfileFragment.getProfileFragment().getCommentsListFragment().getAllPostComments();
-                        }
-                    }
-                });
-            }
-        }
-    };
 
     @Override
     public void onClick(View view) {

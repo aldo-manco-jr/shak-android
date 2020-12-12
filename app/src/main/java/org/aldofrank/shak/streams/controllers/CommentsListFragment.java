@@ -15,7 +15,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.aldofrank.shak.R;
 import org.aldofrank.shak.models.Post;
-import org.aldofrank.shak.profile.controllers.ProfileFragment;
 import org.aldofrank.shak.services.ServiceGenerator;
 import org.aldofrank.shak.services.StreamsService;
 import org.aldofrank.shak.streams.http.GetPostResponse;
@@ -37,7 +36,8 @@ public class CommentsListFragment extends Fragment implements OnBackPressed {
 
     private FloatingActionButton buttonAddComment;
 
-    public CommentsListFragment() { }
+    public CommentsListFragment() {
+    }
 
     /**
      * Use this factory method to create a new instance of
@@ -45,13 +45,9 @@ public class CommentsListFragment extends Fragment implements OnBackPressed {
      *
      * @return A new instance of fragment PostsListFragment.
      */
-    public static CommentsListFragment newInstance(String type, Post post) {
+    public static CommentsListFragment newInstance(Post post) {
 
         CommentsListFragment fragment = new CommentsListFragment();
-
-        Bundle args = new Bundle();
-        args.putString("type", type);
-        fragment.setArguments(args);
 
         CommentsListFragment.post = post;
 
@@ -80,12 +76,7 @@ public class CommentsListFragment extends Fragment implements OnBackPressed {
         buttonAddComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (getArguments().getString("type").equals("home")){
-                    LoggedUserActivity.getLoggedUserActivity().getSupportFragmentManager().beginTransaction().replace(R.id.logged_user_fragment, HomeFragment.getHomeFragment().getCommentFormFragment()).commit();
-                    //LoggedUserActivity.getLoggedUserActivity().changeFragment();
-                }else if (getArguments().getString("type").equals("profile")){
-                    LoggedUserActivity.getLoggedUserActivity().getSupportFragmentManager().beginTransaction().replace(R.id.logged_user_fragment, ProfileFragment.getProfileFragment().getCommentFormFragment()).commit();
-                }
+                    LoggedUserActivity.getLoggedUserActivity().getSupportFragmentManager().beginTransaction().replace(R.id.logged_user_fragment, LoggedUserActivity.getLoggedUserActivity().getCommentFormFragment()).commit();
             }
         });
 
@@ -97,7 +88,7 @@ public class CommentsListFragment extends Fragment implements OnBackPressed {
     /**
      * Quando un post viene pubblicato la home page viene aggiornata.
      */
-    private Emitter.Listener updatePostCommentsList = new Emitter.Listener() {
+    public static Emitter.Listener updatePostCommentsList = new Emitter.Listener() {
 
         @Override
         public void call(final Object... args) {
@@ -107,13 +98,7 @@ public class CommentsListFragment extends Fragment implements OnBackPressed {
                     @Override
                     public void run() {
                         // quando un post viene pubblicato la socket avvisa del necessario aggiornmento
-                        if (getArguments().getString("type").equals("home")){
-                            Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), "home", Toast.LENGTH_LONG).show();
-                            HomeFragment.getHomeFragment().getCommentsListFragment().getAllPostComments();
-                        }else if (getArguments().getString("type").equals("profile")){
-                            Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), "profile", Toast.LENGTH_LONG).show();
-                            ProfileFragment.getProfileFragment().getCommentsListFragment().getAllPostComments();
-                        }
+                        LoggedUserActivity.getLoggedUserActivity().getCommentsListFragment().getAllPostComments();
                     }
                 });
             }
@@ -158,7 +143,7 @@ public class CommentsListFragment extends Fragment implements OnBackPressed {
      */
     private void initializeRecyclerView() {
         RecyclerView recyclerView = view.findViewById(R.id.listComments);
-        CommentsListAdapter adapter = new CommentsListAdapter(this.listPostComments, getArguments().getString("type"));
+        CommentsListAdapter adapter = new CommentsListAdapter(this.listPostComments);
 
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));

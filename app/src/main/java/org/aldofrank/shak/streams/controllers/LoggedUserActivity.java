@@ -20,6 +20,7 @@ import com.github.nkzawa.socketio.client.Socket;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import org.aldofrank.shak.R;
+import org.aldofrank.shak.models.Post;
 import org.aldofrank.shak.notifications.controllers.NotificationsFragment;
 import org.aldofrank.shak.people.controllers.PeopleListFragment;
 import org.aldofrank.shak.profile.controllers.ProfileFragment;
@@ -49,6 +50,9 @@ public class LoggedUserActivity extends AppCompatActivity {
     private PeopleListFragment peopleFragment;
     private NotificationsFragment notificationsFragment;
     private SettingsFragment settingsFragment;
+
+    private CommentsListFragment commentsListFragment;
+    private CommentFormFragment commentFormFragment;
 
     private SharedPreferences sharedPreferences;
 
@@ -177,8 +181,6 @@ public class LoggedUserActivity extends AppCompatActivity {
             // sostituisce il fragment attuale con un fragment scelto
             assert selectedFragment != null : "selectedFragment non poteva essere null";
             changeFragment(selectedFragment);
-            /*       getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.logged_user_fragment, selectedFragment).commit();*/
 
             return true;
         }
@@ -195,16 +197,6 @@ public class LoggedUserActivity extends AppCompatActivity {
     public static String getIdLoggedUser(){
         return LoggedUserActivity.idLoggedUser;
     }
-
-    /*@Override
-    public void onBackPressed()
-    {
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.remove("authToken");
-        editor.commit();
-
-        super.onBackPressed();  // optional depending on your needs
-    }*/
 
     @Override
     public void onDestroy() {
@@ -237,22 +229,43 @@ public class LoggedUserActivity extends AppCompatActivity {
         }
     }
 
+    public CommentsListFragment getCommentsListFragment() {
+        return commentsListFragment;
+    }
+
+    public CommentsListFragment getCommentsListFragment(Post post) {
+        this.commentsListFragment = CommentsListFragment.newInstance(post);
+        return commentsListFragment;
+    }
+
+    public CommentFormFragment getCommentFormFragment() {
+
+        if (this.commentFormFragment == null) {
+            this.commentFormFragment = new CommentFormFragment();
+        }
+
+        return commentFormFragment;
+    }
+
     public void changeFragment(Fragment newFragment){
 
         Fragment oldFragment = getSupportFragmentManager().findFragmentById(R.id.logged_user_fragment);
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction transactionsManager = fragmentManager.beginTransaction();
+        if (oldFragment != newFragment){
 
-        if (oldFragment!=null){
-            transactionsManager
-                    .replace(R.id.logged_user_fragment, newFragment)
-                    .remove(oldFragment)
-                    .commit();
-        }else {
-            transactionsManager
-                    .replace(R.id.logged_user_fragment, newFragment)
-                    .commit();
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentTransaction transactionsManager = fragmentManager.beginTransaction();
+
+            if (oldFragment!=null){
+                transactionsManager
+                        .replace(R.id.logged_user_fragment, newFragment)
+                        .remove(oldFragment)
+                        .commit();
+            }else {
+                transactionsManager
+                        .replace(R.id.logged_user_fragment, newFragment)
+                        .commit();
+            }
         }
     }
 
