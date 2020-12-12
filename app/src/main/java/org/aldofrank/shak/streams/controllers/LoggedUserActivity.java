@@ -59,10 +59,12 @@ public class LoggedUserActivity extends AppCompatActivity {
     private static LoggedUserActivity loggedUserActivity;
 
     private static Socket socket;
+
     {
         try {
             socket = IO.socket("http://10.0.2.2:3000/");
-        } catch (URISyntaxException ignored) {}
+        } catch (URISyntaxException ignored) {
+        }
     }
 
     @Override
@@ -86,7 +88,8 @@ public class LoggedUserActivity extends AppCompatActivity {
             try {
                 infoSocketConnection.put("username", usernameLoggedUser);
                 //infoSocketConnection.put("room", "global");
-            } catch (JSONException ignored) {}
+            } catch (JSONException ignored) {
+            }
 
             // occorre registrare l'esito della connessione per verificare se la connessione è stata
             // stabilita correttamente
@@ -99,7 +102,7 @@ public class LoggedUserActivity extends AppCompatActivity {
                 public void call(Object... args) {
 //                Toast.makeText(LoggedUserActivity.this, "sendMessage IOAcknowledge" + args.toString(), Toast.LENGTH_LONG).show();
                     if (args != null) {
-                        assert args[0] != null: "arg doveva essere un array non vuoto";
+                        assert args[0] != null : "arg doveva essere un array non vuoto";
 
                         isSocketCorrectlyCreate = true;
                         System.out.println("sendMessage IOAcknowledge" + args[0].toString());
@@ -142,17 +145,14 @@ public class LoggedUserActivity extends AppCompatActivity {
 
             switch (navigationSectionIdentifier) {
                 case R.id.navigation_home:
-                    if (homeFragment == null){
+                    if (homeFragment == null) {
                         homeFragment = new HomeFragment();
                     }
 
                     selectedFragment = homeFragment;
                     break;
                 case R.id.navigation_profile:
-                    if (profileFragment == null) {
-                        profileFragment = ProfileFragment.newInstance(LoggedUserActivity.getUsernameLoggedUser());
-                    }
-
+                    profileFragment = ProfileFragment.newInstance(LoggedUserActivity.getUsernameLoggedUser());
                     selectedFragment = profileFragment;
                     break;
                 case R.id.navigation_users:
@@ -190,11 +190,11 @@ public class LoggedUserActivity extends AppCompatActivity {
         return LoggedUserActivity.token;
     }
 
-    public static String getUsernameLoggedUser(){
+    public static String getUsernameLoggedUser() {
         return LoggedUserActivity.usernameLoggedUser;
     }
 
-    public static String getIdLoggedUser(){
+    public static String getIdLoggedUser() {
         return LoggedUserActivity.idLoggedUser;
     }
 
@@ -210,21 +210,21 @@ public class LoggedUserActivity extends AppCompatActivity {
         tellFragments();
     }
 
-    private void tellFragments(){
+    private void tellFragments() {
         List<Fragment> fragments = getSupportFragmentManager().getFragments();
-        for(Fragment fragment : fragments){
-            if(fragment instanceof PostFormFragment)
-                ((PostFormFragment)fragment).onBackPressed();
-            else if (fragment instanceof CommentsListFragment){
-                ((CommentsListFragment)fragment).onBackPressed();
-            }else if (fragment instanceof CommentFormFragment){
-                ((CommentFormFragment)fragment).onBackPressed();
-            }else if(fragment instanceof ProfileFragment){
-                ((ProfileFragment)fragment).onBackPressed();
-            }else if(fragment instanceof ChangePwdFragment){
-                ((ChangePwdFragment)fragment).onBackPressed();
-            }else if(fragment instanceof AboutFragment){
-                ((AboutFragment)fragment).onBackPressed();
+        for (Fragment fragment : fragments) {
+            if (fragment instanceof PostFormFragment)
+                ((PostFormFragment) fragment).onBackPressed();
+            else if (fragment instanceof CommentsListFragment) {
+                ((CommentsListFragment) fragment).onBackPressed();
+            } else if (fragment instanceof CommentFormFragment) {
+                ((CommentFormFragment) fragment).onBackPressed();
+            } else if (fragment instanceof ProfileFragment) {
+                ((ProfileFragment) fragment).onBackPressed();
+            } else if (fragment instanceof ChangePwdFragment) {
+                ((ChangePwdFragment) fragment).onBackPressed();
+            } else if (fragment instanceof AboutFragment) {
+                ((AboutFragment) fragment).onBackPressed();
             }
         }
     }
@@ -247,21 +247,21 @@ public class LoggedUserActivity extends AppCompatActivity {
         return commentFormFragment;
     }
 
-    public void changeFragment(Fragment newFragment){
+    public void changeFragment(Fragment newFragment) {
 
         Fragment oldFragment = getSupportFragmentManager().findFragmentById(R.id.logged_user_fragment);
 
-        if (oldFragment != newFragment){
+        if (oldFragment != newFragment) {
 
             FragmentManager fragmentManager = getSupportFragmentManager();
             FragmentTransaction transactionsManager = fragmentManager.beginTransaction();
 
-            if (oldFragment!=null){
+            if (oldFragment != null) {
                 transactionsManager
                         .replace(R.id.logged_user_fragment, newFragment)
                         .remove(oldFragment)
                         .commit();
-            }else {
+            } else {
                 transactionsManager
                         .replace(R.id.logged_user_fragment, newFragment)
                         .commit();
