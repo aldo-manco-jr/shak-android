@@ -181,5 +181,17 @@
 
         <include layout="@layout/netested_profile_content_scrolling" />
 
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_add_user_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="15dp"
+            android:layout_marginBottom="15dp"
+            app:backgroundTint="@color/colorSHAK"
+            android:clickable="true"
+            android:visibility="gone"
+            android:src="@drawable/ic_add_white_24dp"
+            android:layout_gravity="bottom|right" />
+
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </FrameLayout>

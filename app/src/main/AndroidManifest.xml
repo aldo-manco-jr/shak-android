@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.aldofrank.shak">
+    package="org.aldofrankmarco.shak">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -15,27 +15,27 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.NoActionBar"
         android:usesCleartextTraffic="true">
-        <activity android:name=".profile.controllers.ImageViewerActivity" />
-        <activity android:name=".profile.controllers.MapsActivity" />
+        <activity android:name="org.aldofrankmarco.shak.profile.controllers.ImageViewerActivity" />
+        <activity android:name="org.aldofrankmarco.shak.profile.controllers.MapsActivity" />
         <activity
-            android:name=".authentication.controllers.ConnectionProblems"
+            android:name="org.aldofrankmarco.shak.authentication.controllers.ConnectionProblems"
             android:label="@string/title_connection_problems"
             android:windowSoftInputMode="adjustNothing" />
         <activity
-            android:name=".streams.controllers.LoggedUserActivity"
+            android:name="org.aldofrankmarco.shak.streams.controllers.LoggedUserActivity"
             android:label="@string/title_activity_logged_user"
             android:windowSoftInputMode="adjustNothing"
             android:theme="@style/NoActionBar"/>
         <activity
-            android:name=".profile.controllers.SendMailActivity"
+            android:name="org.aldofrankmarco.shak.profile.controllers.SendMailActivity"
             android:label="@string/title_send_mail"
             android:windowSoftInputMode="adjustNothing" />
         <activity
-            android:name=".authentication.controllers.AccessActivity"
+            android:name="org.aldofrankmarco.shak.authentication.controllers.AccessActivity"
             android:label="@string/app_name"
             android:windowSoftInputMode="adjustNothing" />
         <activity
-            android:name=".authentication.controllers.MainActivity"
+            android:name="org.aldofrankmarco.shak.authentication.controllers.MainActivity"
             android:windowSoftInputMode="adjustNothing">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
