@@ -474,7 +474,6 @@ public class PostsListFragment extends Fragment {
             }
         }
         Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), "ITERATOOO????::: " + listPosts.size(), Toast.LENGTH_SHORT).show();
-
     }
 
     //TODO IMPLEMENTATO per recuperare l'istanza se non è più in memoria

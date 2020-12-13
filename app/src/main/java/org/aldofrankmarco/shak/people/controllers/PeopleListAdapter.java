@@ -82,13 +82,18 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
         }
 
         if (!user.getProfileImageVersion().isEmpty()) {
-            String urlImagePost = this.basicUrlImage + user.getProfileImageVersion() + "/"
-                    + user.getProfileImageId();
+            // nel caso in cui non vi sia un dato valorizzato "profile image version" nel database
+            final String urlImagePost = this.basicUrlImage +
+                    user.getProfileImageVersion() +
+                    "/" +
+                    user.getProfileImageId();
 
             Glide.with(LoggedUserActivity.getLoggedUserActivity())
                     .asBitmap()
                     .load(urlImagePost)
                     .into(holder.imageProfile);
+
+            holder.imageProfile.setVisibility(View.VISIBLE);
         } else {
             holder.imageProfile.setVisibility(View.GONE);
         }
@@ -123,7 +128,7 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
     }
 
     /**
-     * In base ai dati ricavati da {{@link #isFollow(User)}} viene inviata una richiesta http di
+     * In base ai dati ricavati da {@link #isFollow(User, UserItemHolder)} viene inviata una richiesta http di
      * "follow" o di "unfollow" verso il post.
      */
     private void followOrUnfollow(User user, final UserItemHolder holder) {

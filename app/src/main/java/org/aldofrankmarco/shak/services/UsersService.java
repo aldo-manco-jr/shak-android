@@ -17,7 +17,7 @@ import retrofit2.http.Path;
 
 public interface UsersService {
 
-    @GET("users")
+    @GET("users/")
     Call<GetAllUsersResponse> getAllUsers();
 
     @GET("users/following/{username}")

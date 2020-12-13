@@ -96,7 +96,7 @@ public class PeopleListFragment extends Fragment {
 
         titleTextView = view.findViewById(R.id.title_users_list);
 
-        newGetAllUsers();
+        getAllUsers();
 
         return view;
     }
@@ -126,7 +126,7 @@ public class PeopleListFragment extends Fragment {
      * - favorites: sono i post a cui l'utente ha espresso la preferenza
      * Viene mandata una richiesta http per recuperati i dal server.
      */
-    public void newGetAllUsers() {
+    public void getAllUsers() {
 
         if (getArguments() == null) {
             return;
@@ -150,16 +150,6 @@ public class PeopleListFragment extends Fragment {
                         assert response.body() != null : "body() non doveva essere null";
 
                         listUsers = response.body().getAllUsers();
-
-                        User loggedUser = null;
-
-                        for (User u : listUsers) {
-                            if (u.getUsername().equals(LoggedUserActivity.getUsernameLoggedUser())){
-                                loggedUser = u;
-                            }
-                        }
-
-                        listUsers.remove(loggedUser);
 
                         initializeRecyclerView();
                     }

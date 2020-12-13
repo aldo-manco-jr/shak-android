@@ -102,7 +102,10 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
         }
 
         if (!post.getImageVersion().isEmpty()) {
-            final String urlImagePost = this.basicUrlImage + post.getImageVersion() + "/" + post.getImageId();
+            final String urlImagePost = this.basicUrlImage +
+                    post.getImageVersion() +
+                    '/' +
+                    post.getImageId();
 
             Glide.with(LoggedUserActivity.getLoggedUserActivity())
                     .asBitmap()
@@ -117,6 +120,8 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
                     LoggedUserActivity.getLoggedUserActivity().startActivity(intent);
                 }
             });
+
+            holder.imagePost.setVisibility(View.VISIBLE);
         } else {
             holder.imagePost.setVisibility(View.GONE);
         }
