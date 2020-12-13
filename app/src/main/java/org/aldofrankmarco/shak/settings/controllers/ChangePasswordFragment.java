@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import org.aldofrankmarco.shak.R;
 import org.aldofrankmarco.shak.models.User;
+import org.aldofrankmarco.shak.services.AuthenticationService;
 import org.aldofrankmarco.shak.services.NotificationsService;
 import org.aldofrankmarco.shak.services.ServiceGenerator;
 import org.aldofrankmarco.shak.settings.http.ChangePasswordRequest;
@@ -33,7 +34,7 @@ import retrofit2.Response;
  *  ChangePwdFragment è il fragment che ci permette di utilizzare la funzione di cambio password
  *  dell'utente loggato
  */
-public class ChangePwdFragment extends Fragment implements View.OnClickListener, View.OnTouchListener, OnBackPressed {
+public class ChangePasswordFragment extends Fragment implements View.OnClickListener, View.OnTouchListener, OnBackPressed {
 
     private EditText oldPwd;
     private EditText newPwd;
@@ -46,7 +47,7 @@ public class ChangePwdFragment extends Fragment implements View.OnClickListener,
 
     private Button changeButton;
 
-    public ChangePwdFragment (){}
+    public ChangePasswordFragment(){}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -84,7 +85,7 @@ public class ChangePwdFragment extends Fragment implements View.OnClickListener,
      */
     public void changePwd(){
 
-        NotificationsService changePwdService = ServiceGenerator.createService(NotificationsService.class);
+        AuthenticationService authenticationService = ServiceGenerator.createService(AuthenticationService.class);
 
         //inseriamo i dati nel json
 
@@ -98,7 +99,7 @@ public class ChangePwdFragment extends Fragment implements View.OnClickListener,
             test2,
             test3
         );
-        Call<Object> httpRequest =  changePwdService.changePassword(changePasswordJson);
+        Call<Object> httpRequest =  authenticationService.changePassword(changePasswordJson);
         //loadingBar = getActivity().findViewById(R.id.loadingBar);
         //loadingBar.setVisibility(View.VISIBLE);
         httpRequest.enqueue(new Callback<Object>() {
@@ -108,20 +109,10 @@ public class ChangePwdFragment extends Fragment implements View.OnClickListener,
             public void onResponse(Call<Object> call, Response<Object> response) {
                 if (response.isSuccessful()){
                     SettingsFragment.getSettingsFragment();
-                    /*getChildFragmentManager()
-                            .beginTransaction()
-                            .replace(R.id.changePwdFragment, settings)
-                            .addToBackStack("openChangePwdFragment")
-                            .commit();*/
                     LoggedUserActivity.getLoggedUserActivity().changeFragment(SettingsFragment.getSettingsFragment());
                     Toast.makeText(getActivity(), R.string.password_changed, Toast.LENGTH_LONG).show();
                 }else {
                     SettingsFragment.getSettingsFragment();
-                    /*getChildFragmentManager()
-                            .beginTransaction()
-                            .replace(R.id.changePwdFragment, settings)
-                            .addToBackStack("openChangePwdFragment")
-                            .commit();*/
                     LoggedUserActivity.getLoggedUserActivity().changeFragment(SettingsFragment.getSettingsFragment());
                     Toast.makeText(getActivity(), R.string.password_changed_error, Toast.LENGTH_LONG).show();
 //                    loadingBar.setVisibility(View.GONE);

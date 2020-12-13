@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/colorSHAK"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:cardBackgroundColor="@color/white"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="2dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_item"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:padding="15dp">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/image_profile_circle"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="15dp"
+                android:src="@mipmap/ic_launcher"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <LinearLayout
+                android:id="@+id/layoutUserData"
+                android:layout_width="250dp"
+                android:layout_height="80dp"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="15dp"
+                android:orientation="vertical"
+                app:layout_constraintLeft_toRightOf="@id/image_profile_circle"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:id="@+id/notificationContent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Content"
+                    android:textColor="@color/black"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    style="@style/autoscroll"/>
+
+                <TextView
+                    android:id="@+id/dateNotify"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Date"
+                    android:textColor="@color/black"
+                    android:textSize="17sp"
+                    style="@style/autoscroll"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layoutNotifyData"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="15dp"
+                android:orientation="vertical"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/image_profile_circle"/>
+
+            <LinearLayout
+                android:id="@+id/layoutInteractions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="15dp"
+                android:orientation="horizontal"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/layoutNotifyData">
+
+                <ImageView
+                    android:id="@+id/delete_notify_button"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:padding="2dp"
+                    android:src="@drawable/ic_delete_black_24dp" />
+
+                <ImageView
+                    android:id="@+id/mark_button"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_marginLeft="20sp"
+                    android:padding="2dp"
+                    android:src="@drawable/ic_notification_read_color_shak_24dp" />
+
+                <ImageView
+                    android:id="@+id/notifyStatus"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:padding="2dp"
+                    android:layout_marginLeft="200dp"
+                    android:src="@drawable/ic_unread_notification_status_24"
+                    android:layout_alignParentRight="true"/>
+
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

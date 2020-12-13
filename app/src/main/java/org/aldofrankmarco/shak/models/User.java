@@ -200,8 +200,8 @@ public class User {
             return notificationId.getAsString();
         }
 
-        public String getUserId() {
-            return userId.getAsString();
+        public String getSenderUsername() {
+            return notificationContent.split(" ")[0];
         }
 
         public String getNotificationContent() {

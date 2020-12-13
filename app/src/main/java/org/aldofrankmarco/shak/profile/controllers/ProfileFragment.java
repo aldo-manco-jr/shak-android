@@ -200,10 +200,12 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
                 getLocation();
                 break;
             case R.id.email_profile:
-                Intent intent = new Intent(LoggedUserActivity.getLoggedUserActivity(), SendMailActivity.class);
-                intent.putExtra("email", user.getEmail());
-                intent.putExtra("username", user.getUsername());
-                startActivity(intent);
+                if (!user.getUsername().equals(LoggedUserActivity.getUsernameLoggedUser())){
+                    Intent intent = new Intent(LoggedUserActivity.getLoggedUserActivity(), SendMailActivity.class);
+                    intent.putExtra("email", user.getEmail());
+                    intent.putExtra("username", user.getUsername());
+                    startActivity(intent);
+                }
                 break;
             case R.id.followUser:
                 followOrUnfollow(user, followButton);

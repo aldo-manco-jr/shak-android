@@ -4,6 +4,7 @@ import org.aldofrankmarco.shak.authentication.http.LoginRequest;
 import org.aldofrankmarco.shak.authentication.http.LoginResponse;
 import org.aldofrankmarco.shak.authentication.http.SignupRequest;
 import org.aldofrankmarco.shak.authentication.http.SignupResponse;
+import org.aldofrankmarco.shak.settings.http.ChangePasswordRequest;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -16,4 +17,7 @@ public interface AuthenticationService {
 
     @POST("register")
     Call<SignupResponse> register(@Body SignupRequest signupRequest);
+
+    @POST("change-password")
+    Call<Object> changePassword(@Body ChangePasswordRequest changePasswordRequest);
 }

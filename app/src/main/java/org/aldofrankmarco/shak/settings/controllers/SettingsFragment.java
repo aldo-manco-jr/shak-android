@@ -23,7 +23,7 @@ import org.aldofrankmarco.shak.streams.controllers.LoggedUserActivity;
 
 public class SettingsFragment extends Fragment {
 
-    private ChangePwdFragment changePwdFragment;
+    private ChangePasswordFragment changePasswordFragment;
     private AboutFragment aboutFragment;
 
     SharedPreferences sharedPreferences;
@@ -52,13 +52,13 @@ public class SettingsFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id){
                 if (position == 0){
-                       getChangePwdFragment();
+                       getChangePasswordFragment();
                        // sostituisce il fragment attuale con un nuovo fragment
                        /*getChildFragmentManager()
                                .beginTransaction()
                                .replace(R.id.settings, changePwdFragment)
                                .commit();*/
-                    LoggedUserActivity.getLoggedUserActivity().changeFragment(changePwdFragment);
+                    LoggedUserActivity.getLoggedUserActivity().changeFragment(changePasswordFragment);
                 }
                 if (position == 1){
                     getAboutFragment();
@@ -121,11 +121,11 @@ public class SettingsFragment extends Fragment {
             getFragmentManager().beginTransaction().remove(HomeFragment.getHomeFragment().getPostFormFragment()).commitAllowingStateLoss();
         }
 
-        public ChangePwdFragment getChangePwdFragment() {
-            if (this.changePwdFragment == null) {
-                this.changePwdFragment = new ChangePwdFragment();
+        public ChangePasswordFragment getChangePasswordFragment() {
+            if (this.changePasswordFragment == null) {
+                this.changePasswordFragment = new ChangePasswordFragment();
             }
-            return changePwdFragment;
+            return changePasswordFragment;
         }
 
         public AboutFragment getAboutFragment() {

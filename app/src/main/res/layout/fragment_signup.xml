@@ -26,8 +26,8 @@
             android:inputType="textEmailAddress"
             android:paddingLeft="8dip"
             android:singleLine="true"
-            android:textColor="#FFFFFF"
-            android:textColorHint="#FFFFFF"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white"
             android:textSize="14dip" />
 
         <TextView
@@ -55,8 +55,8 @@
             android:inputType="textPersonName"
             android:paddingLeft="8dip"
             android:singleLine="true"
-            android:textColor="#FFFFFF"
-            android:textColorHint="#FFFFFF"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white"
             android:textSize="14dip" />
 
         <TextView
@@ -86,8 +86,8 @@
             android:paddingLeft="8dip"
             android:paddingRight="8dip"
             android:singleLine="true"
-            android:textColor="#FFFFFF"
-            android:textColorHint="#FFFFFF"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white"
             android:textSize="14dip" />
 
         <TextView
@@ -107,9 +107,9 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
-            android:backgroundTint="#FFFFFF"
+            android:backgroundTint="@color/white"
             android:text="SIGN UP"
-            android:textColor="#015D17" />
+            android:textColor="@color/colorSHAK" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

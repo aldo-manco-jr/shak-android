@@ -21,11 +21,11 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import org.aldofrankmarco.shak.R;
 import org.aldofrankmarco.shak.models.Post;
-import org.aldofrankmarco.shak.notifications.controllers.NotificationsFragment;
+import org.aldofrankmarco.shak.notifications.controllers.NotificationsListFragment;
 import org.aldofrankmarco.shak.people.controllers.PeopleListFragment;
 import org.aldofrankmarco.shak.profile.controllers.ProfileFragment;
 import org.aldofrankmarco.shak.settings.controllers.AboutFragment;
-import org.aldofrankmarco.shak.settings.controllers.ChangePwdFragment;
+import org.aldofrankmarco.shak.settings.controllers.ChangePasswordFragment;
 import org.aldofrankmarco.shak.settings.controllers.SettingsFragment;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -48,7 +48,7 @@ public class LoggedUserActivity extends AppCompatActivity {
     private HomeFragment homeFragment;
     private ProfileFragment profileFragment;
     private PeopleListFragment peopleFragment;
-    private NotificationsFragment notificationsFragment;
+    private NotificationsListFragment notificationsFragment;
     private SettingsFragment settingsFragment;
 
     private CommentsListFragment commentsListFragment;
@@ -163,10 +163,7 @@ public class LoggedUserActivity extends AppCompatActivity {
                     selectedFragment = peopleFragment;
                     break;
                 case R.id.navigation_notifications:
-                    if (notificationsFragment == null) {
-                        notificationsFragment = new NotificationsFragment();
-                    }
-
+                    notificationsFragment = new NotificationsListFragment();
                     selectedFragment = notificationsFragment;
                     break;
                 case R.id.navigation_settings:
@@ -221,8 +218,8 @@ public class LoggedUserActivity extends AppCompatActivity {
                 ((CommentFormFragment) fragment).onBackPressed();
             } else if (fragment instanceof ProfileFragment) {
                 ((ProfileFragment) fragment).onBackPressed();
-            } else if (fragment instanceof ChangePwdFragment) {
-                ((ChangePwdFragment) fragment).onBackPressed();
+            } else if (fragment instanceof ChangePasswordFragment) {
+                ((ChangePasswordFragment) fragment).onBackPressed();
             } else if (fragment instanceof AboutFragment) {
                 ((AboutFragment) fragment).onBackPressed();
             }

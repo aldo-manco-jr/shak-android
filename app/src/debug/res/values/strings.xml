@@ -20,7 +20,8 @@
 
     <string name="title_streams_tab">Streams</string>
     <string name="title_favourites_tab">Favourites</string>
-    <string name="title_users_list">Users list</string>
+    <string name="title_users_list">Users List</string>
+    <string name="title_notifications_list">Notifications List</string>
 
     <string name="auth_login">Already registered? Log in now.</string>
     <string name="auth_signup">Not registered yet? Sign up now.</string>

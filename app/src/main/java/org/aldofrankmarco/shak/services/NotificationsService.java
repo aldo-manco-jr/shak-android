@@ -9,15 +9,15 @@ import retrofit2.http.Path;
 
 public interface NotificationsService {
 
-    // frank
-    @POST("change-password")
-    Call<Object> changePassword(@Body ChangePasswordRequest changePasswordRequest);
+    @POST("notification/delete/{id}")
+    Call<Object> deleteNotification(@Path("id") String notificationId);
 
-    // frank
-    @POST("mark/{id}")
-    Call<Object> changeNotificationSetting(@Path("id") String notificationId, @Body boolean isDeleted);
+    @POST("notification/mark/{id}")
+    Call<Object> markNotificationAsRead(@Path("id") String notificationId);
 
-    // frank
     @POST("mark-all")
     Call<Object> markAllNotificationsAsRead();
+
+    @POST("user/view-profile")
+    Call<Object> addNotificationProfileViewed(@Body String userId);
 }
