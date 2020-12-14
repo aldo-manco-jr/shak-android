@@ -25,6 +25,7 @@ import com.google.gson.JsonObject;
 import org.aldofrankmarco.shak.R;
 import org.aldofrankmarco.shak.models.User;
 import org.aldofrankmarco.shak.people.http.GetUserByUsernameResponse;
+import org.aldofrankmarco.shak.profile.http.GetImagesListResponse;
 import org.aldofrankmarco.shak.services.ImagesService;
 import org.aldofrankmarco.shak.services.ServiceGenerator;
 import org.aldofrankmarco.shak.services.UsersService;
@@ -113,7 +114,7 @@ public class ImagesListFragment extends Fragment {
     /**
      * Avvia la fase di caricamento di un immagine dalla memoria dell'utente all'applicazione
      */
-    protected void uploadUserImage(){
+    protected void uploadUserImage() {
         Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setType("image/*");
         startActivityForResult(intent, SELECT_PHOTO);
@@ -121,7 +122,6 @@ public class ImagesListFragment extends Fragment {
 
     /**
      * @param bitmap un'immagine in formato bitmap
-     *
      * @return una stringa che rappresenta un'immagine codificata secondo Base64
      */
     private String bitmapToBase64(Bitmap bitmap) {
@@ -147,13 +147,13 @@ public class ImagesListFragment extends Fragment {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), uri);
                 imageEncoded = bitmapToBase64(bitmap);
                 addUserImage(imageEncoded);
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
-    private void addUserImage(String imageEncoded){
+    private void addUserImage(String imageEncoded) {
 
         ImagesService imagesService = ServiceGenerator.createService(ImagesService.class, LoggedUserActivity.getToken());
 
@@ -203,18 +203,18 @@ public class ImagesListFragment extends Fragment {
             return;
         }
 
-         username = getArguments().getString("username");
-        UsersService usersService = ServiceGenerator.createService(UsersService.class, LoggedUserActivity.getToken());
+        username = getArguments().getString("username");
+        ImagesService imagesService = ServiceGenerator.createService(ImagesService.class, LoggedUserActivity.getToken());
 
-        Call<GetUserByUsernameResponse> httpRequest = usersService.getUserByUsername(username);
+        Call<GetImagesListResponse> httpRequest = imagesService.getAllUserImages(username);
 
-        httpRequest.enqueue(new Callback<GetUserByUsernameResponse>() {
+        httpRequest.enqueue(new Callback<GetImagesListResponse>() {
             @Override
-            public void onResponse(Call<GetUserByUsernameResponse> call, Response<GetUserByUsernameResponse> response) {
+            public void onResponse(Call<GetImagesListResponse> call, Response<GetImagesListResponse> response) {
                 if (response.isSuccessful()) {
                     assert response.body() != null : "body() non doveva essere null";
 
-                    listImages = response.body().getUserFoundByUsername().getArrayImages();
+                    listImages = response.body().getImageList();
                     initializeRecyclerView();
                 } else {
                     Toast.makeText(getActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
@@ -222,7 +222,7 @@ public class ImagesListFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(Call<GetUserByUsernameResponse> call, Throwable t) {
+            public void onFailure(Call<GetImagesListResponse> call, Throwable t) {
                 Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });

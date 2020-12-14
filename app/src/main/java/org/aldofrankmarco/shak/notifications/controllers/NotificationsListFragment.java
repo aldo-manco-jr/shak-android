@@ -18,6 +18,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.aldofrankmarco.shak.R;
 import org.aldofrankmarco.shak.models.User;
+import org.aldofrankmarco.shak.notifications.http.GetNotificationsListResponse;
 import org.aldofrankmarco.shak.people.http.GetUserByUsernameResponse;
 import org.aldofrankmarco.shak.services.NotificationsService;
 import org.aldofrankmarco.shak.services.ServiceGenerator;
@@ -69,25 +70,24 @@ public class NotificationsListFragment extends Fragment {
      * Consente di recuperare tutte le notifiche
      */
     public void getAllNotifications() {
-        UsersService usersService = ServiceGenerator.createService(UsersService.class, LoggedUserActivity.getToken());
-        Call<GetUserByUsernameResponse> httpRequest = usersService.getUserByUsername(LoggedUserActivity.getUsernameLoggedUser());
+        NotificationsService notificationsService = ServiceGenerator.createService(NotificationsService.class, LoggedUserActivity.getToken());
+        Call<GetNotificationsListResponse> httpRequest = notificationsService.getAllNotifications();
 
-        httpRequest.enqueue(new Callback<GetUserByUsernameResponse>() {
+        httpRequest.enqueue(new Callback<GetNotificationsListResponse>() {
             @Override
-            public void onResponse(Call<GetUserByUsernameResponse> call, Response<GetUserByUsernameResponse> response) {
+            public void onResponse(Call<GetNotificationsListResponse> call, Response<GetNotificationsListResponse> response) {
                 if (response.isSuccessful()) {
                     assert response.body() != null : "body() non doveva essere null";
-                    listNotification = response.body().getUserFoundByUsername().getArrayNotifications();
-                    initializeRecyclerView();
+                    listNotification = response.body().getNotificationsList();
 
+                    initializeRecyclerView();
                 } else {
                     Toast.makeText(getActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                 }
-
             }
 
             @Override
-            public void onFailure(Call<GetUserByUsernameResponse> call, Throwable t) {
+            public void onFailure(Call<GetNotificationsListResponse> call, Throwable t) {
                 Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });

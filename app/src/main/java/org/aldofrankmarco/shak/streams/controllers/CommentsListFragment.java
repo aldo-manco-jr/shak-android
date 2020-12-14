@@ -17,6 +17,7 @@ import org.aldofrankmarco.shak.R;
 import org.aldofrankmarco.shak.models.Post;
 import org.aldofrankmarco.shak.services.ServiceGenerator;
 import org.aldofrankmarco.shak.services.StreamsService;
+import org.aldofrankmarco.shak.streams.http.GetAllPostCommentsResponse;
 import org.aldofrankmarco.shak.streams.http.GetPostResponse;
 
 import java.util.List;
@@ -113,17 +114,17 @@ public class CommentsListFragment extends Fragment implements OnBackPressed {
 
         StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
 
-        Call<GetPostResponse> httpRequest = streamsService.getPost(postId);
+        Call<GetAllPostCommentsResponse> httpRequest = streamsService.getAllPostComments(postId);
 
-        httpRequest.enqueue(new Callback<GetPostResponse>() {
+        httpRequest.enqueue(new Callback<GetAllPostCommentsResponse>() {
 
             @Override
-            public void onResponse(Call<GetPostResponse> call, Response<GetPostResponse> response) {
+            public void onResponse(Call<GetAllPostCommentsResponse> call, Response<GetAllPostCommentsResponse> response) {
 
                 if (response.isSuccessful()) {
 
                     //TODO ERA NULL
-                    listPostComments = response.body().getPost().getArrayComments();
+                    listPostComments = response.body().getCommentsList();
                     initializeRecyclerView();
 
                 } else {
@@ -132,7 +133,7 @@ public class CommentsListFragment extends Fragment implements OnBackPressed {
             }
 
             @Override
-            public void onFailure(Call<GetPostResponse> call, Throwable t) {
+            public void onFailure(Call<GetAllPostCommentsResponse> call, Throwable t) {
                 Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });

@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import org.aldofrankmarco.shak.models.Post;
 import org.aldofrankmarco.shak.streams.http.AddCommentRequest;
 import org.aldofrankmarco.shak.streams.http.DeleteCommentRequest;
+import org.aldofrankmarco.shak.streams.http.GetAllPostCommentsResponse;
 import org.aldofrankmarco.shak.streams.http.GetAllUserPostsResponse;
 import org.aldofrankmarco.shak.streams.http.GetNewPostsListResponse;
 import org.aldofrankmarco.shak.streams.http.GetPostResponse;
@@ -41,6 +42,9 @@ public interface StreamsService {
 
     @POST("post/remove-like")
     Call<Object> unlikePost(@Body Post post);
+
+    @GET("comments-list/{id}")
+    Call<GetAllPostCommentsResponse> getAllPostComments(@Path("id") String postId);
 
     @POST("post/add-comment")
     Call<Object> submitComment(@Body AddCommentRequest addCommentRequest);
