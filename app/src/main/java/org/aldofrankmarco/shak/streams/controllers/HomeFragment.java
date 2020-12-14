@@ -90,6 +90,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
         if (this.streamsFragment == null) {
             this.streamsFragment = PostsListFragment.newInstance("all");
+            this.streamsFragment.getAllPosts();
         }
 
         return streamsFragment;

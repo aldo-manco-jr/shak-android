@@ -82,6 +82,10 @@ public class PostsListFragment extends Fragment {
         return fragment;
     }
 
+    protected List<Post> getListPosts(){
+        return this.listPosts;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,8 +107,6 @@ public class PostsListFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         recyclerView = view.findViewById(R.id.listPosts);
-
-        getAllPosts();
     }
 
     /**
@@ -132,18 +134,25 @@ public class PostsListFragment extends Fragment {
                     if (response.isSuccessful()) {
                         assert response.body() != null : "body() non doveva essere null";
 
-                        if (type.equals("all")) {
-                            listPosts = response.body().getArrayPosts();
-                        } else if (type.equals("favourites")) {
-                            listPosts = response.body().getFavouritePosts();
+                        PostsListFragment streamsFragment = HomeFragment.getHomeFragment().getStreamsFragment();
+                        streamsFragment.listPosts = response.body().getStreamPosts();
+                        streamsFragment.listPostsSize = streamsFragment.listPosts.size();
+
+                        if (streamsFragment.listPostsSize > 0){
+                            streamsFragment.lastPostDate = streamsFragment.listPosts.get(0).getCreatedAt();
                         }
 
-                        listPostsSize = listPosts.size();
-                        if (listPostsSize > 0){
-                            lastPostDate = listPosts.get(0).getCreatedAt();
+                        streamsFragment.initializeRecyclerView();
+
+                        PostsListFragment favouritesFragment = HomeFragment.getHomeFragment().getFavouritesFragment();
+                        favouritesFragment.listPosts = response.body().getFavouritePosts();
+                        favouritesFragment.listPostsSize = favouritesFragment.listPosts.size();
+
+                        if (favouritesFragment.listPostsSize > 0){
+                            favouritesFragment.lastPostDate = listPosts.get(0).getCreatedAt();
                         }
 
-                        initializeRecyclerView();
+                        favouritesFragment.initializeRecyclerView();
                     } else {
                         Toast.makeText(getActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                     }

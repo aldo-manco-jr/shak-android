@@ -21,7 +21,7 @@ public class GetPostsListResponse {
         return message;
     }
 
-    public List<Post> getArrayPosts() {
+    public List<Post> getStreamPosts() {
         return arrayPosts;
     }
 
