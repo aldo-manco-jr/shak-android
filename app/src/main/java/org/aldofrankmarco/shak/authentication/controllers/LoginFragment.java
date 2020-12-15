@@ -196,17 +196,18 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         boolean isTouched = event.getAction() == MotionEvent.ACTION_DOWN;
+        EditText editText = (EditText) v;
 
         if (isTouched) {
-            final int eyeIconSize = 32;
-            final int passwordFieldWidth = passwordField.getWidth();
+            final int eyeIconSize = 64;
+            final int passwordFieldWidth = editText.getWidth();
             final int eyeWidthSize = passwordFieldWidth - eyeIconSize;
 
             if (event.getRawX() >= eyeWidthSize) {
-                if (passwordField.getTransformationMethod() == null) {
+                if (editText.getTransformationMethod() == null) {
                     // nascondi password
-                    passwordField.setTransformationMethod(new PasswordTransformationMethod());
-                    passwordField.setCompoundDrawablesWithIntrinsicBounds(
+                    editText.setTransformationMethod(new PasswordTransformationMethod());
+                    editText.setCompoundDrawablesWithIntrinsicBounds(
                             R.drawable.password_drawable_left,
                             0,
                             R.drawable.eye_open_drawable_right,
@@ -214,8 +215,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
                     );
                 } else {
                     // mostra password
-                    passwordField.setTransformationMethod(null);
-                    passwordField.setCompoundDrawablesWithIntrinsicBounds(
+                    editText.setTransformationMethod(null);
+                    editText.setCompoundDrawablesWithIntrinsicBounds(
                             R.drawable.password_drawable_left,
                             0,
                             R.drawable.eye_closed_drawable_right,
