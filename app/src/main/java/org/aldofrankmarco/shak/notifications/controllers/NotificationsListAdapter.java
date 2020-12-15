@@ -17,6 +17,8 @@ import org.aldofrankmarco.shak.R;
 import org.aldofrankmarco.shak.models.User;
 import org.aldofrankmarco.shak.people.http.GetUserByUsernameResponse;
 import org.aldofrankmarco.shak.profile.controllers.ProfileFragment;
+import org.aldofrankmarco.shak.profile.http.GetUserProfileImageResponse;
+import org.aldofrankmarco.shak.services.ImagesService;
 import org.aldofrankmarco.shak.services.NotificationsService;
 import org.aldofrankmarco.shak.services.ServiceGenerator;
 import org.aldofrankmarco.shak.services.UsersService;
@@ -131,20 +133,20 @@ public class NotificationsListAdapter extends RecyclerView.Adapter<Notifications
         return listUserNotification;
     }
 
-    private void setSenderImageProfile(String senderUsername, final NotifyItemHolder holder) {
+    private void setSenderImageProfile(final String senderUsername, final NotifyItemHolder holder) {
 
-        UsersService usersService = ServiceGenerator.createService(UsersService.class, LoggedUserActivity.getToken());
+        ImagesService imagesService = ServiceGenerator.createService(ImagesService.class, LoggedUserActivity.getToken());
 
-        Call<GetUserByUsernameResponse> httpRequest = usersService.getUserByUsername(senderUsername);
+        Call<GetUserProfileImageResponse> httpRequest = imagesService.getUserProfileImage(senderUsername);
 
-        httpRequest.enqueue(new Callback<GetUserByUsernameResponse>() {
+        httpRequest.enqueue(new Callback<GetUserProfileImageResponse>() {
             @Override
-            public void onResponse(Call<GetUserByUsernameResponse> call, final Response<GetUserByUsernameResponse> response) {
+            public void onResponse(Call<GetUserProfileImageResponse> call, final Response<GetUserProfileImageResponse> response) {
                 if (response.isSuccessful()) {
                     assert response.body() != null : "body() non doveva essere null";
 
-                    senderImageProfileId = response.body().getUserFoundByUsername().getProfileImageId();
-                    senderImageProfileVersion = response.body().getUserFoundByUsername().getProfileImageVersion();
+                    senderImageProfileId = response.body().getUserProfileImageId();
+                    senderImageProfileVersion = response.body().getUserProfileImageVersion();
 
                     final String urlImageProfileUser = basicUrlImage
                             + senderImageProfileVersion + "/"
@@ -159,7 +161,15 @@ public class NotificationsListAdapter extends RecyclerView.Adapter<Notifications
                     holder.imageProfile.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            ProfileFragment profileFragment = ProfileFragment.newInstance(response.body().getUserFoundByUsername().getUsername());
+                            ProfileFragment profileFragment = ProfileFragment.newInstance(senderUsername);
+                            LoggedUserActivity.getLoggedUserActivity().changeFragment(profileFragment);
+                        }
+                    });
+
+                    holder.notifyContent.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            ProfileFragment profileFragment = ProfileFragment.newInstance(senderUsername);
                             LoggedUserActivity.getLoggedUserActivity().changeFragment(profileFragment);
                         }
                     });
@@ -169,7 +179,7 @@ public class NotificationsListAdapter extends RecyclerView.Adapter<Notifications
             }
 
             @Override
-            public void onFailure(Call<GetUserByUsernameResponse> call, Throwable t) {
+            public void onFailure(Call<GetUserProfileImageResponse> call, Throwable t) {
                 Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });

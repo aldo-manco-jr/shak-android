@@ -16,6 +16,9 @@ import com.bumptech.glide.Glide;
 import org.aldofrankmarco.shak.R;
 import org.aldofrankmarco.shak.models.Post;
 import org.aldofrankmarco.shak.people.http.GetUserByUsernameResponse;
+import org.aldofrankmarco.shak.profile.controllers.ProfileFragment;
+import org.aldofrankmarco.shak.profile.http.GetUserProfileImageResponse;
+import org.aldofrankmarco.shak.services.ImagesService;
 import org.aldofrankmarco.shak.services.ServiceGenerator;
 import org.aldofrankmarco.shak.services.StreamsService;
 import org.aldofrankmarco.shak.services.UsersService;
@@ -123,16 +126,16 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
 
     private void setProfileImage(final String username, final CommentItemHolder holder){
 
-        UsersService usersService = ServiceGenerator.createService(UsersService.class, LoggedUserActivity.getToken());
-        Call<GetUserByUsernameResponse> httpRequest = usersService.getUserByUsername(username);
+        ImagesService imagesService = ServiceGenerator.createService(ImagesService.class, LoggedUserActivity.getToken());
+        Call<GetUserProfileImageResponse> httpRequest = imagesService.getUserProfileImage(username);
 
-        httpRequest.enqueue(new Callback<GetUserByUsernameResponse>() {
+        httpRequest.enqueue(new Callback<GetUserProfileImageResponse>() {
             @Override
-            public void onResponse(Call<GetUserByUsernameResponse> call, Response<GetUserByUsernameResponse> response) {
+            public void onResponse(Call<GetUserProfileImageResponse> call, Response<GetUserProfileImageResponse> response) {
                 if (response.isSuccessful()) {
 
-                    String profileImageId = response.body().getUserFoundByUsername().getProfileImageId();
-                    String profileImageVersion = response.body().getUserFoundByUsername().getProfileImageVersion();
+                    String profileImageId = response.body().getUserProfileImageId();
+                    String profileImageVersion = response.body().getUserProfileImageVersion();
 
                     String urlImageProfileUser = basicUrlImage + profileImageVersion + "/" + profileImageId;
 
@@ -140,13 +143,29 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
                             .asBitmap()
                             .load(urlImageProfileUser)
                             .into(holder.imageProfile);
+
+                    holder.imageProfile.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            ProfileFragment profileFragment = ProfileFragment.newInstance(username);
+                            LoggedUserActivity.getLoggedUserActivity().changeFragment(profileFragment);
+                        }
+                    });
+
+                    holder.usernameText.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            ProfileFragment profileFragment = ProfileFragment.newInstance(username);
+                            LoggedUserActivity.getLoggedUserActivity().changeFragment(profileFragment);
+                        }
+                    });
                 } else {
                     Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
-            public void onFailure(Call<GetUserByUsernameResponse> call, Throwable t) {
+            public void onFailure(Call<GetUserProfileImageResponse> call, Throwable t) {
                 Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });

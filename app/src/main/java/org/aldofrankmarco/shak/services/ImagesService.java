@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 
 import org.aldofrankmarco.shak.people.http.GetUserByUsernameResponse;
 import org.aldofrankmarco.shak.profile.http.GetImagesListResponse;
+import org.aldofrankmarco.shak.profile.http.GetUserProfileImageResponse;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -15,6 +16,9 @@ public interface ImagesService {
 
     @GET("images-list/{username}")
     Call<GetImagesListResponse> getAllUserImages(@Path("username") String username);
+
+    @GET("get-profile-image/{username}")
+    Call<GetUserProfileImageResponse> getUserProfileImage(@Path("username") String username);
 
     @POST("upload-image")
     Call<Object> uploadImage(@Body JsonObject imageData);
