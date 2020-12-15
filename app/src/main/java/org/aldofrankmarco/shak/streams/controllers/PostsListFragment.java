@@ -106,6 +106,12 @@ public class PostsListFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        String type = getArguments().getString("type");
+        if (type.equals("profile")){
+            // non ci sono altri frammenti simili in profile, può essere inizializzato direttamente
+            getAllPosts();
+        }
+
         recyclerView = view.findViewById(R.id.listPosts);
     }
 

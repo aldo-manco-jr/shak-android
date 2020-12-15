@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,11 +18,11 @@ import com.bumptech.glide.request.target.Target;
 
 import org.aldofrankmarco.shak.R;
 import org.aldofrankmarco.shak.models.User;
+import org.aldofrankmarco.shak.people.http.FollowOrUnfollowRequest;
 import org.aldofrankmarco.shak.people.http.IsFollowingResponse;
 import org.aldofrankmarco.shak.profile.controllers.ProfileFragment;
 import org.aldofrankmarco.shak.services.ServiceGenerator;
 import org.aldofrankmarco.shak.services.UsersService;
-import org.aldofrankmarco.shak.people.http.FollowOrUnfollowRequest;
 import org.aldofrankmarco.shak.streams.controllers.LoggedUserActivity;
 
 import java.util.List;
@@ -44,7 +45,7 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
 
         this.listUsers = listUsers;
 
-        LoggedUserActivity.getSocket().on("refreshPage", PeopleListFragment.getPeopleListFragment().updateUsersList);
+        //LoggedUserActivity.getSocket().on("refreshPage", PeopleListFragment.getPeopleListFragment().updateUsersList);
     }
 
     @NonNull
@@ -98,13 +99,7 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
             holder.imageProfile.setVisibility(View.GONE);
         }
 
-        isFollow(user, holder);
-
-        if (user.getUsername().equals(LoggedUserActivity.getUsernameLoggedUser())){
-            holder.followButton.setVisibility(View.GONE);
-        }else {
-            holder.followButton.setVisibility(View.VISIBLE);
-        }
+       isFollow(user, holder);
 
         holder.followButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -186,6 +181,9 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
                     if (response.body().getMessage().equals("yes")) {
                             holder.followButton.setText("unfollow");
                     }
+
+                    holder.loadingFollow.setVisibility(View.GONE);
+                    holder.followButton.setVisibility(View.VISIBLE);
                     //LoggedUserActivity.getSocket().emit("refresh");
                 } else {
                     Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
@@ -215,6 +213,8 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
 
         Button followButton;
 
+        RelativeLayout loadingFollow;
+
         public UserItemHolder(@NonNull View itemView) {
             super(itemView);
 
@@ -225,6 +225,7 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
             locationText = itemView.findViewById(R.id.location_comment_text);
             imageButton = itemView.findViewById(R.id.imageButton);
             followButton = itemView.findViewById(R.id.follow);
+            loadingFollow =itemView.findViewById(R.id.loading_follow);
         }
     }
 }

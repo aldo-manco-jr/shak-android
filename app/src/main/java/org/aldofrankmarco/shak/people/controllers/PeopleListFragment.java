@@ -7,17 +7,15 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.github.nkzawa.emitter.Emitter;
-
 import org.aldofrankmarco.shak.R;
 import org.aldofrankmarco.shak.models.User;
 import org.aldofrankmarco.shak.people.http.GetAllUsersResponse;
-import org.aldofrankmarco.shak.people.http.GetFollowersResponse;
-import org.aldofrankmarco.shak.people.http.GetFollowingResponse;
 import org.aldofrankmarco.shak.services.ServiceGenerator;
 import org.aldofrankmarco.shak.services.UsersService;
 import org.aldofrankmarco.shak.streams.controllers.LoggedUserActivity;
@@ -90,18 +88,22 @@ public class PeopleListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_people, container, false);
+        return inflater.inflate(R.layout.fragment_people, container, false);
+    }
 
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        this.view = view;
         peopleListFragment = this;
 
         titleTextView = view.findViewById(R.id.title_users_list);
 
         getAllUsers();
-
-        return view;
     }
 
-     Emitter.Listener updateUsersList = new Emitter.Listener() {
+    /*Emitter.Listener updateUsersList = new Emitter.Listener() {
 
         @Override
         public void call(final Object... args) {
@@ -118,7 +120,7 @@ public class PeopleListFragment extends Fragment {
                 });
             }
         }
-    };
+    };*/
 
     /**
      * Consente di recuperare tutti i post:
@@ -132,89 +134,29 @@ public class PeopleListFragment extends Fragment {
             return;
         }
 
-        final String type = getArguments().getString("type");
-        username = getArguments().getString("username");
-
         UsersService usersService = ServiceGenerator.createService(UsersService.class, LoggedUserActivity.getToken());
 
-        if (type.equals("all")) {
+        titleTextView.setVisibility(View.VISIBLE);
 
-            titleTextView.setVisibility(View.VISIBLE);
+        Call<GetAllUsersResponse> httpRequest = usersService.getAllUsers();
 
-            Call<GetAllUsersResponse> httpRequest = usersService.getAllUsers();
+        httpRequest.enqueue(new Callback<GetAllUsersResponse>() {
+            @Override
+            public void onResponse(Call<GetAllUsersResponse> call, Response<GetAllUsersResponse> response) {
+                if (response.isSuccessful()) {
+                    assert response.body() != null : "body() non doveva essere null";
 
-            httpRequest.enqueue(new Callback<GetAllUsersResponse>() {
-                @Override
-                public void onResponse(Call<GetAllUsersResponse> call, Response<GetAllUsersResponse> response) {
-                    if (response.isSuccessful()) {
-                        assert response.body() != null : "body() non doveva essere null";
+                    listUsers = response.body().getAllUsers();
 
-                        listUsers = response.body().getAllUsers();
-
-                        initializeRecyclerView();
-                    }
+                    initializeRecyclerView();
                 }
+            }
 
-                @Override
-                public void onFailure(Call<GetAllUsersResponse> call, Throwable t) {
-                    Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
-                }
-            });
-        } else if (type.equals("following") && !username.isEmpty()) {
-
-            titleTextView.setVisibility(View.GONE);
-
-            Call<GetFollowingResponse> httpRequest = usersService.getFollowing(username);
-
-            httpRequest.enqueue(new Callback<GetFollowingResponse>() {
-                @Override
-                public void onResponse(Call<GetFollowingResponse> call, Response<GetFollowingResponse> response) {
-                    if (response.isSuccessful()) {
-                        assert response.body() != null : "body() non doveva essere null";
-
-                        if (response.body().getFollowingList() != null) {
-                            listUsers = response.body().getFollowingList();
-                        }
-
-                        initializeRecyclerView();
-                    }else {
-                        Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<GetFollowingResponse> call, Throwable t) {
-                    Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
-                }
-            });
-        } else if (type.equals("followers") && !username.isEmpty()) {
-
-            titleTextView.setVisibility(View.GONE);
-
-            Call<GetFollowersResponse> httpRequest = usersService.getFollowers(username);
-
-            httpRequest.enqueue(new Callback<GetFollowersResponse>() {
-                @Override
-                public void onResponse(Call<GetFollowersResponse> call, Response<GetFollowersResponse> response) {
-                    if (response.isSuccessful()) {
-                        assert response.body() != null : "body() non doveva essere null";
-
-                        if (response.body().getFollowersList() != null) {
-                            listUsers = response.body().getFollowersList();
-                        }
-
-                        initializeRecyclerView();
-                    }else {
-                        Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<GetFollowersResponse> call, Throwable t) {
-                    Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
-                }
-            });
-        }
+            @Override
+            public void onFailure(Call<GetAllUsersResponse> call, Throwable t) {
+                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     /**

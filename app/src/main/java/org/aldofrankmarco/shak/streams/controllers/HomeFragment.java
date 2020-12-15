@@ -45,7 +45,15 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     ) {
         View homeFragmentView = inflater.inflate(R.layout.fragment_home, container, false);
 
+        //TODO Aldo non mi dire che questa riga è il costruttore, visto che manca ma la instanzi lo stesso
         homeFragment = this;
+
+        // TODO Aldo ho bisogno di resettare i pannelli perchè hai aggiunto il comportamento di
+        // cancellare i frammenti che vengono chiusi e causa problemi, LE ALTRE CLASSI NON VENGONO
+        // INSTANZIATE NUOVAMENTE
+        streamsFragment = null;
+        favouritesFragment = null;
+        postFormFragment = null;
 
         viewPager = homeFragmentView.findViewById(R.id.view_pager);
         homeTabs = homeFragmentView.findViewById(R.id.home_tabs);
