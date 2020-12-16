@@ -1,18 +1,19 @@
 package org.aldofrankmarco.shak.services;
 
+import org.aldofrankmarco.shak.people.http.FollowOrUnfollowRequest;
 import org.aldofrankmarco.shak.people.http.GetAllUsersResponse;
 import org.aldofrankmarco.shak.people.http.GetFollowersResponse;
 import org.aldofrankmarco.shak.people.http.GetFollowingResponse;
-import org.aldofrankmarco.shak.people.http.GetUserByIdResponse;
 import org.aldofrankmarco.shak.people.http.GetUserByUsernameResponse;
 import org.aldofrankmarco.shak.people.http.IsFollowingResponse;
 import org.aldofrankmarco.shak.people.http.SetUserLocationRequest;
-import org.aldofrankmarco.shak.people.http.FollowOrUnfollowRequest;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Path;
 
 public interface UsersService {
@@ -23,8 +24,8 @@ public interface UsersService {
     @GET("username/{username}")
     Call<GetUserByUsernameResponse> getUserByUsername(@Path("username") String username);
 
-    @POST("user/location")
-    Call<Object> setUserLocation(@Body SetUserLocationRequest setUserLocationRequest);
+    @PUT("user/location/{iduser}")
+    Call<Object> setUserLocation(@Path("iduser") String idUser, @Body SetUserLocationRequest setUserLocationRequest);
 
     @GET("users/is-following/{username}")
     Call<IsFollowingResponse> isFollowing(@Path("username") String username);
@@ -38,6 +39,6 @@ public interface UsersService {
     @POST("follow-user")
     Call<Object> followUser(@Body FollowOrUnfollowRequest followedUserId);
 
-    @POST("unfollow-user")
-    Call<Object> unfollowUser(@Body FollowOrUnfollowRequest followedUserId);
+    @DELETE("unfollow-user/{user}")
+    Call<Object> unfollowUser(@Path("user") Object user);
 }

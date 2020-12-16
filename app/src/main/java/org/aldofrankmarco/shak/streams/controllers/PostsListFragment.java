@@ -41,7 +41,6 @@ public class PostsListFragment extends Fragment {
     private String type;
 
     protected RecyclerView recyclerView;
-    protected String lastPostDate = null;
     protected PostsListAdapter adapter = null;
 
     private View view;
@@ -106,7 +105,7 @@ public class PostsListFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        String type = getArguments().getString("type");
+        type = getArguments().getString("type");
         if (type.equals("profile")){
             // non ci sono altri frammenti simili in profile, può essere inizializzato direttamente
             getAllPosts();
@@ -143,20 +142,12 @@ public class PostsListFragment extends Fragment {
                         PostsListFragment streamsFragment = HomeFragment.getHomeFragment().getStreamsFragment();
                         streamsFragment.listPosts = response.body().getStreamPosts();
                         streamsFragment.listPostsSize = streamsFragment.listPosts.size();
-
-                        if (streamsFragment.listPostsSize > 0){
-                            streamsFragment.lastPostDate = streamsFragment.listPosts.get(0).getCreatedAt();
-                        }
-
+Log.v("aaaaaaaaaaa", String.valueOf(streamsFragment.listPosts.size()) + "capito???");
                         streamsFragment.initializeRecyclerView();
 
                         PostsListFragment favouritesFragment = HomeFragment.getHomeFragment().getFavouritesFragment();
                         favouritesFragment.listPosts = response.body().getFavouritePosts();
                         favouritesFragment.listPostsSize = favouritesFragment.listPosts.size();
-
-                        if (favouritesFragment.listPostsSize > 0){
-                            favouritesFragment.lastPostDate = listPosts.get(0).getCreatedAt();
-                        }
 
                         favouritesFragment.initializeRecyclerView();
                     } else {
@@ -181,10 +172,6 @@ public class PostsListFragment extends Fragment {
                         assert response.body() != null : "body() non doveva essere null";
 
                         listPosts = response.body().getArrayUserPosts();
-
-                        if (listPostsSize > 0){
-                            lastPostDate = listPosts.get(0).getCreatedAt();
-                        }
 
                         initializeRecyclerView();
                     } else {
@@ -217,6 +204,9 @@ public class PostsListFragment extends Fragment {
 
         this.type = arguments.getString("type");
         final String username = arguments.getString("username");
+
+        PostsListFragment streamsFragment = HomeFragment.getHomeFragment().getStreamsFragment();
+        final String lastPostDate = HomeFragment.getHomeFragment().getStreamsFragment().listPosts.get(0).getCreatedAt();
         StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
 
         if (type.equals("all") || type.equals("favourites")) {
@@ -228,18 +218,11 @@ public class PostsListFragment extends Fragment {
                     if (response.isSuccessful()) {
                         assert response.body() != null : "body() non doveva essere null";
 
-                        Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), "QUANTI===??"+response.body().getArrayPosts().size(), Toast.LENGTH_SHORT).show();
-
                         List<Post> newListPosts = response.body().getArrayPosts();
                         boolean isNewPostExist = (newListPosts != null && newListPosts.size() > 0);
 
                         if (isNewPostExist) {
-                            lastPostDate = newListPosts.get(0).getCreatedAt();
-
                             updateRecyclerView(newListPosts);
-                            //Toast.makeText(getActivity(), "AGGIORNATTTTTTTTOOOOO: " + newListPosts.get(0).getPostContent(), Toast.LENGTH_LONG).show();
-                        } else {
-                            Toast.makeText(getActivity(), "NON ESISTEEEEE" + (newListPosts == null), Toast.LENGTH_LONG).show();
                         }
                     } else {
                         Toast.makeText(getActivity(), response.message() + "  " + response.code() + "  " +response.toString(), Toast.LENGTH_LONG).show();
@@ -248,9 +231,7 @@ public class PostsListFragment extends Fragment {
 
                 @Override
                 public void onFailure(Call<GetNewPostsListResponse> call, Throwable t) {
-                    Toast.makeText(getActivity(), "trow getNewpost", Toast.LENGTH_LONG).show();
-
-                    //Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(),"t.getMessage()", Toast.LENGTH_LONG).show();
                 }
             });
 
@@ -266,9 +247,9 @@ public class PostsListFragment extends Fragment {
                         assert response.body() != null : "body() non doveva essere null";
 
                         listPosts = response.body().getArrayUserPosts();
-                        if (listPosts.size() > 0) {
+                        /*if (listPosts.size() > 0) {
                             lastPostDate = listPosts.get(0).getCreatedAt();
-                        }
+                        }*/
 
                         initializeRecyclerView();
                     } else {
@@ -306,7 +287,6 @@ public class PostsListFragment extends Fragment {
         assert newListPosts != null && newListPosts.get(0) != null: "newListPost e il primo elemento" +
                 " non potevano essere null";
 
-        lastPostDate = newListPosts.get(0).getCreatedAt();
         this.listPostsSize += newListPosts.size();
 
         Log.v("update", String.valueOf(newListPosts.size()));

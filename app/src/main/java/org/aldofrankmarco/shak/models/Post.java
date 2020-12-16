@@ -70,6 +70,10 @@ public class Post implements Comparable<Post> {
         return isRemoved;
     }
 
+    public JsonElement getPostId() {
+        return postId;
+    }
+
     public String getPostCreatedAt() {
         return postId.getAsString();
     }

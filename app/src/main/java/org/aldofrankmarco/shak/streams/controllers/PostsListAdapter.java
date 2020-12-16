@@ -208,13 +208,13 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
     }
 
     public void addPosts(List<Post> newListPosts) {
-        assert newListPosts.size() > 0 : "newLIstPost doveva avere almeno un elemento";
+        assert (newListPosts != null && newListPosts.size() > 0) : "newLIstPost doveva avere almeno un elemento";
 
         List<Post> newAndOldPost = new ArrayList<>();
         newAndOldPost.addAll(newListPosts);
         newAndOldPost.addAll(this.listPosts);
 
-        int originaListPostSize = this.listPosts.size() - 1;
+        //int originaListPostSize = this.listPosts.size() - 1;
         this.listPosts = newAndOldPost;
         //HomeFragment.getHomeFragment().getStreamsFragment().adapter.notifyDataSetChanged();
         //TODO USARE QUESTO HomeFragment.getHomeFragment().getStreamsFragment().adapter.notifyItemInserted(0);
@@ -249,7 +249,6 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
      * In base ai dati ricavati da {{@link #isLiked(Post)}} viene inviata una richiesta http di
      * "like" o di "unlike" verso il post.
      */
-
     private void likeOrUnlike(final Post post, final PostItemHolder holder, final View view, final String type) {
         StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
 

@@ -15,13 +15,11 @@ import com.bumptech.glide.Glide;
 
 import org.aldofrankmarco.shak.R;
 import org.aldofrankmarco.shak.models.Post;
-import org.aldofrankmarco.shak.people.http.GetUserByUsernameResponse;
 import org.aldofrankmarco.shak.profile.controllers.ProfileFragment;
 import org.aldofrankmarco.shak.profile.http.GetUserProfileImageResponse;
 import org.aldofrankmarco.shak.services.ImagesService;
 import org.aldofrankmarco.shak.services.ServiceGenerator;
 import org.aldofrankmarco.shak.services.StreamsService;
-import org.aldofrankmarco.shak.services.UsersService;
 import org.aldofrankmarco.shak.streams.http.DeleteCommentRequest;
 import org.ocpsoft.prettytime.PrettyTime;
 
@@ -180,7 +178,11 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
         DeleteCommentRequest deleteCommentRequest = new DeleteCommentRequest(postId, comment);
 
         StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
-        Call<Object> httpRequest = streamsService.deleteComment(deleteCommentRequest);
+        //Call<Object> httpRequest = streamsService.deleteComment(deleteCommentRequest);
+        Call<Object> httpRequest = streamsService.deleteComment(postId, comment.getCommentId());
+
+
+        //@DELETE("post/remove-comment/{deleteCommentRequest}")
 
         httpRequest.enqueue(new Callback<Object>() {
             @Override

@@ -10,8 +10,10 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.viewpager.widget.ViewPager;
 
+import com.github.nkzawa.emitter.Emitter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 
@@ -35,6 +37,13 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     private PostFormFragment postFormFragment;
 
     private static HomeFragment homeFragment;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        LoggedUserActivity.getSocket().on("refreshListPosts", updatePostsList);
+    }
 
     @Nullable
     @Override
@@ -86,9 +95,33 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.fab_switch_to_post_form) {
-            LoggedUserActivity.getLoggedUserActivity().changeFragment(getPostFormFragment());
+            // viene mostrata la form di inserimento del nuovo post
+            FragmentTransaction transactionsManager = getFragmentManager().beginTransaction();
+            transactionsManager
+                    .replace(R.id.home_fragment, new PostFormFragment())
+                    .commit();
         }
     }
+
+    /**
+     * Quando un post viene pubblicato la home page viene aggiornata.
+     */
+    private Emitter.Listener updatePostsList = new Emitter.Listener() {
+
+        @Override
+        public void call(final Object... args) {
+            if (getActivity() != null){
+                getActivity().runOnUiThread(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        // quando un post viene pubblicato la socket avvisa del necessario aggiornmento
+                        HomeFragment.getHomeFragment().getStreamsFragment().getAllNewPosts();
+                    }
+                });
+            }
+        }
+    };
 
     public static HomeFragment getHomeFragment() {
         return homeFragment;
@@ -111,15 +144,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         }
 
         return favouritesFragment;
-    }
-
-    public PostFormFragment getPostFormFragment() {
-
-        if (this.postFormFragment == null) {
-            this.postFormFragment = new PostFormFragment();
-        }
-
-        return postFormFragment;
     }
 
     private class ViewPagerAdapter extends FragmentPagerAdapter {

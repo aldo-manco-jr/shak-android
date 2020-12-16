@@ -20,7 +20,6 @@ import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
-import com.github.nkzawa.emitter.Emitter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.JsonObject;
@@ -65,9 +64,6 @@ public class PostFormFragment extends Fragment implements View.OnClickListener, 
         super.onCreate(savedInstanceState);
 
         imageEncoded = null;
-
-        //LoggedUserActivity.getSocket().on("refreshPage", updatePostsList);
-        LoggedUserActivity.getSocket().on("refreshListPosts", updatePostsList);
     }
 
     @Override
@@ -173,8 +169,9 @@ public class PostFormFragment extends Fragment implements View.OnClickListener, 
      */
     private void closePost(){
         //getFragmentManager().beginTransaction().remove(HomeFragment.getHomeFragment().getPostFormFragment()).commitAllowingStateLoss();
-        LoggedUserActivity.getLoggedUserActivity().changeFragment(HomeFragment.getHomeFragment());
+        //LoggedUserActivity.getLoggedUserActivity().changeFragment(HomeFragment.getHomeFragment());
         postContentField.setText("");
+        getFragmentManager().beginTransaction().remove(this).commit();
     }
 
     /**
@@ -246,27 +243,6 @@ public class PostFormFragment extends Fragment implements View.OnClickListener, 
             }
         }
     }
-
-    /**
-     * Quando un post viene pubblicato la home page viene aggiornata.
-     */
-    private Emitter.Listener updatePostsList = new Emitter.Listener() {
-
-        @Override
-        public void call(final Object... args) {
-            if (getActivity() != null){
-                getActivity().runOnUiThread(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        // quando un post viene pubblicato la socket avvisa del necessario aggiornmento
-                        // HomeFragment.getHomeFragment().getStreamsFragment().getAllPosts();
-                        HomeFragment.getHomeFragment().getStreamsFragment().getAllNewPosts();
-                    }
-                });
-            }
-        }
-    };
 
     @Override
     public void onClick(View view) {

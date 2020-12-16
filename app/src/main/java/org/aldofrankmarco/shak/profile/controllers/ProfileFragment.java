@@ -297,7 +297,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
         if (country != null) {
             UsersService usersService = ServiceGenerator.createService(UsersService.class, LoggedUserActivity.getToken());
             SetUserLocationRequest setUserLocationRequest = new SetUserLocationRequest(city, country);
-            Call<Object> httpRequest = usersService.setUserLocation(setUserLocationRequest);
+            Call<Object> httpRequest = usersService.setUserLocation(LoggedUserActivity.getIdLoggedUser(), setUserLocationRequest);
 
             httpRequest.enqueue(new Callback<Object>() {
                 @Override

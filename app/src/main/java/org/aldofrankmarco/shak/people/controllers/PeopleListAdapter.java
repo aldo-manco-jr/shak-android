@@ -133,7 +133,8 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
 
         if (holder.followButton.getText().equals("unfollow")) {
             // l'utente che ha effettuato l'accesso è un follower dell'utente considerato
-            httpRequest = usersService.unfollowUser(new FollowOrUnfollowRequest(user.getId()));
+            //httpRequest = usersService.unfollowUser(new FollowOrUnfollowRequest(user.getId()));
+            httpRequest = usersService.unfollowUser(user.getId());
         } else {
             httpRequest = usersService.followUser(new FollowOrUnfollowRequest(user.getId()));
         }

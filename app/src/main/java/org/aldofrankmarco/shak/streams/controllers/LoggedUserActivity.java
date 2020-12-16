@@ -244,8 +244,9 @@ public class LoggedUserActivity extends AppCompatActivity {
         return commentFormFragment;
     }
 
+    //TODO NON VA BENE QUESTO METODO
     public void changeFragment(Fragment newFragment) {
-
+//TODO è sbagliata, i frammenti continuano a esistere da qualche parte
         Fragment oldFragment = getSupportFragmentManager().findFragmentById(R.id.logged_user_fragment);
 
         if (oldFragment != newFragment) {
