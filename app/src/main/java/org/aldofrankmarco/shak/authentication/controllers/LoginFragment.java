@@ -144,11 +144,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
         usernameField.setTag("username");
         passwordField.setTag("password");
 
-        usernameField.setOnFocusChangeListener(focusListener);
-        passwordField.setOnFocusChangeListener(focusListener);
-
-        usernameField.addTextChangedListener(checkLoginForm);
-        passwordField.addTextChangedListener(checkLoginForm);
+        usernameField.addTextChangedListener(checkUsernameField);
+        passwordField.addTextChangedListener(checkPasswordField);
 
         loginButton.setOnClickListener(this);
         passwordField.setOnTouchListener(this);
@@ -158,19 +155,34 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
         return loginFragmentView;
     }
 
-    TextWatcher checkLoginForm = new TextWatcher() {
+    private boolean isUsernameValid(EditText usernameField){
+        int usernameTextFieldLength = usernameField.getText().toString().trim().length();
+        return (usernameTextFieldLength>=4 && usernameTextFieldLength<=16);
+    }
+
+    private boolean isPasswordValid(EditText passwordField){
+        int passwordTextFieldLength = passwordField.getText().toString().trim().length();
+        return (passwordTextFieldLength>=8 && passwordTextFieldLength<=64);
+    }
+
+    TextWatcher checkUsernameField = new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
         }
 
         @Override
         public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            if (charSequence.toString().isEmpty()){
+            if (charSequence.length() < 4 || charSequence.length() > 16) {
                 loginButton.setEnabled(false);
                 loginButton.setTextColor(Color.parseColor("#a8acaf"));
-            }else {
-                loginButton.setEnabled(true);
-                loginButton.setTextColor(Color.parseColor("#004317"));
+                usernameAlert.setVisibility(View.VISIBLE);
+            } else {
+                usernameAlert.setVisibility(View.GONE);
+
+                if (isPasswordValid(passwordField)) {
+                    loginButton.setEnabled(true);
+                    loginButton.setTextColor(Color.parseColor("#004317"));
+                }
             }
         }
 
@@ -179,29 +191,29 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
         }
     };
 
-    /**
-     * Gestisce la visibilità dei messaggi di errore
-     */
-    private View.OnFocusChangeListener focusListener = new View.OnFocusChangeListener() {
-        public void onFocusChange(View v, boolean hasFocus) {
-            EditText editText = (EditText) v;
-            int inputTextLength = editText.getText().toString().trim().length();
+    TextWatcher checkPasswordField = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        }
 
-            if (!hasFocus) {
-                if (v.getTag() == "username") {
-                    if (inputTextLength < 4 || inputTextLength > 16) {
-                        usernameAlert.setVisibility(View.VISIBLE);
-                    } else {
-                        usernameAlert.setVisibility(View.GONE);
-                    }
-                } else if (v.getTag() == "password") {
-                    if (inputTextLength < 8 || inputTextLength > 64) {
-                        passwordAlert.setVisibility(View.VISIBLE);
-                    } else {
-                        passwordAlert.setVisibility(View.GONE);
-                    }
+        @Override
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            if (charSequence.length() < 8 || charSequence.length() > 64) {
+                loginButton.setEnabled(false);
+                loginButton.setTextColor(Color.parseColor("#a8acaf"));
+                passwordAlert.setVisibility(View.VISIBLE);
+            } else {
+                passwordAlert.setVisibility(View.GONE);
+
+                if (isUsernameValid(usernameField)) {
+                    loginButton.setEnabled(true);
+                    loginButton.setTextColor(Color.parseColor("#004317"));
                 }
             }
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
         }
     };
 

@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.text.method.PasswordTransformationMethod;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -37,7 +39,7 @@ import retrofit2.Response;
  * Frammento che consente l'inserimento dei dati inerenti la registrazione e gestisce il contatto
  * iniziale con il server remoto shak.
  */
-public class SignupFragment extends Fragment implements View.OnClickListener, View.OnTouchListener{
+public class SignupFragment extends Fragment implements View.OnClickListener, View.OnTouchListener {
 
     private final AuthenticationService authService = ServiceGenerator.createService(AuthenticationService.class);
 
@@ -65,7 +67,7 @@ public class SignupFragment extends Fragment implements View.OnClickListener, Vi
      * I dati vengono inseriti in una richiesta http e mandati al server, se i dati sono corretti
      * l'utente viene registrato.
      */
-    protected void signup(){
+    protected void signup() {
 
         SignupRequest signupRequest = new SignupRequest(
                 emailField.getText().toString().trim(),
@@ -84,7 +86,7 @@ public class SignupFragment extends Fragment implements View.OnClickListener, Vi
 
                 loadingBar.setVisibility(View.GONE);
 
-                if (response.isSuccessful()){
+                if (response.isSuccessful()) {
                     String token = response.body().getToken();
 
                     SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -94,21 +96,21 @@ public class SignupFragment extends Fragment implements View.OnClickListener, Vi
                     Intent intentLoggedUser = new Intent(getActivity(), LoggedUserActivity.class);
                     intentLoggedUser.putExtra("authToken", token);
                     startActivity(intentLoggedUser);
-                }else {
+                } else {
 
-                    if (response.code() == 409){
+                    if (response.code() == 409) {
                         new AlertDialog.Builder(getContext())
                                 .setIcon(android.R.drawable.stat_notify_error)
                                 .setTitle("Email Already Signed Up")
                                 .setMessage("Email entered is used by another user in SHAK.")
                                 .setPositiveButton("OK", null).show();
-                    }else if (response.code() == 403){
+                    } else if (response.code() == 403) {
                         new AlertDialog.Builder(getContext())
                                 .setIcon(android.R.drawable.stat_notify_error)
                                 .setTitle("Username Already Signed Up")
                                 .setMessage("Username entered is used by another user in SHAK.")
                                 .setPositiveButton("OK", null).show();
-                    }else{
+                    } else {
                         new AlertDialog.Builder(getContext())
                                 .setIcon(android.R.drawable.stat_notify_error)
                                 .setTitle("Server Error")
@@ -149,9 +151,9 @@ public class SignupFragment extends Fragment implements View.OnClickListener, Vi
         usernameField.setTag("username");
         passwordField.setTag("password");
 
-        emailField.setOnFocusChangeListener(focusListener);
-        usernameField.setOnFocusChangeListener(focusListener);
-        passwordField.setOnFocusChangeListener(focusListener);
+        emailField.addTextChangedListener(checkEmailField);
+        usernameField.addTextChangedListener(checkUsernameField);
+        passwordField.addTextChangedListener(checkPasswordField);
 
         signUpButton.setOnClickListener(this);
 
@@ -162,40 +164,103 @@ public class SignupFragment extends Fragment implements View.OnClickListener, Vi
         return view;
     }
 
-    /**
-     * Se l'username, la password o l'email non sono validi vengono mostrati degli errori
-     */
-    private View.OnFocusChangeListener focusListener = new View.OnFocusChangeListener() {
+    private boolean isEmailValid(EditText emailField){
+        String field = emailField.getText().toString().trim();
+        Pattern regularExpression = Pattern.compile("@(.*?).");
+        Matcher m = regularExpression.matcher(field);
 
-        public void onFocusChange(View v, boolean hasFocus) {
-            EditText editText = (EditText) v;
-            int fieldLength = editText.getText().toString().trim().length();
+        if (!m.find()) {
+            return false;
+        } else {
+            return true;
+        }
+    }
 
-            if (!hasFocus) {
-                if (v.getTag()=="username"){
-                    if (fieldLength<4 || fieldLength>16){
-                        usernameAlert.setVisibility(View.VISIBLE);
-                    }else {
-                        usernameAlert.setVisibility(View.GONE);
-                    }
-                }else if (v.getTag()=="password"){
-                    if (fieldLength<8 || fieldLength>64){
-                        passwordAlert.setVisibility(View.VISIBLE);
-                    }else {
-                        passwordAlert.setVisibility(View.GONE);
-                    }
-                }else if (v.getTag()=="email"){
-                    String field = editText.getText().toString().trim();
-                    Pattern regularExpression = Pattern.compile("@(.*?).");
-                    Matcher m = regularExpression.matcher(field);
+    private boolean isUsernameValid(EditText usernameField){
+        int usernameTextFieldLength = usernameField.getText().toString().trim().length();
+        return (usernameTextFieldLength>=4 && usernameTextFieldLength<=16);
+    }
 
-                    if (!m.find()){
-                        emailAlert.setVisibility(View.VISIBLE);
-                    }else {
-                        emailAlert.setVisibility(View.GONE);
-                    }
+    private boolean isPasswordValid(EditText passwordField){
+        int passwordTextFieldLength = passwordField.getText().toString().trim().length();
+        return (passwordTextFieldLength>=8 && passwordTextFieldLength<=64);
+    }
+
+    TextWatcher checkEmailField = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            if (!isEmailValid(emailField)) {
+                signUpButton.setEnabled(false);
+                signUpButton.setTextColor(Color.parseColor("#a8acaf"));
+                emailAlert.setVisibility(View.VISIBLE);
+            } else {
+                emailAlert.setVisibility(View.GONE);
+
+                if (isUsernameValid(usernameField) && isPasswordValid(passwordField)) {
+                    signUpButton.setEnabled(true);
+                    signUpButton.setTextColor(Color.parseColor("#004317"));
                 }
             }
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+        }
+    };
+
+    TextWatcher checkUsernameField = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            if (charSequence.length() < 4 || charSequence.length() > 16) {
+                signUpButton.setEnabled(false);
+                signUpButton.setTextColor(Color.parseColor("#a8acaf"));
+                usernameAlert.setVisibility(View.VISIBLE);
+            } else {
+                usernameAlert.setVisibility(View.GONE);
+
+                if (isEmailValid(emailField) && isPasswordValid(passwordField)) {
+                    signUpButton.setEnabled(true);
+                    signUpButton.setTextColor(Color.parseColor("#004317"));
+                }
+            }
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+        }
+    };
+
+    TextWatcher checkPasswordField = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            if (charSequence.length() < 8 || charSequence.length() > 64) {
+                signUpButton.setEnabled(false);
+                signUpButton.setTextColor(Color.parseColor("#a8acaf"));
+                passwordAlert.setVisibility(View.VISIBLE);
+            } else {
+                passwordAlert.setVisibility(View.GONE);
+
+                if (isEmailValid(emailField) && isUsernameValid(usernameField)) {
+                    signUpButton.setEnabled(true);
+                    signUpButton.setTextColor(Color.parseColor("#004317"));
+                }
+            }
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
         }
     };
 
@@ -208,6 +273,7 @@ public class SignupFragment extends Fragment implements View.OnClickListener, Vi
 
     /**
      * Gestisce la visibilità del campo di testo contentente la password
+     *
      * @return true se è stata eseguita un azione, false altrimenti
      */
     @Override
