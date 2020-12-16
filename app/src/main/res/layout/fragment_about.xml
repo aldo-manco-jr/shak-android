@@ -14,43 +14,49 @@
 
         <ImageView
             android:id="@+id/copertinaAbout"
-            android:layout_width="352dp"
-            android:layout_height="191dp"
-            android:layout_marginTop="40dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:adjustViewBounds="true"
+            android:scaleType="centerCrop"
+            android:src="@drawable/shak_logo_shadow"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:src="@drawable/shak_logo_shadow" />
+            app:layout_constraintBottom_toTopOf="@id/scrollViewAbout"/>
 
         <ScrollView
-            android:layout_width="356dp"
-            android:layout_height="302dp"
+            android:id="@+id/scrollViewAbout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             app:layout_constraintBottom_toTopOf="@+id/exit"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/copertinaAbout"
-            app:layout_constraintVertical_bias="0.148">
+            app:layout_constraintTop_toBottomOf="@+id/copertinaAbout">
 
             <TextView
                 android:id="@+id/storiaAbout"
-
-                android:layout_width="355dp"
-                android:layout_height="338dp"
-                android:layout_marginTop="28dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:text="TextView"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+                android:textAlignment="center"
+                app:layout_constraintHorizontal_bias="0.482"
+                app:layout_constraintVertical_bias="0.0" />
         </ScrollView>
 
         <Button
             android:id="@+id/exit"
-            android:layout_width="374dp"
-            android:layout_height="59dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:background="@color/colorSHAK"
             android:text="Exit"
             android:textSize="20sp"
+            app:layout_constraintTop_toBottomOf="@id/scrollViewAbout"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

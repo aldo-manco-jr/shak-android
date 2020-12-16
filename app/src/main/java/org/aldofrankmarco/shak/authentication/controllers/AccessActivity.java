@@ -50,9 +50,27 @@ public class AccessActivity extends AppCompatActivity implements View.OnClickLis
 
         if (areLawsRead == null) {
             new AlertDialog.Builder(this)
-                    .setIcon(android.R.drawable.btn_star)
+                    .setIcon(R.drawable.ic_baseline_privacy_tip_24)
                     .setTitle("Informativa dell'Utente:")
-                    .setMessage("COSE CHE PIACCIONO ALLA TRONCARELLI")
+                    .setMessage("Questa Applicazione richiede permessi specifici" +
+                            " sugli smartphone dei propri Utenti.\n" +
+                            " Tipologie di Dati raccolti\n" +
+                            "\n" +
+                            "Fra i Dati Personali raccolti da questa Applicazione, in modo autonomo" +
+                            " o tramite terze parti, ci sono: " +
+                            "Permesso Camera;" +
+                            " Permesso Localizzazione approssimativa (continua);" +
+                            " Cookie;" +
+                            " Dati di utilizzo;" +
+                            " email;" +
+                            " password;" +
+                            " Essendo essi necessari al diretto funzionamento dell'app" +
+                            " e non per essere usati per alcun trattamento dei dati" +
+                            " (come la profilazione e marketing), per poter proseguire" +
+                            " con il corretto funzionamento dell'app si bisogna di un vostro " +
+                            " consenso."+
+                            "\n"+
+                            "Grazie")
                     .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {

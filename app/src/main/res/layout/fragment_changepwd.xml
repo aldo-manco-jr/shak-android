@@ -8,15 +8,32 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".settings.controllers.ChangePasswordFragment">
 
-    <LinearLayout
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/title_users_list"
+        style="@style/Base.TextAppearance.AppCompat.Title"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:text="Change Password"
+        android:textAlignment="textStart"
+        android:textSize="36sp"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout2"
+        app:layout_constraintTop_toTopOf="parent" />
 
-         <EditText
+    <LinearLayout
+        android:id="@+id/linearLayout2"
+        android:layout_width="403dp"
+        android:layout_height="526dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+        <EditText
             android:id="@+id/oldPassword"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="77dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
@@ -35,19 +52,19 @@
             android:textSize="14dip" />
 
         <TextView
-            android:id="@+id/alert_oldPassword_invalid"
+            android:id="@+id/oldPasswordAlert"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="24dp"
             android:layout_marginTop="8dp"
             android:layout_marginRight="16dp"
             android:text="Password should be of 8-64 characters."
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
         <EditText
             android:id="@+id/newPassword"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="77dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
@@ -66,19 +83,19 @@
             android:textSize="14dip" />
 
         <TextView
-            android:id="@+id/alert_newPassword_invalid"
+            android:id="@+id/newPasswordAlert"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="24dp"
             android:layout_marginTop="8dp"
             android:layout_marginRight="16dp"
             android:text="Password should be of 8-64 characters."
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
         <EditText
             android:id="@+id/confirmPassword"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="77dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
@@ -97,14 +114,29 @@
             android:textSize="14dip" />
 
         <TextView
-            android:id="@+id/alert_confirmPassword_invalid"
+            android:id="@+id/confPasswordAlert"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="24dp"
             android:layout_marginTop="8dp"
             android:layout_marginRight="16dp"
             android:text="Password should be of 8-64 characters."
-            android:visibility="gone"/>
+            android:visibility="gone" />
+
+        <ProgressBar
+            android:id="@+id/loadingBar"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginBottom="14dp"
+            android:background="#025502"
+            android:indeterminate="true"
+            android:padding="20dp"
+            android:visibility="gone" />
 
         <Button
             android:id="@+id/changeButton"
@@ -114,7 +146,18 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
             android:backgroundTint="#FFFFFF"
-            android:text="Send"
+            android:text="change password"
+            android:textColor="#015D17" />
+
+        <Button
+            android:id="@+id/exitButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:backgroundTint="#FFFFFF"
+            android:text="Exit"
             android:textColor="#015D17" />
     </LinearLayout>
 

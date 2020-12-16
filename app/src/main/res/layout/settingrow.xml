@@ -9,6 +9,7 @@
         android:id="@+id/img"
         android:layout_height="40dp"
         android:layout_width="40dp"
+        android:layout_gravity="center"
         android:src="@mipmap/ic_launcher" />
 
     <LinearLayout
@@ -20,10 +21,10 @@
             android:id="@+id/txtv1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
+            android:layout_margin="18dp"
             android:text="Main Title"
             android:textColor="#ffffff"
-            android:textSize="16sp"
+            android:textSize="22sp"
             android:textStyle="normal" />
     </LinearLayout>
 </LinearLayout>

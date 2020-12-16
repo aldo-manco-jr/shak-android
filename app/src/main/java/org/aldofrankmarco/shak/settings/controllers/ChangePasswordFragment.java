@@ -1,9 +1,12 @@
 package org.aldofrankmarco.shak.settings.controllers;
 
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import android.text.method.PasswordTransformationMethod;
@@ -31,8 +34,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- *  ChangePwdFragment è il fragment che ci permette di utilizzare la funzione di cambio password
- *  dell'utente loggato
+ * ChangePwdFragment è il fragment che ci permette di utilizzare la funzione di cambio password
+ * dell'utente loggato
  */
 public class ChangePasswordFragment extends Fragment implements View.OnClickListener, View.OnTouchListener, OnBackPressed {
 
@@ -40,18 +43,21 @@ public class ChangePasswordFragment extends Fragment implements View.OnClickList
     private EditText newPwd;
     private EditText confPwd;
 
-    private TextView passwordAlert;
+    String old, next, confirm;
 
+    private TextView oldPasswordAlert, newPasswordAlert, confPasswordAlert;
     private ProgressBar loadingBar;
-    private User user;
 
     private Button changeButton;
+    private Button exitButton;
 
-    public ChangePasswordFragment(){}
+    public ChangePasswordFragment() {
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState); }
+        super.onCreate(savedInstanceState);
+    }
 
     /**
      * creazione della vista e istanziazione degli oggetti della view
@@ -65,17 +71,27 @@ public class ChangePasswordFragment extends Fragment implements View.OnClickList
         oldPwd = view.findViewById(R.id.oldPassword);
         newPwd = view.findViewById(R.id.newPassword);
         confPwd = view.findViewById(R.id.confirmPassword);
-        changeButton= view.findViewById(R.id.changeButton);
+        changeButton = view.findViewById(R.id.changeButton);
+        exitButton = view.findViewById(R.id.exitButton);
 
-        // oldPasswordAlert = view.findViewById(R.id.alert_oldPassword_invalid);
-        // newPasswordAlert = view.findViewById(R.id.alert_newPassword_invalid);
-        // confirmPasswordAlert = view.findViewById(R.id.alert_confirmPassword_invalid);
+        oldPwd.setTag("oldPwd");
+        newPwd.setTag("newPwd");
+        confPwd.setTag("confPwd");
 
         oldPwd.setOnFocusChangeListener(focusListener);
         newPwd.setOnFocusChangeListener(focusListener);
         confPwd.setOnFocusChangeListener(focusListener);
 
+        oldPasswordAlert = view.findViewById(R.id.oldPasswordAlert);
+        newPasswordAlert = view.findViewById(R.id.newPasswordAlert);
+        confPasswordAlert = view.findViewById(R.id.confPasswordAlert);
+
         changeButton.setOnClickListener(this);
+        exitButton.setOnClickListener(this);
+
+        oldPwd.setOnTouchListener(this);
+        newPwd.setOnTouchListener(this);
+        confPwd.setOnTouchListener(this);
 
         return view;
     }
@@ -83,39 +99,41 @@ public class ChangePasswordFragment extends Fragment implements View.OnClickList
     /**
      * invio dellla change password al server
      */
-    public void changePwd(){
-
+    public void changePwd() {
         AuthenticationService authenticationService = ServiceGenerator.createService(AuthenticationService.class);
 
-        //inseriamo i dati nel json
-
-        String test1 = oldPwd.getText().toString().trim();
-        String test2 = newPwd.getText().toString().trim();
-        String test3 = confPwd.getText().toString().trim();
-
-
-        ChangePasswordRequest changePasswordJson = new ChangePasswordRequest(
-            test1,
-            test2,
-            test3
-        );
-        Call<Object> httpRequest =  authenticationService.changePassword(changePasswordJson);
-        //loadingBar = getActivity().findViewById(R.id.loadingBar);
-        //loadingBar.setVisibility(View.VISIBLE);
+        ChangePasswordRequest changePasswordJson = new ChangePasswordRequest(old, next, confirm);
+        Call<Object> httpRequest = authenticationService.changePassword(changePasswordJson);
         httpRequest.enqueue(new Callback<Object>() {
-
 
             @Override
             public void onResponse(Call<Object> call, Response<Object> response) {
-                if (response.isSuccessful()){
-                    SettingsFragment.getSettingsFragment();
-                    LoggedUserActivity.getLoggedUserActivity().changeFragment(SettingsFragment.getSettingsFragment());
-                    Toast.makeText(getActivity(), R.string.password_changed, Toast.LENGTH_LONG).show();
-                }else {
-                    SettingsFragment.getSettingsFragment();
-                    LoggedUserActivity.getLoggedUserActivity().changeFragment(SettingsFragment.getSettingsFragment());
-                    Toast.makeText(getActivity(), R.string.password_changed_error, Toast.LENGTH_LONG).show();
-//                    loadingBar.setVisibility(View.GONE);
+                //success
+                if (response.isSuccessful()) {
+                    loadingBar = getActivity().findViewById(R.id.loadingBar);
+                    loadingBar.setVisibility(View.VISIBLE);
+                    new AlertDialog.Builder(getContext())
+                            .setIcon(android.R.drawable.ic_menu_upload)
+                            .setMessage("Password Changed")
+                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    LoggedUserActivity.getLoggedUserActivity().changeFragment(SettingsFragment.getSettingsFragment());
+                                }
+                            }).show();
+                } else {
+                    //errors
+                    if (response.code() == 400) {
+                        new AlertDialog.Builder(getContext())
+                                .setIcon(android.R.drawable.stat_notify_error)
+                                .setMessage("Wrong current password")
+                                .setPositiveButton("OK", null).show();
+                    } else if (response.code() == 500) {
+                        new AlertDialog.Builder(getContext())
+                                .setIcon(android.R.drawable.stat_notify_error)
+                                .setMessage("Wrong change password on failure server request")
+                                .setPositiveButton("OK", null).show();
+                    }
                 }
             }
 
@@ -126,7 +144,6 @@ public class ChangePasswordFragment extends Fragment implements View.OnClickList
         });
     }
 
-
     //controlli sulle editext delle password
     private View.OnFocusChangeListener focusListener = new View.OnFocusChangeListener() {
 
@@ -134,42 +151,50 @@ public class ChangePasswordFragment extends Fragment implements View.OnClickList
             EditText editText = (EditText) v;
             int fieldLength = editText.getText().toString().trim().length();
             if (!hasFocus) {
-                 if (v.getTag()=="oldpwd"){
-                    if (fieldLength<8 || fieldLength>64){
-                        passwordAlert.setVisibility(View.VISIBLE);
-                    }else {
-                        passwordAlert.setVisibility(View.GONE);
+                if (v.getTag() == "oldPwd") {
+                    if (fieldLength < 8 || fieldLength > 64) {
+                        oldPasswordAlert.setVisibility(View.VISIBLE);
+                        changeButton.setEnabled(false);
+                    } else {
+                        oldPasswordAlert.setVisibility(View.GONE);
+                        changeButton.setEnabled(true);
                     }
-                }else if (v.getTag()=="newPwd"){
-                     if (fieldLength<8 || fieldLength>64){
-                         passwordAlert.setVisibility(View.VISIBLE);
-                     }else {
-                         passwordAlert.setVisibility(View.GONE);
-                     }
-                 }else if (v.getTag()=="confPwd"){
-                     if (fieldLength<8 || fieldLength>64){
-                         passwordAlert.setVisibility(View.VISIBLE);
-                     }else {
-                         passwordAlert.setVisibility(View.GONE);
-                     }
-                 }
+                } else if (v.getTag() == "newPwd") {
+                    if ((fieldLength < 8 || fieldLength > 64)) {
+                        newPasswordAlert.setVisibility(View.VISIBLE);
+                        changeButton.setEnabled(false);
+                    } else {
+                        newPasswordAlert.setVisibility(View.GONE);
+                        changeButton.setEnabled(true);
+                    }
+                } else if (v.getTag() == "confPwd") {
+                    if (fieldLength < 8 || fieldLength > 64) {
+                        confPasswordAlert.setVisibility(View.VISIBLE);
+                        changeButton.setEnabled(false);
+                    } else {
+                        confPasswordAlert.setVisibility(View.GONE);
+                        changeButton.setEnabled(true);
+                    }
+                }
             }
         }
     };
 
-    @Override
     public boolean onTouch(View view, MotionEvent event) {
+
+        EditText editText = (EditText) view;
+
         boolean isTouched = event.getAction() == MotionEvent.ACTION_DOWN;
         if (isTouched) {
-            final int eyeIconSize = 32;
-            final int passwordFieldWidth = oldPwd.getWidth();
+            final int eyeIconSize = 64;
+            final int passwordFieldWidth = editText.getWidth();
             final int eyeWidthSize = passwordFieldWidth - eyeIconSize;
 
             if (event.getRawX() >= eyeWidthSize) {
-                if (oldPwd.getTransformationMethod() == null) {
+                if (editText.getTransformationMethod() == null) {
                     // nascondi password
-                    oldPwd.setTransformationMethod(new PasswordTransformationMethod());
-                    oldPwd.setCompoundDrawablesWithIntrinsicBounds(
+                    editText.setTransformationMethod(new PasswordTransformationMethod());
+                    editText.setCompoundDrawablesWithIntrinsicBounds(
                             R.drawable.password_drawable_left,
                             0,
                             R.drawable.eye_open_drawable_right,
@@ -177,8 +202,8 @@ public class ChangePasswordFragment extends Fragment implements View.OnClickList
                     );
                 } else {
                     // mostra password
-                    oldPwd.setTransformationMethod(null);
-                    oldPwd.setCompoundDrawablesWithIntrinsicBounds(
+                    editText.setTransformationMethod(null);
+                    editText.setCompoundDrawablesWithIntrinsicBounds(
                             R.drawable.password_drawable_left,
                             0,
                             R.drawable.eye_closed_drawable_right,
@@ -188,15 +213,24 @@ public class ChangePasswordFragment extends Fragment implements View.OnClickList
                 return true;
             }
         }
-
         return false;
     }
 
 
     @Override
     public void onClick(View view) {
-        if (view.getId() == R.id.changeButton) {
-            changePwd();
+
+        old = oldPwd.getText().toString().trim();
+        next = newPwd.getText().toString().trim();
+        confirm = confPwd.getText().toString().trim();
+
+        switch (view.getId()) {
+            case R.id.changeButton:
+                changePwd();
+                break;
+            case R.id.exitButton:
+                LoggedUserActivity.getLoggedUserActivity().changeFragment(SettingsFragment.getSettingsFragment());
+                break;
         }
     }
 

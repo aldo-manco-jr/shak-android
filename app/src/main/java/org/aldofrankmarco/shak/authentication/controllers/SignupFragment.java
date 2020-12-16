@@ -3,6 +3,7 @@ package org.aldofrankmarco.shak.authentication.controllers;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.method.PasswordTransformationMethod;
 import android.view.LayoutInflater;
@@ -15,6 +16,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import org.aldofrankmarco.shak.R;
@@ -79,6 +81,9 @@ public class SignupFragment extends Fragment implements View.OnClickListener, Vi
         httpRequest.enqueue(new Callback<SignupResponse>() {
             @Override
             public void onResponse(Call<SignupResponse> call, Response<SignupResponse> response) {
+
+                loadingBar.setVisibility(View.GONE);
+
                 if (response.isSuccessful()){
                     String token = response.body().getToken();
 
@@ -86,21 +91,43 @@ public class SignupFragment extends Fragment implements View.OnClickListener, Vi
                     editor.putString(getString(R.string.sharedpreferences_token), token);
                     editor.commit();
 
-                    loadingBar.setVisibility(View.GONE);
-
                     Intent intentLoggedUser = new Intent(getActivity(), LoggedUserActivity.class);
                     intentLoggedUser.putExtra("authToken", token);
                     startActivity(intentLoggedUser);
                 }else {
-                    Toast.makeText(getActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
 
-                    loadingBar.setVisibility(View.GONE);
+                    if (response.code() == 409){
+                        new AlertDialog.Builder(getContext())
+                                .setIcon(android.R.drawable.stat_notify_error)
+                                .setTitle("Email Already Signed Up")
+                                .setMessage("Email entered is used by another user in SHAK.")
+                                .setPositiveButton("OK", null).show();
+                    }else if (response.code() == 403){
+                        new AlertDialog.Builder(getContext())
+                                .setIcon(android.R.drawable.stat_notify_error)
+                                .setTitle("Username Already Signed Up")
+                                .setMessage("Username entered is used by another user in SHAK.")
+                                .setPositiveButton("OK", null).show();
+                    }else{
+                        new AlertDialog.Builder(getContext())
+                                .setIcon(android.R.drawable.stat_notify_error)
+                                .setTitle("Server Error")
+                                .setMessage("Internal server error.")
+                                .setPositiveButton("OK", null).show();
+                    }
                 }
             }
 
             @Override
             public void onFailure(Call<SignupResponse> call, Throwable t) {
-                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
+
+                loadingBar.setVisibility(View.GONE);
+
+                new AlertDialog.Builder(getContext())
+                        .setIcon(android.R.drawable.stat_notify_error)
+                        .setTitle("Server Error")
+                        .setMessage("Internal server error.")
+                        .setPositiveButton("OK", null).show();
             }
         });
     }
@@ -213,7 +240,6 @@ public class SignupFragment extends Fragment implements View.OnClickListener, Vi
                             0
                     );
                 }
-
                 return true;
             }
         }

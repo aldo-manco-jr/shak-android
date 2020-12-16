@@ -285,7 +285,6 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
                 @Override
                 public void onResponse(Call<Object> call, Response<Object> response) {
                     if (response.isSuccessful()) {
-                        Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), "LO FACIIO======??", Toast.LENGTH_SHORT).show();
                         holder.likeButton.setImageResource(R.drawable.ic_favorite_border_black_24dp);
                         holder.likeButton.setTag("unlike");
 

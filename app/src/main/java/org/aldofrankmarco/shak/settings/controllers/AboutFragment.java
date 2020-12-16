@@ -35,23 +35,20 @@ public class AboutFragment extends Fragment implements OnBackPressed {
         Button button = (Button) view.findViewById(R.id.exit);
         TextView tv = (TextView) view.findViewById(R.id.storiaAbout);
         tv.setText(Html.fromHtml(
-                "<H1 style=\"text-align: center\">SHAK TEAM</H1>" +
+                "<H1>SHAK TEAM</H1><br>" +
                         "<H3>Students:</H3>" +
-                            "<p style=\"text-align: center\">Brunetti Marco</p>" +
-                            "<p style=\"text-align: center\">Ferrini Francesco</p>" +
-                            "<p style=\"text-align: center\">Manco Aldo</p>" +
-                        "<H3>Coordinator:</H3>" +
-                            "<p style=\"text-align: center\">Mercaldo Francesco</p>" +
-                        "<H3>University: </H3>" +
-                            "<p style=\"text-align: center\">Unimol 2020/2021</p>"));
+                            "<p>Brunetti Marco</p>" +
+                            "<p>Ferrini Francesco</p>" +
+                            "<p>Manco Aldo</p><br>" +
+                        "<H3>Coordinator:</H3><br>" +
+                            "<p>Mercaldo Francesco</p><br>" +
+                        "<H3>University: </H3><br>" +
+                            "<p>Unimol 2020/2021</p>"));
 
+        //bottone d'uscita che mi rimanda a Settings'
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 SettingsFragment.getSettingsFragment();
-                /*getChildFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.AboutFragment, settings)
-                        .commit();*/
                 LoggedUserActivity.getLoggedUserActivity().changeFragment(SettingsFragment.getSettingsFragment());
             }
         });

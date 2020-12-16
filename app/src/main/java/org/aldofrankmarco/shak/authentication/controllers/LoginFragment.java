@@ -3,6 +3,7 @@ package org.aldofrankmarco.shak.authentication.controllers;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -17,6 +18,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
@@ -70,6 +72,9 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
         httpRequest.enqueue(new Callback<LoginResponse>() {
             @Override
             public void onResponse(Call<LoginResponse> call, final Response<LoginResponse> response) {
+
+                loadingBar.setVisibility(View.GONE);
+
                 if (response.isSuccessful()) {
                     assert response.body() != null : "body() non doveva essere null";
 
@@ -79,8 +84,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
                     editor.putString(getString(R.string.sharedpreferences_token), token);
                     editor.commit();
 
-                    loadingBar.setVisibility(View.GONE);
-
                     Intent intentLoggedUser = new Intent(getActivity(), LoggedUserActivity.class);
                     intentLoggedUser.putExtra("authToken", token);
                     intentLoggedUser.putExtra("username", response.body().getUserFound().getUsername());
@@ -89,18 +92,40 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
                     startActivity(intentLoggedUser);
                     ActivityCompat.finishAffinity(getActivity());
                 } else {
-                    Toast.makeText(getActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
 
-                    loadingBar.setVisibility(View.GONE);
+                    if (response.code() == 404){
+                        new AlertDialog.Builder(getContext())
+                                .setIcon(android.R.drawable.stat_notify_error)
+                                .setTitle("User Not Found")
+                                .setMessage("Username entered does not correspond\nto any SHAK registered user.")
+                                .setPositiveButton("OK", null).show();
+                    }else if (response.code() == 403){
+                        new AlertDialog.Builder(getContext())
+                                .setIcon(android.R.drawable.stat_notify_error)
+                                .setTitle("Wrong Password")
+                                .setMessage("Password entered does not match the account password of user.")
+                                .setPositiveButton("OK", null).show();
+                    }else{
+                        new AlertDialog.Builder(getContext())
+                                .setIcon(android.R.drawable.stat_notify_error)
+                                .setTitle("Server Error")
+                                .setMessage("Internal server error.")
+                                .setPositiveButton("OK", null).show();
+                    }
                 }
             }
 
             @Override
             public void onFailure(Call<LoginResponse> call, Throwable t) {
                 // errore a livello di rete
-                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
 
                 loadingBar.setVisibility(View.GONE);
+
+                new AlertDialog.Builder(getContext())
+                        .setIcon(android.R.drawable.stat_notify_error)
+                        .setTitle("Server Error")
+                        .setMessage("Internal server error.")
+                        .setPositiveButton("OK", null).show();
             }
         });
     }
@@ -141,9 +166,11 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
         @Override
         public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
             if (charSequence.toString().isEmpty()){
-                loginButton.setVisibility(View.GONE);
+                loginButton.setEnabled(false);
+                loginButton.setTextColor(Color.parseColor("#a8acaf"));
             }else {
-                loginButton.setVisibility(View.VISIBLE);
+                loginButton.setEnabled(true);
+                loginButton.setTextColor(Color.parseColor("#004317"));
             }
         }
 
@@ -164,18 +191,14 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
                 if (v.getTag() == "username") {
                     if (inputTextLength < 4 || inputTextLength > 16) {
                         usernameAlert.setVisibility(View.VISIBLE);
-                        loginButton.setEnabled(false);
                     } else {
                         usernameAlert.setVisibility(View.GONE);
-                        loginButton.setEnabled(true);
                     }
                 } else if (v.getTag() == "password") {
                     if (inputTextLength < 8 || inputTextLength > 64) {
                         passwordAlert.setVisibility(View.VISIBLE);
-                        loginButton.setEnabled(false);
                     } else {
                         passwordAlert.setVisibility(View.GONE);
-                        loginButton.setEnabled(true);
                     }
                 }
             }
