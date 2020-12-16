@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 
 import org.aldofrankmarco.shak.R;
+import org.aldofrankmarco.shak.models.Comment;
 import org.aldofrankmarco.shak.models.Post;
 import org.aldofrankmarco.shak.profile.controllers.ProfileFragment;
 import org.aldofrankmarco.shak.profile.http.GetUserProfileImageResponse;
@@ -38,19 +39,25 @@ import retrofit2.Response;
 
 public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapter.CommentItemHolder> {
 
-    private List<Post.Comment> listComments;
+    private List<Comment> listComments;
 
     public static String postId;
 
     private final String basicUrlImage = "http://res.cloudinary.com/dfn8llckr/image/upload/v";
 
-    public CommentsListAdapter(List<Post.Comment> listComments) {
+    private ImagesService imagesService;
+    private StreamsService streamsService;
+
+    public CommentsListAdapter(List<Comment> listComments) {
 
         this.listComments = new ArrayList<>();
 
-        for (int i = listComments.size()-1; i >= 0; i--) {
+        for (int i = listComments.size() - 1; i >= 0; i--) {
             this.listComments.add(listComments.get(i));
         }
+
+        streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
+        imagesService = ServiceGenerator.createService(ImagesService.class, LoggedUserActivity.getToken());
     }
 
     @NonNull
@@ -70,7 +77,7 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
     @Override
     public void onBindViewHolder(@NonNull final CommentsListAdapter.CommentItemHolder holder, final int position) {
 
-        final Post.Comment comment = listComments.get(position);
+        final Comment comment = listComments.get(position);
 
         setProfileImage(comment.getUsernamePublisher(), holder);
 
@@ -122,9 +129,7 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
         return correctDateForUserDevice;
     }
 
-    private void setProfileImage(final String username, final CommentItemHolder holder){
-
-        ImagesService imagesService = ServiceGenerator.createService(ImagesService.class, LoggedUserActivity.getToken());
+    private void setProfileImage(final String username, final CommentItemHolder holder) {
         Call<GetUserProfileImageResponse> httpRequest = imagesService.getUserProfileImage(username);
 
         httpRequest.enqueue(new Callback<GetUserProfileImageResponse>() {
@@ -173,14 +178,8 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
      * Questa funzione è accesibile solo per i post dell'utente autenticato e invia una richiesta
      * http in cui richieste la cancellazione del post.
      */
-    private void deleteComment(String postId, Post.Comment comment) {
-
-        DeleteCommentRequest deleteCommentRequest = new DeleteCommentRequest(postId, comment);
-
-        StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
-        //Call<Object> httpRequest = streamsService.deleteComment(deleteCommentRequest);
+    private void deleteComment(String postId, Comment comment) {
         Call<Object> httpRequest = streamsService.deleteComment(postId, comment.getCommentId());
-
 
         //@DELETE("post/remove-comment/{deleteCommentRequest}")
 

@@ -69,6 +69,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
 
     private TabLayout profileTabs;
 
+    private UsersService usersService;
+
     private PostsListFragment profilePostsFragment;
     private PeopleListFragment profileFollowingFragment;
     private PeopleListFragment profileFollowersFragment;
@@ -82,6 +84,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        usersService = ServiceGenerator.createService(UsersService.class, LoggedUserActivity.getToken());
         profileFragment = this;
 
         LoggedUserActivity.getSocket().on("refreshPage", updateProfilePage);
@@ -101,7 +104,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
             @Nullable ViewGroup container,
             @Nullable Bundle savedInstanceState
     ) {
-         view = inflater.inflate(R.layout.fragment_profile, container, false);
+        view = inflater.inflate(R.layout.fragment_profile, container, false);
         return view;
     }
 
@@ -159,10 +162,10 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
         profileTabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                if (tab.getPosition() == 3){
-                    if (user.getUsername().equals(LoggedUserActivity.getUsernameLoggedUser())){
+                if (tab.getPosition() == 3) {
+                    if (user.getUsername().equals(LoggedUserActivity.getUsernameLoggedUser())) {
                         addUserImageButton.setVisibility(View.VISIBLE);
-                    }else {
+                    } else {
                         addUserImageButton.setVisibility(View.GONE);
                     }
                 } else {
@@ -171,10 +174,12 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
             }
 
             @Override
-            public void onTabUnselected(TabLayout.Tab ignored) {}
+            public void onTabUnselected(TabLayout.Tab ignored) {
+            }
 
             @Override
-            public void onTabReselected(TabLayout.Tab ignored) {}
+            public void onTabReselected(TabLayout.Tab ignored) {
+            }
         });
     }
 
@@ -200,7 +205,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
                 getLocation();
                 break;
             case R.id.email_profile:
-                if (!user.getUsername().equals(LoggedUserActivity.getUsernameLoggedUser())){
+                if (!user.getUsername().equals(LoggedUserActivity.getUsernameLoggedUser())) {
                     Intent intent = new Intent(LoggedUserActivity.getLoggedUserActivity(), SendMailActivity.class);
                     intent.putExtra("email", user.getEmail());
                     intent.putExtra("username", user.getUsername());
@@ -211,8 +216,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
                 followOrUnfollow(user, followButton);
                 break;
             case R.id.fab_add_user_image:
-                    profileImagesFragment.uploadUserImage();
-                    break;
+                profileImagesFragment.uploadUserImage();
+                break;
         }
     }
 
@@ -221,8 +226,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
      * di "follow" o di "unfollow" verso il post.
      */
     public void followOrUnfollow(User user, final Button followButton) {
-        UsersService usersService = ServiceGenerator.createService(UsersService.class, LoggedUserActivity.getToken());
-
         Call<Object> httpRequest;
 
         if (followButton.getText().equals("unfollow")) {
@@ -263,8 +266,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
 
         followButton.setText("follow");
 
-        UsersService usersService = ServiceGenerator.createService(UsersService.class, LoggedUserActivity.getToken());
-
         Call<IsFollowingResponse> httpRequest = usersService.isFollowing(user.getUsername());
 
         httpRequest.enqueue(new Callback<IsFollowingResponse>() {
@@ -295,7 +296,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
     public void setUserLocation(final String city, final String country) {
 
         if (country != null) {
-            UsersService usersService = ServiceGenerator.createService(UsersService.class, LoggedUserActivity.getToken());
             SetUserLocationRequest setUserLocationRequest = new SetUserLocationRequest(city, country);
             Call<Object> httpRequest = usersService.setUserLocation(LoggedUserActivity.getIdLoggedUser(), setUserLocationRequest);
 
@@ -363,8 +363,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
     }
 
     public void userDataBinding(String username) {
-
-        UsersService usersService = ServiceGenerator.createService(UsersService.class, LoggedUserActivity.getToken());
         Call<GetUserByUsernameResponse> httpRequest = usersService.getUserByUsername(username);
 
         httpRequest.enqueue(new Callback<GetUserByUsernameResponse>() {

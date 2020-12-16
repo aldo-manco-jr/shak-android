@@ -16,6 +16,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.Target;
 
 import org.aldofrankmarco.shak.R;
+import org.aldofrankmarco.shak.models.Like;
 import org.aldofrankmarco.shak.models.Post;
 import org.aldofrankmarco.shak.models.User;
 import org.aldofrankmarco.shak.profile.controllers.ImageViewerActivity;
@@ -49,11 +50,15 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
 
     private final String basicUrlImage = "http://res.cloudinary.com/dfn8llckr/image/upload/v";
 
+    StreamsService streamsService;
+
     public PostsListAdapter(List<Post> listPosts, String type, PostsListFragment postsListFragment, View view) {
         this.listPosts = listPosts;
         this.type = type;
         this.postsListFragment = postsListFragment;
         this.fragmentView = view;
+
+        streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
     }
 
     public List<Post> getListPosts() {
@@ -234,7 +239,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
     private boolean isLiked(Post post) {
         String loggedUser = LoggedUserActivity.getUsernameLoggedUser();
 
-        for (Post.Like like : post.getArrayLikes()) {
+        for (Like like : post.getArrayLikes()) {
             boolean isLiked = like.getUsernamePublisher().equals(loggedUser);
 
             if (isLiked) {
@@ -250,7 +255,6 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
      * "like" o di "unlike" verso il post.
      */
     private void likeOrUnlike(final Post post, final PostItemHolder holder, final View view, final String type) {
-        StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
 
         if (!isLiked(post)) {
             // viene aggiunto ai preferiti

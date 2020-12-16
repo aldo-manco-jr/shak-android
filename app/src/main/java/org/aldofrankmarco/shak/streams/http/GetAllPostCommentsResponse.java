@@ -2,6 +2,7 @@ package org.aldofrankmarco.shak.streams.http;
 
 import com.google.gson.annotations.SerializedName;
 
+import org.aldofrankmarco.shak.models.Comment;
 import org.aldofrankmarco.shak.models.Post;
 
 import java.util.List;
@@ -12,13 +13,13 @@ public class GetAllPostCommentsResponse {
     String message;
 
     @SerializedName("commentsList")
-    List<Post.Comment> commentsList;
+    List<Comment> commentsList;
 
     public String getMessage() {
         return message;
     }
 
-    public List<Post.Comment> getCommentsList() {
+    public List<Comment> getCommentsList() {
         return commentsList;
     }
 }

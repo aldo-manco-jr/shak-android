@@ -3,6 +3,7 @@ package org.aldofrankmarco.shak.chat.http;
 import com.google.gson.annotations.SerializedName;
 
 import org.aldofrankmarco.shak.models.Conversation;
+import org.aldofrankmarco.shak.models.Message;
 
 import java.util.List;
 
@@ -12,13 +13,13 @@ class GetAllConversationMessagesResponse {
     private String message;
 
     @SerializedName("messages")
-    private List<Conversation.Message> arrayConversationMessages;
+    private List<Message> arrayConversationMessages;
 
     public String getMessage() {
         return message;
     }
 
-    public List<Conversation.Message> getArrayConversationMessages() {
+    public List<Message> getArrayConversationMessages() {
         return arrayConversationMessages;
     }
 }

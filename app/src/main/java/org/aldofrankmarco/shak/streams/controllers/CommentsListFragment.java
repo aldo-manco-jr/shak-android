@@ -14,6 +14,7 @@ import com.github.nkzawa.emitter.Emitter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.aldofrankmarco.shak.R;
+import org.aldofrankmarco.shak.models.Comment;
 import org.aldofrankmarco.shak.models.Post;
 import org.aldofrankmarco.shak.services.ServiceGenerator;
 import org.aldofrankmarco.shak.services.StreamsService;
@@ -29,13 +30,15 @@ import retrofit2.Response;
 import static org.aldofrankmarco.shak.streams.controllers.CommentsListAdapter.postId;
 
 public class CommentsListFragment extends Fragment implements OnBackPressed {
-    private List<Post.Comment> listPostComments;
+    private List<Comment> listPostComments;
 
     private View view;
 
     private static Post post;
 
     private FloatingActionButton buttonAddComment;
+
+    private StreamsService streamsService;
 
     public CommentsListFragment() {
     }
@@ -59,6 +62,7 @@ public class CommentsListFragment extends Fragment implements OnBackPressed {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
         LoggedUserActivity.getSocket().on("refreshPage", updatePostCommentsList);
     }
 
@@ -111,8 +115,6 @@ public class CommentsListFragment extends Fragment implements OnBackPressed {
         if (post == null) {
             return;
         }
-
-        StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
 
         Call<GetAllPostCommentsResponse> httpRequest = streamsService.getAllPostComments(postId);
 

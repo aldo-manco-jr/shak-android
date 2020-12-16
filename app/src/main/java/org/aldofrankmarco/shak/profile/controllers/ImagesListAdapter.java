@@ -14,8 +14,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.Target;
 import com.github.nkzawa.emitter.Emitter;
+import com.google.android.material.snackbar.Snackbar;
 
 import org.aldofrankmarco.shak.R;
+import org.aldofrankmarco.shak.models.Image;
 import org.aldofrankmarco.shak.models.User;
 import org.aldofrankmarco.shak.services.ImagesService;
 import org.aldofrankmarco.shak.services.ServiceGenerator;
@@ -30,16 +32,19 @@ import retrofit2.Response;
 
 public class ImagesListAdapter extends RecyclerView.Adapter<ImagesListAdapter.ImageItemHolder> {
 
-    private List<User.Image> listImages;
+    private List<Image> listImages;
 
     private String username;
 
     private final String basicUrlImage = "http://res.cloudinary.com/dfn8llckr/image/upload/v";
 
-    public ImagesListAdapter(List<User.Image> listImages, String username) {
+    private ImagesService imagesService;
+
+    public ImagesListAdapter(List<Image> listImages, String username) {
         this.listImages = listImages;
         this.username = username;
 
+        imagesService = ServiceGenerator.createService(ImagesService.class, LoggedUserActivity.getToken());
         LoggedUserActivity.getSocket().on("refreshPage", updateImagesList);
     }
 
@@ -80,7 +85,7 @@ public class ImagesListAdapter extends RecyclerView.Adapter<ImagesListAdapter.Im
      */
     @Override
     public void onBindViewHolder(@NonNull final ImagesListAdapter.ImageItemHolder holder, final int position) {
-        final User.Image image = listImages.get(position);
+        final Image image = listImages.get(position);
 
         final String urlImage = this.basicUrlImage + image.getImageVersion() + "/"
                 + image.getImageId();
@@ -129,18 +134,15 @@ public class ImagesListAdapter extends RecyclerView.Adapter<ImagesListAdapter.Im
     }
 
     private void setAsDefaultImage(String imageVersion, String imageId, final ImagesListAdapter.ImageItemHolder holder) {
-
-        ImagesService imagesService = ServiceGenerator.createService(ImagesService.class, LoggedUserActivity.getToken());
-
         Call<Object> httpRequest = imagesService.setUserProfilePhoto(imageId, imageVersion);
-
-        Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), imageId + " " + imageVersion, Toast.LENGTH_LONG).show();
-        System.out.println(basicUrlImage + imageVersion + "/" + imageId);
 
         httpRequest.enqueue(new Callback<Object>() {
             @Override
             public void onResponse(Call<Object> call, Response<Object> response) {
                 if (response.isSuccessful()) {
+                    Snackbar.make(ProfileFragment.getProfileFragment().getView(), "Image Set As Profile Successfully!!", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+
                     LoggedUserActivity.getSocket().emit("refresh");
                 } else {
                     Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
@@ -155,18 +157,15 @@ public class ImagesListAdapter extends RecyclerView.Adapter<ImagesListAdapter.Im
     }
 
     private void setAsCoverImage(String imageVersion, String imageId, final ImagesListAdapter.ImageItemHolder holder) {
-
-        ImagesService imagesService = ServiceGenerator.createService(ImagesService.class, LoggedUserActivity.getToken());
-
         Call<Object> httpRequest = imagesService.setUserCoverPhoto(imageId, imageVersion);
-
-        Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), imageId + " " + imageVersion, Toast.LENGTH_LONG).show();
-        System.out.println(basicUrlImage + imageVersion + "/" + imageId);
 
         httpRequest.enqueue(new Callback<Object>() {
             @Override
             public void onResponse(Call<Object> call, Response<Object> response) {
                 if (response.isSuccessful()) {
+                    Snackbar.make(ProfileFragment.getProfileFragment().getView(), "Image Set As Cover Successfully!!", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+
                     LoggedUserActivity.getSocket().emit("refresh");
                 } else {
                     Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();

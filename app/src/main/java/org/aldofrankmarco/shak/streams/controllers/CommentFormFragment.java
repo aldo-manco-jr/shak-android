@@ -33,6 +33,8 @@ public class CommentFormFragment extends Fragment implements View.OnClickListene
     private FloatingActionButton buttonCloseCommentForm;
     private FloatingActionButton buttonSubmitComment;
 
+    private StreamsService streamsService;
+
     public CommentFormFragment() {
         // Required empty public constructor
     }
@@ -41,6 +43,7 @@ public class CommentFormFragment extends Fragment implements View.OnClickListene
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
         LoggedUserActivity.getSocket().on("refreshPage", CommentsListFragment.updatePostCommentsList);
     }
 
@@ -83,9 +86,6 @@ public class CommentFormFragment extends Fragment implements View.OnClickListene
     };
 
     private void submitComment() {
-
-        StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
-
         AddCommentRequest addCommentRequest = new AddCommentRequest(postId, commentContentField.getText().toString().trim());
 
         Call<Object> httpRequest = streamsService.submitComment(addCommentRequest);
@@ -121,7 +121,7 @@ public class CommentFormFragment extends Fragment implements View.OnClickListene
      */
     private void closeCommentBox() {
 
-            LoggedUserActivity.getLoggedUserActivity().changeFragment(LoggedUserActivity.getLoggedUserActivity().getCommentsListFragment());
+        LoggedUserActivity.getLoggedUserActivity().changeFragment(LoggedUserActivity.getLoggedUserActivity().getCommentsListFragment());
 
         commentContentField.setText("");
         //getFragmentManager().beginTransaction().remove(HomeFragment.getHomeFragment().getCommentFormFragment()).commitAllowingStateLoss();

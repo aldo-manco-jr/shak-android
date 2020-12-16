@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.aldofrankmarco.shak.R;
+import org.aldofrankmarco.shak.models.Notification;
 import org.aldofrankmarco.shak.models.User;
 import org.aldofrankmarco.shak.notifications.http.GetNotificationsListResponse;
 import org.aldofrankmarco.shak.people.http.GetUserByUsernameResponse;
@@ -33,10 +34,12 @@ import retrofit2.Response;
 
 public class NotificationsListFragment extends Fragment {
 
-    protected List<User.Notification> listNotification;
+    protected List<Notification> listNotification;
     protected RecyclerView recyclerView;
     protected NotificationsListAdapter adapter;
     private View view;
+
+    NotificationsService notificationsService;
 
     FloatingActionButton buttonMarkAllNotificationAsRead;
 
@@ -46,6 +49,8 @@ public class NotificationsListFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        notificationsService = ServiceGenerator.createService(NotificationsService.class, LoggedUserActivity.getToken());
     }
 
     @Override
@@ -66,7 +71,6 @@ public class NotificationsListFragment extends Fragment {
      * Consente di recuperare tutte le notifiche
      */
     public void getAllNotifications() {
-        NotificationsService notificationsService = ServiceGenerator.createService(NotificationsService.class, LoggedUserActivity.getToken());
         Call<GetNotificationsListResponse> httpRequest = notificationsService.getAllNotifications();
 
         httpRequest.enqueue(new Callback<GetNotificationsListResponse>() {
@@ -89,7 +93,7 @@ public class NotificationsListFragment extends Fragment {
         });
     }
 
-    void removeUserNotification(NotificationsListFragment notificationsListFragment, User.Notification notification, View view, RecyclerView recyclerView, NotificationsListAdapter.NotifyItemHolder holder){
+    void removeUserNotification(NotificationsListFragment notificationsListFragment, Notification notification, View view, RecyclerView recyclerView, NotificationsListAdapter.NotifyItemHolder holder){
         recyclerView.removeView(view);
 
         notificationsListFragment.adapter.getListNotification().remove(notification);
@@ -97,9 +101,6 @@ public class NotificationsListFragment extends Fragment {
     }
 
     void markAllNotificationsAsRead(final NotificationsListAdapter.NotifyItemHolder holder){
-
-        NotificationsService notificationsService = ServiceGenerator.createService(NotificationsService.class, LoggedUserActivity.getToken());
-
         Call<Object> httpRequest = notificationsService.markAllNotificationsAsRead();
 
         httpRequest.enqueue(new Callback<Object>() {

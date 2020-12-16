@@ -23,6 +23,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.JsonObject;
 
 import org.aldofrankmarco.shak.R;
+import org.aldofrankmarco.shak.models.Image;
 import org.aldofrankmarco.shak.models.User;
 import org.aldofrankmarco.shak.people.http.GetUserByUsernameResponse;
 import org.aldofrankmarco.shak.profile.http.GetImagesListResponse;
@@ -45,7 +46,7 @@ import retrofit2.Response;
  */
 public class ImagesListFragment extends Fragment {
 
-    private List<User.Image> listImages;
+    private List<Image> listImages;
 
     private View view;
 
@@ -58,6 +59,8 @@ public class ImagesListFragment extends Fragment {
     private final int SELECT_PHOTO = 1;
 
     private ImageView chosenImagePost;
+
+    ImagesService imagesService;
 
     public ImagesListFragment() {
     }
@@ -83,6 +86,7 @@ public class ImagesListFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        imagesService = ServiceGenerator.createService(ImagesService.class, LoggedUserActivity.getToken());
         LoggedUserActivity.getSocket().on("refreshPage", updateUserImagesList);
     }
 
@@ -155,8 +159,6 @@ public class ImagesListFragment extends Fragment {
 
     private void addUserImage(String imageEncoded) {
 
-        ImagesService imagesService = ServiceGenerator.createService(ImagesService.class, LoggedUserActivity.getToken());
-
         if (imageEncoded == null) {
             return;
         }
@@ -204,7 +206,6 @@ public class ImagesListFragment extends Fragment {
         }
 
         username = getArguments().getString("username");
-        ImagesService imagesService = ServiceGenerator.createService(ImagesService.class, LoggedUserActivity.getToken());
 
         Call<GetImagesListResponse> httpRequest = imagesService.getAllUserImages(username);
 

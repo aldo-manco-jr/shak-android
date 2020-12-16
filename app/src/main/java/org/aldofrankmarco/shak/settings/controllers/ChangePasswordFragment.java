@@ -51,12 +51,16 @@ public class ChangePasswordFragment extends Fragment implements View.OnClickList
     private Button changeButton;
     private Button exitButton;
 
+    private AuthenticationService authenticationService;
+
     public ChangePasswordFragment() {
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        authenticationService = ServiceGenerator.createService(AuthenticationService.class);
     }
 
     /**
@@ -100,8 +104,6 @@ public class ChangePasswordFragment extends Fragment implements View.OnClickList
      * invio dellla change password al server
      */
     public void changePwd() {
-        AuthenticationService authenticationService = ServiceGenerator.createService(AuthenticationService.class);
-
         ChangePasswordRequest changePasswordJson = new ChangePasswordRequest(old, next, confirm);
         Call<Object> httpRequest = authenticationService.changePassword(changePasswordJson);
         httpRequest.enqueue(new Callback<Object>() {

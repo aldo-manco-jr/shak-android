@@ -14,6 +14,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.Target;
 
 import org.aldofrankmarco.shak.R;
+import org.aldofrankmarco.shak.models.Notification;
 import org.aldofrankmarco.shak.models.User;
 import org.aldofrankmarco.shak.people.http.GetUserByUsernameResponse;
 import org.aldofrankmarco.shak.profile.controllers.ProfileFragment;
@@ -39,21 +40,25 @@ import retrofit2.Response;
 
 
 public class NotificationsListAdapter extends RecyclerView.Adapter<NotificationsListAdapter.NotifyItemHolder> {
-    private List<User.Notification> listUserNotification;
+    private List<Notification> listUserNotification;
     private NotificationsListFragment notificationsListFragment;
     private View fragmentView;
     private RecyclerView recyclerView;
+
+    private NotificationsService notificationsService;
 
     private final String basicUrlImage = "http://res.cloudinary.com/dfn8llckr/image/upload/v";
 
     private String senderImageProfileId;
     private String senderImageProfileVersion;
 
-    public NotificationsListAdapter(List<User.Notification> listUser, NotificationsListFragment notificationsListFragment, View view, RecyclerView recyclerView) {
+    public NotificationsListAdapter(List<Notification> listUser, NotificationsListFragment notificationsListFragment, View view, RecyclerView recyclerView) {
         this.listUserNotification = listUser;
         this.notificationsListFragment = notificationsListFragment;
         this.fragmentView = view;
         this.recyclerView = recyclerView;
+
+        notificationsService = ServiceGenerator.createService(NotificationsService.class, LoggedUserActivity.getToken());
     }
 
     @NonNull
@@ -74,7 +79,7 @@ public class NotificationsListAdapter extends RecyclerView.Adapter<Notifications
     @Override
     public void onBindViewHolder(@NonNull final NotificationsListAdapter.NotifyItemHolder holder, final int position) {
 
-        final User.Notification notification = listUserNotification.get(position);
+        final Notification notification = listUserNotification.get(position);
         final String senderUsername = notification.getSenderUsername();
 
         setSenderImageProfile(senderUsername, holder);
@@ -129,7 +134,7 @@ public class NotificationsListAdapter extends RecyclerView.Adapter<Notifications
         return listUserNotification.size();
     }
 
-    public List<User.Notification> getListNotification() {
+    public List<Notification> getListNotification() {
         return listUserNotification;
     }
 
@@ -207,10 +212,7 @@ public class NotificationsListAdapter extends RecyclerView.Adapter<Notifications
      * l'utente autenticato e invia una richiesta http in cui richiede la cancellazione della
      * notifica.
      */
-    private void deleteNotification(final User.Notification notification, final NotifyItemHolder holder) {
-
-        NotificationsService notificationsService = ServiceGenerator.createService(NotificationsService.class, LoggedUserActivity.getToken());
-
+    private void deleteNotification(final Notification notification, final NotifyItemHolder holder) {
         Call<Object> httpRequest = notificationsService.deleteNotification(notification.getNotificationId());
 
         httpRequest.enqueue(new Callback<Object>() {
@@ -232,10 +234,7 @@ public class NotificationsListAdapter extends RecyclerView.Adapter<Notifications
 
     }
 
-    private void markNotificationAsRead(final User.Notification notification, final NotifyItemHolder holder) {
-
-        NotificationsService notificationsService = ServiceGenerator.createService(NotificationsService.class, LoggedUserActivity.getToken());
-
+    private void markNotificationAsRead(final Notification notification, final NotifyItemHolder holder) {
         Call<Object> httpRequest = notificationsService.markNotificationAsRead(notification.getNotificationId());
 
         httpRequest.enqueue(new Callback<Object>() {

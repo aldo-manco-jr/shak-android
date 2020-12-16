@@ -115,16 +115,16 @@ public class User {
     }
 
     public boolean addFollowtoFollowings(String userId) {
-        User.Following userFollowed = new User.Following(userId);
+        Following userFollowed = new Following(userId);
         boolean isAdded = arrayFollowing.add(userFollowed);
         return isAdded;
     }
 
     public boolean removeLikeFromArray(String userId) {
-        User.Following userFollowRemoved = null;
+        Following userFollowRemoved = null;
         boolean isRemoved = false;
 
-        for (User.Following following : arrayFollowing) {
+        for (Following following : arrayFollowing) {
             if (following.getFollowingId().equals(userId)) {
                 userFollowRemoved = following;
             }
@@ -135,113 +135,5 @@ public class User {
         }
 
         return isRemoved;
-    }
-
-    public class Following{
-/*
-        @SerializedName("_id")
-        private Object id;
-
-        @SerializedName("userFollowed")
-        private Object followingId;
-
-        // TODO QUESTO GENERA UN ERRORE NON è USERFOLLOWED
-        public Object getFollowingId() {
-            return followingId;
-        }*/
-        @SerializedName("userFollowed")
-        private JsonElement followingId;
-
-        public Following(String followingId) {
-            this.followingId = new Gson().fromJson(followingId, JsonElement.class);
-        }
-
-        public JsonArray getFollowingId() {
-            if (followingId != null) {
-                return followingId.getAsJsonObject().get("following").getAsJsonArray();
-            } else {
-                return null;
-            }
-        }
-    }
-
-    public class Follower{
-        @SerializedName("follower")
-        //JsonObject non funziona
-        //TODO il dato offerto dal server è un JsonElement, ma in realtà è un JsonObject
-        private JsonElement followerId;
-
-        public JsonArray getFollowerId() {
-            return followerId.getAsJsonObject().get("followers").getAsJsonArray();
-        }
-    }
-
-    public class Notification{
-
-        @SerializedName("_id")
-        private JsonElement notificationId;
-
-        @SerializedName("senderId")
-        private JsonElement userId;
-
-        @SerializedName("message")
-        private String notificationContent;
-
-        @SerializedName("viewProfile")
-        private boolean isAboutViewedProfile;
-
-        @SerializedName("created")
-        private String createdAt;
-
-        @SerializedName("read")
-        private boolean isRead;
-
-        public String getNotificationId() {
-            return notificationId.getAsString();
-        }
-
-        public String getSenderUsername() {
-            return notificationContent.split(" ")[0];
-        }
-
-        public String getNotificationContent() {
-            return notificationContent;
-        }
-
-        public boolean isAboutViewedProfile() {
-            return isAboutViewedProfile;
-        }
-
-        public String getCreatedAt() {
-            return createdAt;
-        }
-
-        public boolean isRead() {
-            return isRead;
-        }
-    }
-
-    public class Image{
-
-        @SerializedName("_id")
-        private JsonElement imageDatabaseId;
-
-        @SerializedName("imageId")
-        private String imageId;
-
-        @SerializedName("imageVersion")
-        private String imageVersion;
-
-        public String getImageDatabaseId() {
-            return imageDatabaseId.getAsString();
-        }
-
-        public String getImageId() {
-            return imageId;
-        }
-
-        public String getImageVersion() {
-            return imageVersion;
-        }
     }
 }

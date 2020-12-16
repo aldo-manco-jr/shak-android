@@ -1,5 +1,6 @@
 package org.aldofrankmarco.shak.people.controllers;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,11 +42,11 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
 
     private final String basicUrlImage = "http://res.cloudinary.com/dfn8llckr/image/upload/v";
 
+    private UsersService usersService;
+
     public PeopleListAdapter(List<User> listUsers) {
-
         this.listUsers = listUsers;
-
-        //LoggedUserActivity.getSocket().on("refreshPage", PeopleListFragment.getPeopleListFragment().updateUsersList);
+        usersService = ServiceGenerator.createService(UsersService.class, LoggedUserActivity.getToken());
     }
 
     @NonNull
@@ -127,8 +128,6 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
      * "follow" o di "unfollow" verso il post.
      */
     private void followOrUnfollow(User user, final UserItemHolder holder) {
-        UsersService usersService = ServiceGenerator.createService(UsersService.class, LoggedUserActivity.getToken());
-
         Call<Object> httpRequest;
 
         if (holder.followButton.getText().equals("unfollow")) {
@@ -169,9 +168,13 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
      */
     private void isFollow(User user, final UserItemHolder holder) {
 
-        holder.followButton.setText("follow");
+        if (user.getUsername().equals(LoggedUserActivity.getUsernameLoggedUser())){
+            holder.followButton.setVisibility(View.INVISIBLE);
+            holder.loadingFollow.setVisibility(View.GONE);
+            return;
+        }
 
-        UsersService usersService = ServiceGenerator.createService(UsersService.class, LoggedUserActivity.getToken());
+        holder.followButton.setText("follow");
 
         Call<IsFollowingResponse> httpRequest = usersService.isFollowing(user.getUsername());
 

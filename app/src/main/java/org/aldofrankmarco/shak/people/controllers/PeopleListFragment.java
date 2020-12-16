@@ -42,6 +42,8 @@ public class PeopleListFragment extends Fragment {
 
     private static PeopleListFragment peopleListFragment;
 
+    private UsersService usersService;
+
     public PeopleListFragment() {
     }
 
@@ -85,6 +87,7 @@ public class PeopleListFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        usersService = ServiceGenerator.createService(UsersService.class, LoggedUserActivity.getToken());
     }
 
     @Override
@@ -139,8 +142,6 @@ public class PeopleListFragment extends Fragment {
         final String type = getArguments().getString("type");
         username = getArguments().getString("username");
 
-        UsersService usersService = ServiceGenerator.createService(UsersService.class, LoggedUserActivity.getToken());
-
         if (type.equals("all")) {
 
             titleTextView.setVisibility(View.VISIBLE);
@@ -154,7 +155,6 @@ public class PeopleListFragment extends Fragment {
                         assert response.body() != null : "body() non doveva essere null";
 
                         listUsers = response.body().getAllUsers();
-
                         initializeRecyclerView();
                     }
                 }

@@ -55,6 +55,8 @@ public class PostFormFragment extends Fragment implements View.OnClickListener, 
     private FloatingActionButton buttonUploadImagePost;
     private FloatingActionButton buttonSubmitPost;
 
+    private StreamsService streamsService;
+
     public PostFormFragment() {
         // Required empty public constructor
     }
@@ -63,6 +65,7 @@ public class PostFormFragment extends Fragment implements View.OnClickListener, 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
         imageEncoded = null;
     }
 
@@ -99,10 +102,10 @@ public class PostFormFragment extends Fragment implements View.OnClickListener, 
 
         @Override
         public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            if (charSequence.toString().isEmpty()){
+            if (charSequence.toString().isEmpty()) {
                 // quando il campo di testo del post è vuoto
                 buttonSubmitPost.setVisibility(View.GONE);
-            }else {
+            } else {
                 buttonSubmitPost.setVisibility(View.VISIBLE);
             }
         }
@@ -116,9 +119,7 @@ public class PostFormFragment extends Fragment implements View.OnClickListener, 
      * Consente la pubblicazione di un post ad un'utente autenticato.
      * I dati vengono inseriti in una richiesta http e mandati al server.
      */
-    private void submitPost(){
-        StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
-
+    private void submitPost() {
         JsonObject postData = new JsonObject();
         postData.addProperty("post", postContentField.getText().toString().trim());
 
@@ -167,7 +168,7 @@ public class PostFormFragment extends Fragment implements View.OnClickListener, 
     /**
      * Il post viene chiuso e le informazioni scritte dall'utente vengono cancellate
      */
-    private void closePost(){
+    private void closePost() {
         //getFragmentManager().beginTransaction().remove(HomeFragment.getHomeFragment().getPostFormFragment()).commitAllowingStateLoss();
         //LoggedUserActivity.getLoggedUserActivity().changeFragment(HomeFragment.getHomeFragment());
         postContentField.setText("");
@@ -178,7 +179,7 @@ public class PostFormFragment extends Fragment implements View.OnClickListener, 
      * Cancella un immagine selezionata. L'immagine non sarà più visibile e non verrà caricata sul
      * server con il messaggio.
      */
-    private void deleteImagePost(){
+    private void deleteImagePost() {
         imageEncoded = null;
 
         chosenImagePost.setVisibility(View.GONE);
@@ -194,7 +195,7 @@ public class PostFormFragment extends Fragment implements View.OnClickListener, 
     /**
      * Avvia la fase di caricamento di un immagine dalla memoria dell'utente all'applicazione
      */
-    private void uploadImagePost(){
+    private void uploadImagePost() {
         Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setType("image/*");
         startActivityForResult(intent, SELECT_PHOTO);
@@ -202,7 +203,6 @@ public class PostFormFragment extends Fragment implements View.OnClickListener, 
 
     /**
      * @param bitmap un'immagine in formato bitmap
-     *
      * @return una stringa che rappresenta un'immagine codificata secondo Base64
      */
     private String bitmapToBase64(Bitmap bitmap) {
@@ -238,7 +238,7 @@ public class PostFormFragment extends Fragment implements View.OnClickListener, 
 
                 chosenImagePost.setVisibility(View.VISIBLE);
                 buttonDeleteImagePost.setVisibility(View.VISIBLE);
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -248,7 +248,7 @@ public class PostFormFragment extends Fragment implements View.OnClickListener, 
     public void onClick(View view) {
         int idButtonPressed = view.getId();
 
-        switch (idButtonPressed){
+        switch (idButtonPressed) {
             case R.id.fab_submit_button:
                 submitPost();
                 break;
