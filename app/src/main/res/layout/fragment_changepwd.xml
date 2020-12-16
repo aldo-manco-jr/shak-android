@@ -58,7 +58,6 @@
             android:layout_marginLeft="24dp"
             android:layout_marginTop="8dp"
             android:layout_marginRight="16dp"
-            android:text="Password should be of 8-64 characters."
             android:visibility="gone" />
 
         <EditText
@@ -89,7 +88,6 @@
             android:layout_marginLeft="24dp"
             android:layout_marginTop="8dp"
             android:layout_marginRight="16dp"
-            android:text="Password should be of 8-64 characters."
             android:visibility="gone" />
 
         <EditText
@@ -120,7 +118,6 @@
             android:layout_marginLeft="24dp"
             android:layout_marginTop="8dp"
             android:layout_marginRight="16dp"
-            android:text="Password should be of 8-64 characters."
             android:visibility="gone" />
 
         <ProgressBar

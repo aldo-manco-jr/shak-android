@@ -154,25 +154,42 @@ public class ChangePasswordFragment extends Fragment implements View.OnClickList
                 if (v.getTag() == "oldPwd") {
                     if (fieldLength < 8 || fieldLength > 64) {
                         oldPasswordAlert.setVisibility(View.VISIBLE);
+                        oldPasswordAlert.setText("Password should be of 8-64 characters.");
                         changeButton.setEnabled(false);
                     } else {
                         oldPasswordAlert.setVisibility(View.GONE);
+                        confPasswordAlert.setText("");
                         changeButton.setEnabled(true);
                     }
-                } else if (v.getTag() == "newPwd") {
+                }
+                else if (v.getTag() == "newPwd") {
                     if ((fieldLength < 8 || fieldLength > 64)) {
                         newPasswordAlert.setVisibility(View.VISIBLE);
+                        newPasswordAlert.setText("Password should be of 8-64 characters.");
                         changeButton.setEnabled(false);
                     } else {
                         newPasswordAlert.setVisibility(View.GONE);
+                        confPasswordAlert.setText("");
                         changeButton.setEnabled(true);
                     }
-                } else if (v.getTag() == "confPwd") {
-                    if (fieldLength < 8 || fieldLength > 64) {
+                }
+                else if (v.getTag() == "confPwd") {
+                    if ((fieldLength < 8 || fieldLength > 64)) {
                         confPasswordAlert.setVisibility(View.VISIBLE);
+                        confPasswordAlert.setText("Password should be of 8-64 characters.");
+                        changeButton.setEnabled(false);
+                    }else{
+                        confPasswordAlert.setVisibility(View.GONE);
+                        confPasswordAlert.setText("");
+                        changeButton.setEnabled(true);
+                    }
+                    if (!newPwd.equals(confPwd)) {
+                        confPasswordAlert.setVisibility(View.VISIBLE);
+                        confPasswordAlert.setText("New password and Confirm Password must be the same");
                         changeButton.setEnabled(false);
                     } else {
                         confPasswordAlert.setVisibility(View.GONE);
+                        newPasswordAlert.setText("");
                         changeButton.setEnabled(true);
                     }
                 }

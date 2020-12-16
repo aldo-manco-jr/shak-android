@@ -127,13 +127,11 @@ public class SettingsFragment extends Fragment {
             public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent){
 
                 LayoutInflater layoutInflater =(LayoutInflater)getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
                 View row = layoutInflater.inflate(R.layout.settingrow, parent, false);
                 ImageView images = row.findViewById(R.id.img);
                 TextView myTitle = row.findViewById(R.id.txtv1);
                 images.setImageResource(rImgs[position]);
                 myTitle.setText(rTitle[position]);
-
                 return row;
             }
         }
