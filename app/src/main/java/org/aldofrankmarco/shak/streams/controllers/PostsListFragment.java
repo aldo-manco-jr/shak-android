@@ -45,8 +45,6 @@ public class PostsListFragment extends Fragment {
 
     private View view;
 
-    private StreamsService streamsService;
-
     public PostsListFragment() {
     }
 
@@ -129,7 +127,6 @@ public class PostsListFragment extends Fragment {
 
         this.type = getArguments().getString("type");
         final String username = getArguments().getString("username");
-        streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
 
         if (type.equals("all") || type.equals("favourites")) {
 
@@ -208,7 +205,6 @@ public class PostsListFragment extends Fragment {
 
         PostsListFragment streamsFragment = HomeFragment.getHomeFragment().getStreamsFragment();
         final String lastPostDate = HomeFragment.getHomeFragment().getStreamsFragment().listPosts.get(0).getCreatedAt();
-        streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
 
         if (type.equals("all") || type.equals("favourites")) {
             Call<GetNewPostsListResponse> httpRequest = LoggedUserActivity.getStreamsService().getAllNewPosts(lastPostDate);
@@ -388,7 +384,6 @@ public class PostsListFragment extends Fragment {
                     final View view,
                     final PostsListAdapter.PostItemHolder holder,
                     final String type) {
-        streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
         Call<Object> httpRequest = LoggedUserActivity.getStreamsService().deletePost(selectPost);
 
         httpRequest.enqueue(new Callback<Object>() {
