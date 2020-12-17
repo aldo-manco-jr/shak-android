@@ -1,7 +1,6 @@
 package org.aldofrankmarco.shak.streams.controllers;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,15 +32,12 @@ import retrofit2.Response;
  */
 public class PostsListFragment extends Fragment {
 
-    private List<Post> listPosts;
-
-    private int listPostsSize;
     protected static int itemRemoved;
 
     private String type;
 
     protected RecyclerView recyclerView;
-    protected PostsListAdapter adapter = null;
+    private PostsListAdapter adapter;
 
     private View view;
 
@@ -82,12 +78,14 @@ public class PostsListFragment extends Fragment {
     }
 
     protected List<Post> getListPosts(){
-        return this.listPosts;
+        return this.adapter.getListPosts();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        this.adapter = new PostsListAdapter(this, view);
     }
 
     @Override
@@ -114,6 +112,10 @@ public class PostsListFragment extends Fragment {
         recyclerView = view.findViewById(R.id.listPosts);
     }
 
+    protected String getType(){
+        return this.type;
+    }
+
     /**
      * Consente di recuperare tutti i post:
      * - streams: lista dei post dell'utente e dei suoi following
@@ -127,10 +129,11 @@ public class PostsListFragment extends Fragment {
 
         this.type = getArguments().getString("type");
         final String username = getArguments().getString("username");
+        StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
 
         if (type.equals("all") || type.equals("favourites")) {
 
-            Call<GetPostsListResponse> httpRequest = LoggedUserActivity.getStreamsService().getAllPosts();
+            Call<GetPostsListResponse> httpRequest = streamsService.getAllPosts();
 
             httpRequest.enqueue(new Callback<GetPostsListResponse>() {
                 @Override
@@ -138,16 +141,19 @@ public class PostsListFragment extends Fragment {
                     if (response.isSuccessful()) {
                         assert response.body() != null : "body() non doveva essere null";
 
-                        PostsListFragment streamsFragment = HomeFragment.getHomeFragment().getStreamsFragment();
-                        streamsFragment.listPosts = response.body().getStreamPosts();
-                        streamsFragment.listPostsSize = streamsFragment.listPosts.size();
-                        streamsFragment.initializeRecyclerView();
+                        PostsListFragment streamsFragment =
+                                HomeFragment.getHomeFragment().getStreamsFragment();
+                        streamsFragment.initializeRecyclerView(
+                                streamsFragment,
+                                response.body().getStreamPosts()
+                        );
 
-                        PostsListFragment favouritesFragment = HomeFragment.getHomeFragment().getFavouritesFragment();
-                        favouritesFragment.listPosts = response.body().getFavouritePosts();
-                        favouritesFragment.listPostsSize = favouritesFragment.listPosts.size();
-
-                        favouritesFragment.initializeRecyclerView();
+                        PostsListFragment favouritesFragment =
+                                HomeFragment.getHomeFragment().getFavouritesFragment();
+                        favouritesFragment.initializeRecyclerView(
+                                favouritesFragment,
+                                response.body().getFavouritePosts()
+                        );
                     } else {
                         Toast.makeText(getActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                     }
@@ -161,7 +167,7 @@ public class PostsListFragment extends Fragment {
 
         } else if (type.equals("profile") && !username.isEmpty()) {
 
-            Call<GetAllUserPostsResponse> httpRequest = LoggedUserActivity.getStreamsService().getAllUserPosts(username);
+            Call<GetAllUserPostsResponse> httpRequest = streamsService.getAllUserPosts(username);
 
             httpRequest.enqueue(new Callback<GetAllUserPostsResponse>() {
                 @Override
@@ -169,9 +175,14 @@ public class PostsListFragment extends Fragment {
                     if (response.isSuccessful()) {
                         assert response.body() != null : "body() non doveva essere null";
 
-                        listPosts = response.body().getArrayUserPosts();
+                        adapter.setListPosts(response.body().getArrayUserPosts());
 
-                        initializeRecyclerView();
+                        PostsListFragment profileFragment =
+                                ProfileFragment.getProfileFragment().getProfilePostsFragment(username);
+                        initializeRecyclerView(
+                                profileFragment,
+                                response.body().getArrayUserPosts()
+                        );
                     } else {
                         //TODO nel caso in cui non sia possibile accedere a internet usare response.code
                         // e response.message causa il crash dell'applicazione
@@ -204,10 +215,11 @@ public class PostsListFragment extends Fragment {
         final String username = arguments.getString("username");
 
         PostsListFragment streamsFragment = HomeFragment.getHomeFragment().getStreamsFragment();
-        final String lastPostDate = HomeFragment.getHomeFragment().getStreamsFragment().listPosts.get(0).getCreatedAt();
+        final String lastPostDate = HomeFragment.getHomeFragment().getStreamsFragment().getListPosts().get(0).getCreatedAt();
+        StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
 
         if (type.equals("all") || type.equals("favourites")) {
-            Call<GetNewPostsListResponse> httpRequest = LoggedUserActivity.getStreamsService().getAllNewPosts(lastPostDate);
+            Call<GetNewPostsListResponse> httpRequest = streamsService.getAllNewPosts(lastPostDate);
 
             httpRequest.enqueue(new Callback<GetNewPostsListResponse>() {
                 @Override
@@ -233,9 +245,8 @@ public class PostsListFragment extends Fragment {
             });
 
         } else if (type.equals("profile") && !username.isEmpty()) {
-            Toast.makeText(getActivity(), "PROFILLLEEEE", Toast.LENGTH_LONG).show();
             // profile fragments: visualizza i post relativi al profilo di una persona
-            Call<GetAllUserPostsResponse> httpRequest = LoggedUserActivity.getStreamsService().getAllUserPosts(username);
+            Call<GetAllUserPostsResponse> httpRequest = streamsService.getAllUserPosts(username);
 
             httpRequest.enqueue(new Callback<GetAllUserPostsResponse>() {
                 @Override
@@ -243,12 +254,16 @@ public class PostsListFragment extends Fragment {
                     if (response.isSuccessful()) {
                         assert response.body() != null : "body() non doveva essere null";
 
-                        listPosts = response.body().getArrayUserPosts();
                         /*if (listPosts.size() > 0) {
                             lastPostDate = listPosts.get(0).getCreatedAt();
                         }*/
 
-                        initializeRecyclerView();
+                        PostsListFragment profileFragment =
+                                ProfileFragment.getProfileFragment().getProfilePostsFragment(username);
+                        initializeRecyclerView(
+                                profileFragment,
+                                response.body().getArrayUserPosts()
+                        );
                     } else {
                         //TODO nel caso in cui non sia possibile accedere a internet usare response.code
                         // e response.message causa il crash dell'applicazione
@@ -267,8 +282,11 @@ public class PostsListFragment extends Fragment {
     /**
      * Viene collegata la recycler view con l'adapter
      */
-    private void initializeRecyclerView() {
-        adapter = new PostsListAdapter(this.listPosts, this.type, this, view);
+    private void initializeRecyclerView(PostsListFragment postsListFragment, List<Post> listPosts) {
+        assert listPosts != null && postsListFragment != null: "listPost e postListFragment non potevano" +
+                "essere null";
+
+        postsListFragment.adapter.addPosts(listPosts);
 
         //RecyclerView recyclerView = view.findViewById(R.id.listPosts);
         //PostsListFragment.recyclerView = view.findViewById(R.id.listPosts);
@@ -278,25 +296,35 @@ public class PostsListFragment extends Fragment {
     }
 
     /**
-     * Viene collegata la recycler view con l'adapter
+     * @param newListPosts contiene la lista dei post non in possesso attualmente dell'utente
+     *
+     * Viene aggiornato l'adapter aggiungendo nuovi elementi, l'aggiunta viene notifica
+     * successivamente.
      */
     private void updateRecyclerView(List<Post> newListPosts) {
         assert newListPosts != null && newListPosts.get(0) != null: "newListPost e il primo elemento" +
                 " non potevano essere null";
 
-        this.listPostsSize += newListPosts.size();
+        PostsListFragment streamsFragment  = HomeFragment.getHomeFragment().getStreamsFragment();
 
-        Log.v("update", String.valueOf(newListPosts.size()));
+        if (newListPosts.size() > 0) {
+            streamsFragment.adapter.addPosts(newListPosts);
+            streamsFragment.adapterNotifyChange(streamsFragment, AdapterNotifyType.itemInserted);
+        }
+    }
 
-        adapter.addPosts(newListPosts);
-
-        HomeFragment.getHomeFragment().getStreamsFragment().adapter.notifyItemInserted(0);
+    protected void adapterNotifyChange(PostsListFragment fragment, @NonNull AdapterNotifyType notifyType){
+        if (notifyType.equals(AdapterNotifyType.dataSetChanged)) {
+            fragment.adapter.notifyDataSetChanged();
+        } else if (notifyType.equals(AdapterNotifyType.itemInserted)) {
+            fragment.adapter.notifyItemInserted(0);
+        }
     }
 
     void pushOnFavoritesList(Post post){
         PostsListFragment favouritesFragment = HomeFragment.getHomeFragment().getFavouritesFragment();
 
-        favouritesFragment.listPosts.add(0, post);
+        favouritesFragment.getListPosts().add(0, post);
         favouritesFragment.adapter.notifyItemInserted(0);
     }
 
@@ -367,6 +395,8 @@ public class PostsListFragment extends Fragment {
      * TODO
      */
     private int getPostPosition(Post post){
+        List<Post> listPosts = this.getListPosts();
+
         for (int i = 0; i < listPosts.size(); i++){
             if (listPosts.get(i).equals(post)){
                 return i;
@@ -382,9 +412,9 @@ public class PostsListFragment extends Fragment {
      */
     void deletePost(final Post selectPost,
                     final View view,
-                    final PostsListAdapter.PostItemHolder holder,
-                    final String type) {
-        Call<Object> httpRequest = LoggedUserActivity.getStreamsService().deletePost(selectPost);
+                    final PostsListAdapter.PostItemHolder holder) {
+        StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
+        Call<Object> httpRequest = streamsService.deletePost(selectPost.getPostId());
 
         httpRequest.enqueue(new Callback<Object>() {
             @Override

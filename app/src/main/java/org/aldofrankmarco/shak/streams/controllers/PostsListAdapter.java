@@ -44,17 +44,15 @@ import retrofit2.Response;
 public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.PostItemHolder> {
 
     private List<Post> listPosts;
-    private String type;
-    private PostsListFragment postsListFragment;
+    private PostsListFragment fatherListFragment;
     private View fragmentView;
 
     private final String basicUrlImage = "http://res.cloudinary.com/dfn8llckr/image/upload/v";
 
-    public PostsListAdapter(List<Post> listPosts, String type, PostsListFragment postsListFragment, View view) {
-        this.listPosts = listPosts;
-        this.type = type;
-        this.postsListFragment = postsListFragment;
+    public PostsListAdapter(PostsListFragment fatherListFragment, View view) {
+        this.fatherListFragment = fatherListFragment;
         this.fragmentView = view;
+        this.listPosts = new ArrayList<>();
     }
 
     public List<Post> getListPosts() {
@@ -158,7 +156,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
             @Override
             public void onClick(View view) {
                 //todo potrebbe perdere delle funzionalità dopo la cancellazione o l'aggiunta di nuovi post
-                likeOrUnlike(post, holder, view, type);
+                likeOrUnlike(post, holder, view);
             }
         });
 
@@ -177,12 +175,16 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
             holder.deletePostButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    postsListFragment.deletePost(post, view, holder, type);
+                    fatherListFragment.deletePost(post, view, holder);
                 }
             });
         } else {
             holder.deletePostButton.setVisibility(View.GONE);
         }
+    }
+
+    protected void setListPosts(List<Post> listPosts){
+        this.listPosts = listPosts;
     }
 
     /**
@@ -209,7 +211,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
     }
 
     public void addPosts(List<Post> newListPosts) {
-        assert (newListPosts != null && newListPosts.size() > 0) : "newLIstPost doveva avere almeno un elemento";
+        assert (newListPosts != null) : "newLIstPost non può essere null";
 
         List<Post> newAndOldPost = new ArrayList<>();
         newAndOldPost.addAll(newListPosts);
@@ -250,11 +252,12 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
      * In base ai dati ricavati da {{@link #isLiked(Post)}} viene inviata una richiesta http di
      * "like" o di "unlike" verso il post.
      */
-    private void likeOrUnlike(final Post post, final PostItemHolder holder, final View view, final String type) {
+    private void likeOrUnlike(final Post post, final PostItemHolder holder, final View view) {
+        StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
 
         if (!isLiked(post)) {
             // viene aggiunto ai preferiti
-            Call<Object> httpRequest = LoggedUserActivity.getStreamsService().likePost(post);
+            Call<Object> httpRequest = streamsService.likePost(post);
 
             httpRequest.enqueue(new Callback<Object>() {
                 @Override
@@ -264,7 +267,8 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
                         holder.likeButton.setTag("like");
 
                         post.addLiketoArray(LoggedUserActivity.getUsernameLoggedUser());
-                        postsListFragment.adapter.notifyDataSetChanged();
+                        //postsListFragment.adapter.notifyDataSetChanged();
+                        fatherListFragment.adapterNotifyChange(fatherListFragment, AdapterNotifyType.dataSetChanged);
                         HomeFragment.getHomeFragment().getFavouritesFragment().pushOnFavoritesList(post);
                     } else {
                         Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
@@ -278,7 +282,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
             });
         } else {
             // viene rimosso dai preferiti
-            Call<Object> httpRequest = LoggedUserActivity.getStreamsService().unlikePost(post);
+            Call<Object> httpRequest = streamsService.unlikePost(post);
 
             httpRequest.enqueue(new Callback<Object>() {
                 @Override
@@ -287,6 +291,8 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
                         holder.likeButton.setImageResource(R.drawable.ic_favorite_border_black_24dp);
                         holder.likeButton.setTag("unlike");
 
+                        String type = fatherListFragment.getType();
+
                         if (!type.equals("profile")) {
                             PostsListFragment streamsFragment = HomeFragment.getHomeFragment().getStreamsFragment();
                             PostsListFragment favouritesFragment = HomeFragment.getHomeFragment().getFavouritesFragment();
@@ -294,14 +300,14 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
                             if (type.equals("all")) {
                                 post.removeLikeFromArray(LoggedUserActivity.getUsernameLoggedUser());
                                 //HomeFragment.getHomeFragment().getStreamsFragment().adapter.notifyItemChanged(holder.getAdapterPosition());
-                                HomeFragment.getHomeFragment().getStreamsFragment().adapter.notifyDataSetChanged();
+                                streamsFragment.adapterNotifyChange(streamsFragment, AdapterNotifyType.dataSetChanged);
                                 favouritesFragment.removeLikeFromFavoritesList(post);
                             } else if (type.equals("favourites")) {
-                                postsListFragment.removeLikeFromStreamsList(post, holder, streamsFragment, favouritesFragment);
+                                fatherListFragment.removeLikeFromStreamsList(post, holder, streamsFragment, favouritesFragment);
                             }
                         } else {
                             PostsListFragment profilePostsFragment = ProfileFragment.getProfileFragment().getProfilePostsFragment(post.getUsernamePublisher());
-                            postsListFragment.removeLikeFromProfilePostsList(post, holder, profilePostsFragment);
+                            fatherListFragment.removeLikeFromProfilePostsList(post, holder, profilePostsFragment);
                         }
                     } else {
                         Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
