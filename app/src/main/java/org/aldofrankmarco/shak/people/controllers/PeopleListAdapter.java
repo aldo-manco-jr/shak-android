@@ -42,11 +42,8 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
 
     private final String basicUrlImage = "http://res.cloudinary.com/dfn8llckr/image/upload/v";
 
-    private UsersService usersService;
-
     public PeopleListAdapter(List<User> listUsers) {
         this.listUsers = listUsers;
-        usersService = ServiceGenerator.createService(UsersService.class, LoggedUserActivity.getToken());
     }
 
     @NonNull
@@ -133,9 +130,9 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
         if (holder.followButton.getText().equals("unfollow")) {
             // l'utente che ha effettuato l'accesso è un follower dell'utente considerato
             //httpRequest = usersService.unfollowUser(new FollowOrUnfollowRequest(user.getId()));
-            httpRequest = usersService.unfollowUser(user.getId());
+            httpRequest = LoggedUserActivity.getUsersService().unfollowUser(user.getId());
         } else {
-            httpRequest = usersService.followUser(new FollowOrUnfollowRequest(user.getId()));
+            httpRequest = LoggedUserActivity.getUsersService().followUser(new FollowOrUnfollowRequest(user.getId()));
         }
 
         httpRequest.enqueue(new Callback<Object>() {
@@ -176,7 +173,7 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
 
         holder.followButton.setText("follow");
 
-        Call<IsFollowingResponse> httpRequest = usersService.isFollowing(user.getUsername());
+        Call<IsFollowingResponse> httpRequest = LoggedUserActivity.getUsersService().isFollowing(user.getUsername());
 
         httpRequest.enqueue(new Callback<IsFollowingResponse>() {
             @Override

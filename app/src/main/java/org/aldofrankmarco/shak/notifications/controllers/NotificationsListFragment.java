@@ -39,8 +39,6 @@ public class NotificationsListFragment extends Fragment {
     protected NotificationsListAdapter adapter;
     private View view;
 
-    NotificationsService notificationsService;
-
     FloatingActionButton buttonMarkAllNotificationAsRead;
 
     public NotificationsListFragment() {
@@ -49,8 +47,6 @@ public class NotificationsListFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        notificationsService = ServiceGenerator.createService(NotificationsService.class, LoggedUserActivity.getToken());
     }
 
     @Override
@@ -71,7 +67,7 @@ public class NotificationsListFragment extends Fragment {
      * Consente di recuperare tutte le notifiche
      */
     public void getAllNotifications() {
-        Call<GetNotificationsListResponse> httpRequest = notificationsService.getAllNotifications();
+        Call<GetNotificationsListResponse> httpRequest = LoggedUserActivity.getNotificationsService().getAllNotifications();
 
         httpRequest.enqueue(new Callback<GetNotificationsListResponse>() {
             @Override
@@ -101,7 +97,7 @@ public class NotificationsListFragment extends Fragment {
     }
 
     void markAllNotificationsAsRead(final NotificationsListAdapter.NotifyItemHolder holder){
-        Call<Object> httpRequest = notificationsService.markAllNotificationsAsRead();
+        Call<Object> httpRequest = LoggedUserActivity.getNotificationsService().markAllNotificationsAsRead();
 
         httpRequest.enqueue(new Callback<Object>() {
             @Override

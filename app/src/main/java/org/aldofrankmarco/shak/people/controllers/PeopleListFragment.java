@@ -42,8 +42,6 @@ public class PeopleListFragment extends Fragment {
 
     private static PeopleListFragment peopleListFragment;
 
-    private UsersService usersService;
-
     public PeopleListFragment() {
     }
 
@@ -87,7 +85,6 @@ public class PeopleListFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        usersService = ServiceGenerator.createService(UsersService.class, LoggedUserActivity.getToken());
     }
 
     @Override
@@ -146,7 +143,7 @@ public class PeopleListFragment extends Fragment {
 
             titleTextView.setVisibility(View.VISIBLE);
 
-            Call<GetAllUsersResponse> httpRequest = usersService.getAllUsers();
+            Call<GetAllUsersResponse> httpRequest = LoggedUserActivity.getUsersService().getAllUsers();
 
             httpRequest.enqueue(new Callback<GetAllUsersResponse>() {
                 @Override
@@ -168,7 +165,7 @@ public class PeopleListFragment extends Fragment {
 
             titleTextView.setVisibility(View.GONE);
 
-            Call<GetFollowingResponse> httpRequest = usersService.getFollowing(username);
+            Call<GetFollowingResponse> httpRequest = LoggedUserActivity.getUsersService().getFollowing(username);
 
             httpRequest.enqueue(new Callback<GetFollowingResponse>() {
                 @Override
@@ -195,7 +192,7 @@ public class PeopleListFragment extends Fragment {
 
             titleTextView.setVisibility(View.GONE);
 
-            Call<GetFollowersResponse> httpRequest = usersService.getFollowers(username);
+            Call<GetFollowersResponse> httpRequest = LoggedUserActivity.getUsersService().getFollowers(username);
 
             httpRequest.enqueue(new Callback<GetFollowersResponse>() {
                 @Override

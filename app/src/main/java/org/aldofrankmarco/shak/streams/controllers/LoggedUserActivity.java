@@ -20,10 +20,18 @@ import com.github.nkzawa.socketio.client.Socket;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import org.aldofrankmarco.shak.R;
+import org.aldofrankmarco.shak.models.Image;
+import org.aldofrankmarco.shak.models.Notification;
 import org.aldofrankmarco.shak.models.Post;
 import org.aldofrankmarco.shak.notifications.controllers.NotificationsListFragment;
 import org.aldofrankmarco.shak.people.controllers.PeopleListFragment;
 import org.aldofrankmarco.shak.profile.controllers.ProfileFragment;
+import org.aldofrankmarco.shak.services.AuthenticationService;
+import org.aldofrankmarco.shak.services.ImagesService;
+import org.aldofrankmarco.shak.services.NotificationsService;
+import org.aldofrankmarco.shak.services.ServiceGenerator;
+import org.aldofrankmarco.shak.services.StreamsService;
+import org.aldofrankmarco.shak.services.UsersService;
 import org.aldofrankmarco.shak.settings.controllers.AboutFragment;
 import org.aldofrankmarco.shak.settings.controllers.ChangePasswordFragment;
 import org.aldofrankmarco.shak.settings.controllers.SettingsFragment;
@@ -57,6 +65,12 @@ public class LoggedUserActivity extends AppCompatActivity {
     private SharedPreferences sharedPreferences;
 
     private static LoggedUserActivity loggedUserActivity;
+
+    private static AuthenticationService authenticationService;
+    private static StreamsService streamsService;
+    private static UsersService usersService;
+    private static ImagesService imagesService;
+    private static NotificationsService notificationsService;
 
     private static Socket socket;
 
@@ -182,6 +196,46 @@ public class LoggedUserActivity extends AppCompatActivity {
             return true;
         }
     };
+
+    public static StreamsService getStreamsService() {
+
+        if (streamsService==null){
+            streamsService = ServiceGenerator.createService(StreamsService.class, getToken());
+        }
+        return streamsService;
+    }
+
+    public static AuthenticationService getAuthenticationService() {
+
+        if (authenticationService==null){
+            authenticationService = ServiceGenerator.createService(AuthenticationService.class, getToken());
+        }
+        return authenticationService;
+    }
+
+    public static UsersService getUsersService() {
+
+        if (usersService==null){
+            usersService = ServiceGenerator.createService(UsersService.class, getToken());
+        }
+        return usersService;
+    }
+
+    public static ImagesService getImagesService() {
+
+        if (imagesService==null){
+            imagesService = ServiceGenerator.createService(ImagesService.class, getToken());
+        }
+        return imagesService;
+    }
+
+    public static NotificationsService getNotificationsService() {
+
+        if (notificationsService==null){
+            notificationsService = ServiceGenerator.createService(NotificationsService.class, getToken());
+        }
+        return notificationsService;
+    }
 
     public static String getToken() {
         return LoggedUserActivity.token;

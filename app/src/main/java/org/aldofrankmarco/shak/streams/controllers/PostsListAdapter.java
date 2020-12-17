@@ -50,15 +50,11 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
 
     private final String basicUrlImage = "http://res.cloudinary.com/dfn8llckr/image/upload/v";
 
-    StreamsService streamsService;
-
     public PostsListAdapter(List<Post> listPosts, String type, PostsListFragment postsListFragment, View view) {
         this.listPosts = listPosts;
         this.type = type;
         this.postsListFragment = postsListFragment;
         this.fragmentView = view;
-
-        streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
     }
 
     public List<Post> getListPosts() {
@@ -258,7 +254,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
 
         if (!isLiked(post)) {
             // viene aggiunto ai preferiti
-            Call<Object> httpRequest = streamsService.likePost(post);
+            Call<Object> httpRequest = LoggedUserActivity.getStreamsService().likePost(post);
 
             httpRequest.enqueue(new Callback<Object>() {
                 @Override
@@ -282,7 +278,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
             });
         } else {
             // viene rimosso dai preferiti
-            Call<Object> httpRequest = streamsService.unlikePost(post);
+            Call<Object> httpRequest = LoggedUserActivity.getStreamsService().unlikePost(post);
 
             httpRequest.enqueue(new Callback<Object>() {
                 @Override

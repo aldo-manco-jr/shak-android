@@ -133,7 +133,7 @@ public class PostsListFragment extends Fragment {
 
         if (type.equals("all") || type.equals("favourites")) {
 
-            Call<GetPostsListResponse> httpRequest = streamsService.getAllPosts();
+            Call<GetPostsListResponse> httpRequest = LoggedUserActivity.getStreamsService().getAllPosts();
 
             httpRequest.enqueue(new Callback<GetPostsListResponse>() {
                 @Override
@@ -164,7 +164,7 @@ public class PostsListFragment extends Fragment {
 
         } else if (type.equals("profile") && !username.isEmpty()) {
 
-            Call<GetAllUserPostsResponse> httpRequest = streamsService.getAllUserPosts(username);
+            Call<GetAllUserPostsResponse> httpRequest = LoggedUserActivity.getStreamsService().getAllUserPosts(username);
 
             httpRequest.enqueue(new Callback<GetAllUserPostsResponse>() {
                 @Override
@@ -211,7 +211,7 @@ public class PostsListFragment extends Fragment {
         streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
 
         if (type.equals("all") || type.equals("favourites")) {
-            Call<GetNewPostsListResponse> httpRequest = streamsService.getAllNewPosts(lastPostDate);
+            Call<GetNewPostsListResponse> httpRequest = LoggedUserActivity.getStreamsService().getAllNewPosts(lastPostDate);
 
             httpRequest.enqueue(new Callback<GetNewPostsListResponse>() {
                 @Override
@@ -239,7 +239,7 @@ public class PostsListFragment extends Fragment {
         } else if (type.equals("profile") && !username.isEmpty()) {
             Toast.makeText(getActivity(), "PROFILLLEEEE", Toast.LENGTH_LONG).show();
             // profile fragments: visualizza i post relativi al profilo di una persona
-            Call<GetAllUserPostsResponse> httpRequest = streamsService.getAllUserPosts(username);
+            Call<GetAllUserPostsResponse> httpRequest = LoggedUserActivity.getStreamsService().getAllUserPosts(username);
 
             httpRequest.enqueue(new Callback<GetAllUserPostsResponse>() {
                 @Override
@@ -389,7 +389,7 @@ public class PostsListFragment extends Fragment {
                     final PostsListAdapter.PostItemHolder holder,
                     final String type) {
         streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
-        Call<Object> httpRequest = streamsService.deletePost(selectPost);
+        Call<Object> httpRequest = LoggedUserActivity.getStreamsService().deletePost(selectPost);
 
         httpRequest.enqueue(new Callback<Object>() {
             @Override

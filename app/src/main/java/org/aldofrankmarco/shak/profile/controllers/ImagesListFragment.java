@@ -60,8 +60,6 @@ public class ImagesListFragment extends Fragment {
 
     private ImageView chosenImagePost;
 
-    ImagesService imagesService;
-
     public ImagesListFragment() {
     }
 
@@ -86,7 +84,6 @@ public class ImagesListFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        imagesService = ServiceGenerator.createService(ImagesService.class, LoggedUserActivity.getToken());
         LoggedUserActivity.getSocket().on("refreshPage", updateUserImagesList);
     }
 
@@ -166,7 +163,7 @@ public class ImagesListFragment extends Fragment {
         JsonObject imageData = new JsonObject();
         imageData.addProperty("image", "data:image/png;base64," + imageEncoded);
 
-        Call<Object> httpRequest = imagesService.uploadImage(imageData);
+        Call<Object> httpRequest = LoggedUserActivity.getImagesService().uploadImage(imageData);
 
         httpRequest.enqueue(new Callback<Object>() {
             @Override
@@ -207,7 +204,7 @@ public class ImagesListFragment extends Fragment {
 
         username = getArguments().getString("username");
 
-        Call<GetImagesListResponse> httpRequest = imagesService.getAllUserImages(username);
+        Call<GetImagesListResponse> httpRequest = LoggedUserActivity.getImagesService().getAllUserImages(username);
 
         httpRequest.enqueue(new Callback<GetImagesListResponse>() {
             @Override

@@ -41,8 +41,6 @@ import retrofit2.Response;
  */
 public class SignupFragment extends Fragment implements View.OnClickListener, View.OnTouchListener {
 
-    private final AuthenticationService authService = ServiceGenerator.createService(AuthenticationService.class);
-
     private SharedPreferences sharedPreferences;
 
     private EditText emailField;
@@ -75,7 +73,7 @@ public class SignupFragment extends Fragment implements View.OnClickListener, Vi
                 passwordField.getText().toString().trim()
         );
 
-        Call<SignupResponse> httpRequest = authService.register(signupRequest);
+        Call<SignupResponse> httpRequest = LoggedUserActivity.getAuthenticationService().register(signupRequest);
 
         loadingBar = getActivity().findViewById(R.id.loadingBar);
         loadingBar.setVisibility(View.VISIBLE);

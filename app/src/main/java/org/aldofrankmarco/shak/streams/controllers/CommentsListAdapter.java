@@ -45,9 +45,6 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
 
     private final String basicUrlImage = "http://res.cloudinary.com/dfn8llckr/image/upload/v";
 
-    private ImagesService imagesService;
-    private StreamsService streamsService;
-
     public CommentsListAdapter(List<Comment> listComments) {
 
         this.listComments = new ArrayList<>();
@@ -55,9 +52,6 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
         for (int i = listComments.size() - 1; i >= 0; i--) {
             this.listComments.add(listComments.get(i));
         }
-
-        streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
-        imagesService = ServiceGenerator.createService(ImagesService.class, LoggedUserActivity.getToken());
     }
 
     @NonNull
@@ -130,7 +124,7 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
     }
 
     private void setProfileImage(final String username, final CommentItemHolder holder) {
-        Call<GetUserProfileImageResponse> httpRequest = imagesService.getUserProfileImage(username);
+        Call<GetUserProfileImageResponse> httpRequest = LoggedUserActivity.getImagesService().getUserProfileImage(username);
 
         httpRequest.enqueue(new Callback<GetUserProfileImageResponse>() {
             @Override
@@ -179,7 +173,7 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
      * http in cui richieste la cancellazione del post.
      */
     private void deleteComment(String postId, Comment comment) {
-        Call<Object> httpRequest = streamsService.deleteComment(postId, comment.getCommentId());
+        Call<Object> httpRequest = LoggedUserActivity.getStreamsService().deleteComment(postId, comment.getCommentId());
 
         //@DELETE("post/remove-comment/{deleteCommentRequest}")
 

@@ -38,8 +38,6 @@ public class CommentsListFragment extends Fragment implements OnBackPressed {
 
     private FloatingActionButton buttonAddComment;
 
-    private StreamsService streamsService;
-
     public CommentsListFragment() {
     }
 
@@ -62,7 +60,6 @@ public class CommentsListFragment extends Fragment implements OnBackPressed {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
         LoggedUserActivity.getSocket().on("refreshPage", updatePostCommentsList);
     }
 
@@ -116,7 +113,7 @@ public class CommentsListFragment extends Fragment implements OnBackPressed {
             return;
         }
 
-        Call<GetAllPostCommentsResponse> httpRequest = streamsService.getAllPostComments(postId);
+        Call<GetAllPostCommentsResponse> httpRequest = LoggedUserActivity.getStreamsService().getAllPostComments(postId);
 
         httpRequest.enqueue(new Callback<GetAllPostCommentsResponse>() {
 

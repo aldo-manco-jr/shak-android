@@ -69,8 +69,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
 
     private TabLayout profileTabs;
 
-    private UsersService usersService;
-
     private PostsListFragment profilePostsFragment;
     private PeopleListFragment profileFollowingFragment;
     private PeopleListFragment profileFollowersFragment;
@@ -84,7 +82,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        usersService = ServiceGenerator.createService(UsersService.class, LoggedUserActivity.getToken());
         profileFragment = this;
 
         LoggedUserActivity.getSocket().on("refreshPage", updateProfilePage);
@@ -230,9 +227,9 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
 
         if (followButton.getText().equals("unfollow")) {
             // l'utente che ha effettuato l'accesso è un follower dell'utente considerato
-            httpRequest = usersService.unfollowUser(new FollowOrUnfollowRequest(user.getId()));
+            httpRequest = LoggedUserActivity.getUsersService().unfollowUser(new FollowOrUnfollowRequest(user.getId()));
         } else {
-            httpRequest = usersService.followUser(new FollowOrUnfollowRequest(user.getId()));
+            httpRequest = LoggedUserActivity.getUsersService().followUser(new FollowOrUnfollowRequest(user.getId()));
         }
 
         httpRequest.enqueue(new Callback<Object>() {
@@ -266,7 +263,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
 
         followButton.setText("follow");
 
-        Call<IsFollowingResponse> httpRequest = usersService.isFollowing(user.getUsername());
+        Call<IsFollowingResponse> httpRequest = LoggedUserActivity.getUsersService().isFollowing(user.getUsername());
 
         httpRequest.enqueue(new Callback<IsFollowingResponse>() {
             @Override
@@ -297,7 +294,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
 
         if (country != null) {
             SetUserLocationRequest setUserLocationRequest = new SetUserLocationRequest(city, country);
-            Call<Object> httpRequest = usersService.setUserLocation(LoggedUserActivity.getIdLoggedUser(), setUserLocationRequest);
+            Call<Object> httpRequest = LoggedUserActivity.getUsersService().setUserLocation(LoggedUserActivity.getIdLoggedUser(), setUserLocationRequest);
 
             httpRequest.enqueue(new Callback<Object>() {
                 @Override
@@ -363,7 +360,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
     }
 
     public void userDataBinding(String username) {
-        Call<GetUserByUsernameResponse> httpRequest = usersService.getUserByUsername(username);
+        Call<GetUserByUsernameResponse> httpRequest = LoggedUserActivity.getUsersService().getUserByUsername(username);
 
         httpRequest.enqueue(new Callback<GetUserByUsernameResponse>() {
             @Override

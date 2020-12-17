@@ -55,8 +55,6 @@ public class PostFormFragment extends Fragment implements View.OnClickListener, 
     private FloatingActionButton buttonUploadImagePost;
     private FloatingActionButton buttonSubmitPost;
 
-    private StreamsService streamsService;
-
     public PostFormFragment() {
         // Required empty public constructor
     }
@@ -65,7 +63,6 @@ public class PostFormFragment extends Fragment implements View.OnClickListener, 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
         imageEncoded = null;
     }
 
@@ -127,7 +124,7 @@ public class PostFormFragment extends Fragment implements View.OnClickListener, 
             postData.addProperty("image", "data:image/png;base64," + imageEncoded);
         }
 
-        Call<Object> httpRequest = streamsService.submitPost(postData);
+        Call<Object> httpRequest = LoggedUserActivity.getStreamsService().submitPost(postData);
 
         httpRequest.enqueue(new Callback<Object>() {
             @Override

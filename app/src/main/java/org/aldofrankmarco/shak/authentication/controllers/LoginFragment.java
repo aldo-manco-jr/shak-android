@@ -39,8 +39,6 @@ import retrofit2.Response;
  */
 public class LoginFragment extends Fragment implements View.OnClickListener, View.OnTouchListener {
 
-    private final AuthenticationService authService = ServiceGenerator.createService(AuthenticationService.class);
-
     private SharedPreferences sharedPreferences;
 
     private EditText usernameField;
@@ -64,7 +62,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
 
         LoginRequest loginRequest = new LoginRequest(username, password);
 
-        Call<LoginResponse> httpRequest = authService.login(loginRequest);
+        Call<LoginResponse> httpRequest = LoggedUserActivity.getAuthenticationService().login(loginRequest);
 
         loadingBar = getActivity().findViewById(R.id.loadingBar);
         loadingBar.setVisibility(View.VISIBLE);

@@ -38,13 +38,10 @@ public class ImagesListAdapter extends RecyclerView.Adapter<ImagesListAdapter.Im
 
     private final String basicUrlImage = "http://res.cloudinary.com/dfn8llckr/image/upload/v";
 
-    private ImagesService imagesService;
-
     public ImagesListAdapter(List<Image> listImages, String username) {
         this.listImages = listImages;
         this.username = username;
 
-        imagesService = ServiceGenerator.createService(ImagesService.class, LoggedUserActivity.getToken());
         LoggedUserActivity.getSocket().on("refreshPage", updateImagesList);
     }
 
@@ -134,7 +131,7 @@ public class ImagesListAdapter extends RecyclerView.Adapter<ImagesListAdapter.Im
     }
 
     private void setAsDefaultImage(String imageVersion, String imageId, final ImagesListAdapter.ImageItemHolder holder) {
-        Call<Object> httpRequest = imagesService.setUserProfilePhoto(imageId, imageVersion);
+        Call<Object> httpRequest = LoggedUserActivity.getImagesService().setUserProfilePhoto(imageId, imageVersion);
 
         httpRequest.enqueue(new Callback<Object>() {
             @Override
@@ -157,7 +154,7 @@ public class ImagesListAdapter extends RecyclerView.Adapter<ImagesListAdapter.Im
     }
 
     private void setAsCoverImage(String imageVersion, String imageId, final ImagesListAdapter.ImageItemHolder holder) {
-        Call<Object> httpRequest = imagesService.setUserCoverPhoto(imageId, imageVersion);
+        Call<Object> httpRequest = LoggedUserActivity.getImagesService().setUserCoverPhoto(imageId, imageVersion);
 
         httpRequest.enqueue(new Callback<Object>() {
             @Override

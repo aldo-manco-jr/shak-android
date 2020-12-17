@@ -45,8 +45,6 @@ public class NotificationsListAdapter extends RecyclerView.Adapter<Notifications
     private View fragmentView;
     private RecyclerView recyclerView;
 
-    private NotificationsService notificationsService;
-
     private final String basicUrlImage = "http://res.cloudinary.com/dfn8llckr/image/upload/v";
 
     private String senderImageProfileId;
@@ -57,8 +55,6 @@ public class NotificationsListAdapter extends RecyclerView.Adapter<Notifications
         this.notificationsListFragment = notificationsListFragment;
         this.fragmentView = view;
         this.recyclerView = recyclerView;
-
-        notificationsService = ServiceGenerator.createService(NotificationsService.class, LoggedUserActivity.getToken());
     }
 
     @NonNull
@@ -213,7 +209,7 @@ public class NotificationsListAdapter extends RecyclerView.Adapter<Notifications
      * notifica.
      */
     private void deleteNotification(final Notification notification, final NotifyItemHolder holder) {
-        Call<Object> httpRequest = notificationsService.deleteNotification(notification.getNotificationId());
+        Call<Object> httpRequest = LoggedUserActivity.getNotificationsService().deleteNotification(notification.getNotificationId());
 
         httpRequest.enqueue(new Callback<Object>() {
             @Override
@@ -235,7 +231,7 @@ public class NotificationsListAdapter extends RecyclerView.Adapter<Notifications
     }
 
     private void markNotificationAsRead(final Notification notification, final NotifyItemHolder holder) {
-        Call<Object> httpRequest = notificationsService.markNotificationAsRead(notification.getNotificationId());
+        Call<Object> httpRequest = LoggedUserActivity.getNotificationsService().markNotificationAsRead(notification.getNotificationId());
 
         httpRequest.enqueue(new Callback<Object>() {
             @Override
