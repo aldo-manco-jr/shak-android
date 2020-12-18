@@ -11,6 +11,8 @@ import android.os.Bundle;
 import androidx.core.app.ActivityCompat;
 
 import org.aldofrankmarco.shak.R;
+import org.aldofrankmarco.shak.services.AuthenticationService;
+import org.aldofrankmarco.shak.services.ServiceGenerator;
 import org.aldofrankmarco.shak.streams.controllers.LoggedUserActivity;
 import org.json.JSONObject;
 

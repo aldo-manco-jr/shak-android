@@ -66,7 +66,6 @@ public class LoggedUserActivity extends AppCompatActivity {
 
     private static LoggedUserActivity loggedUserActivity;
 
-    private static AuthenticationService authenticationService;
     private static StreamsService streamsService;
     private static UsersService usersService;
     private static ImagesService imagesService;
@@ -203,14 +202,6 @@ public class LoggedUserActivity extends AppCompatActivity {
             streamsService = ServiceGenerator.createService(StreamsService.class, getToken());
         }
         return streamsService;
-    }
-
-    public static AuthenticationService getAuthenticationService() {
-
-        if (authenticationService==null){
-            authenticationService = ServiceGenerator.createService(AuthenticationService.class, getToken());
-        }
-        return authenticationService;
     }
 
     public static UsersService getUsersService() {

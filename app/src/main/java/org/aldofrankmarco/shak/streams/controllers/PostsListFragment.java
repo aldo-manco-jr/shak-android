@@ -1,6 +1,7 @@
 package org.aldofrankmarco.shak.streams.controllers;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,8 +16,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import org.aldofrankmarco.shak.R;
 import org.aldofrankmarco.shak.models.Post;
 import org.aldofrankmarco.shak.profile.controllers.ProfileFragment;
-import org.aldofrankmarco.shak.services.ServiceGenerator;
-import org.aldofrankmarco.shak.services.StreamsService;
 import org.aldofrankmarco.shak.streams.http.GetAllUserPostsResponse;
 import org.aldofrankmarco.shak.streams.http.GetNewPostsListResponse;
 import org.aldofrankmarco.shak.streams.http.GetPostsListResponse;
@@ -129,11 +128,10 @@ public class PostsListFragment extends Fragment {
 
         this.type = getArguments().getString("type");
         final String username = getArguments().getString("username");
-        StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
 
         if (type.equals("all") || type.equals("favourites")) {
 
-            Call<GetPostsListResponse> httpRequest = streamsService.getAllPosts();
+            Call<GetPostsListResponse> httpRequest = LoggedUserActivity.getStreamsService().getAllPosts();
 
             httpRequest.enqueue(new Callback<GetPostsListResponse>() {
                 @Override
@@ -167,7 +165,7 @@ public class PostsListFragment extends Fragment {
 
         } else if (type.equals("profile") && !username.isEmpty()) {
 
-            Call<GetAllUserPostsResponse> httpRequest = streamsService.getAllUserPosts(username);
+            Call<GetAllUserPostsResponse> httpRequest = LoggedUserActivity.getStreamsService().getAllUserPosts(username);
 
             httpRequest.enqueue(new Callback<GetAllUserPostsResponse>() {
                 @Override
@@ -216,10 +214,9 @@ public class PostsListFragment extends Fragment {
 
         PostsListFragment streamsFragment = HomeFragment.getHomeFragment().getStreamsFragment();
         final String lastPostDate = HomeFragment.getHomeFragment().getStreamsFragment().getListPosts().get(0).getCreatedAt();
-        StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
 
         if (type.equals("all") || type.equals("favourites")) {
-            Call<GetNewPostsListResponse> httpRequest = streamsService.getAllNewPosts(lastPostDate);
+            Call<GetNewPostsListResponse> httpRequest = LoggedUserActivity.getStreamsService().getAllNewPosts(lastPostDate);
 
             httpRequest.enqueue(new Callback<GetNewPostsListResponse>() {
                 @Override
@@ -246,7 +243,7 @@ public class PostsListFragment extends Fragment {
 
         } else if (type.equals("profile") && !username.isEmpty()) {
             // profile fragments: visualizza i post relativi al profilo di una persona
-            Call<GetAllUserPostsResponse> httpRequest = streamsService.getAllUserPosts(username);
+            Call<GetAllUserPostsResponse> httpRequest = LoggedUserActivity.getStreamsService().getAllUserPosts(username);
 
             httpRequest.enqueue(new Callback<GetAllUserPostsResponse>() {
                 @Override
@@ -413,8 +410,7 @@ public class PostsListFragment extends Fragment {
     void deletePost(final Post selectPost,
                     final View view,
                     final PostsListAdapter.PostItemHolder holder) {
-        StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
-        Call<Object> httpRequest = streamsService.deletePost(selectPost.getPostId());
+        Call<Object> httpRequest = LoggedUserActivity.getStreamsService().deletePost(selectPost.getPostId());
 
         httpRequest.enqueue(new Callback<Object>() {
             @Override

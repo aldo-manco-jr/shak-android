@@ -62,7 +62,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
 
         LoginRequest loginRequest = new LoginRequest(username, password);
 
-        Call<LoginResponse> httpRequest = LoggedUserActivity.getAuthenticationService().login(loginRequest);
+        Call<LoginResponse> httpRequest = AccessActivity.getAuthenticationService().login(loginRequest);
 
         loadingBar = getActivity().findViewById(R.id.loadingBar);
         loadingBar.setVisibility(View.VISIBLE);

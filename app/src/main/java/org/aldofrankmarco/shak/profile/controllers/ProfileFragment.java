@@ -28,7 +28,6 @@ import com.google.android.material.tabs.TabLayout;
 import org.aldofrankmarco.shak.R;
 import org.aldofrankmarco.shak.models.User;
 import org.aldofrankmarco.shak.people.controllers.PeopleListFragment;
-import org.aldofrankmarco.shak.people.http.FollowOrUnfollowRequest;
 import org.aldofrankmarco.shak.people.http.GetUserByUsernameResponse;
 import org.aldofrankmarco.shak.people.http.IsFollowingResponse;
 import org.aldofrankmarco.shak.people.http.SetUserLocationRequest;
@@ -227,9 +226,9 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
 
         if (followButton.getText().equals("unfollow")) {
             // l'utente che ha effettuato l'accesso è un follower dell'utente considerato
-            httpRequest = LoggedUserActivity.getUsersService().unfollowUser(new FollowOrUnfollowRequest(user.getId()));
+            httpRequest = LoggedUserActivity.getUsersService().unfollowUser(user.getId());
         } else {
-            httpRequest = LoggedUserActivity.getUsersService().followUser(new FollowOrUnfollowRequest(user.getId()));
+            httpRequest = LoggedUserActivity.getUsersService().followUser(user.getId());
         }
 
         httpRequest.enqueue(new Callback<Object>() {

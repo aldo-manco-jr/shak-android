@@ -21,8 +21,6 @@ import org.aldofrankmarco.shak.models.Post;
 import org.aldofrankmarco.shak.models.User;
 import org.aldofrankmarco.shak.profile.controllers.ImageViewerActivity;
 import org.aldofrankmarco.shak.profile.controllers.ProfileFragment;
-import org.aldofrankmarco.shak.services.ServiceGenerator;
-import org.aldofrankmarco.shak.services.StreamsService;
 import org.ocpsoft.prettytime.PrettyTime;
 
 import java.text.ParseException;
@@ -253,11 +251,10 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
      * "like" o di "unlike" verso il post.
      */
     private void likeOrUnlike(final Post post, final PostItemHolder holder, final View view) {
-        StreamsService streamsService = ServiceGenerator.createService(StreamsService.class, LoggedUserActivity.getToken());
 
         if (!isLiked(post)) {
             // viene aggiunto ai preferiti
-            Call<Object> httpRequest = streamsService.likePost(post);
+            Call<Object> httpRequest = LoggedUserActivity.getStreamsService().likePost(post);
 
             httpRequest.enqueue(new Callback<Object>() {
                 @Override
@@ -282,7 +279,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
             });
         } else {
             // viene rimosso dai preferiti
-            Call<Object> httpRequest = streamsService.unlikePost(post);
+            Call<Object> httpRequest = LoggedUserActivity.getStreamsService().unlikePost(post);
 
             httpRequest.enqueue(new Callback<Object>() {
                 @Override

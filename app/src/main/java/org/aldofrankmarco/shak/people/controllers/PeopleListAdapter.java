@@ -19,7 +19,6 @@ import com.bumptech.glide.request.target.Target;
 
 import org.aldofrankmarco.shak.R;
 import org.aldofrankmarco.shak.models.User;
-import org.aldofrankmarco.shak.people.http.FollowOrUnfollowRequest;
 import org.aldofrankmarco.shak.people.http.IsFollowingResponse;
 import org.aldofrankmarco.shak.profile.controllers.ProfileFragment;
 import org.aldofrankmarco.shak.services.ServiceGenerator;
@@ -132,7 +131,7 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
             //httpRequest = usersService.unfollowUser(new FollowOrUnfollowRequest(user.getId()));
             httpRequest = LoggedUserActivity.getUsersService().unfollowUser(user.getId());
         } else {
-            httpRequest = LoggedUserActivity.getUsersService().followUser(new FollowOrUnfollowRequest(user.getId()));
+            httpRequest = LoggedUserActivity.getUsersService().followUser(user.getId());
         }
 
         httpRequest.enqueue(new Callback<Object>() {
@@ -164,12 +163,6 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
      * @return true se l'utente selezionato è un follower, false altrimenti
      */
     private void isFollow(User user, final UserItemHolder holder) {
-
-        if (user.getUsername().equals(LoggedUserActivity.getUsernameLoggedUser())){
-            holder.followButton.setVisibility(View.INVISIBLE);
-            holder.loadingFollow.setVisibility(View.GONE);
-            return;
-        }
 
         holder.followButton.setText("follow");
 

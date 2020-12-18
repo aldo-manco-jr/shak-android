@@ -16,6 +16,8 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import org.aldofrankmarco.shak.R;
+import org.aldofrankmarco.shak.services.AuthenticationService;
+import org.aldofrankmarco.shak.services.ServiceGenerator;
 
 /**
  * Activity principale dell'applicazione, gestisce la visibilità dei tipi di autenticazione
@@ -29,6 +31,8 @@ public class AccessActivity extends AppCompatActivity implements View.OnClickLis
     private Button switchButton;
 
     private SharedPreferences sharedPreferences;
+
+    private static AuthenticationService authenticationService;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -129,4 +133,11 @@ public class AccessActivity extends AppCompatActivity implements View.OnClickLis
         transaction.commit();
     }
 
+    public static AuthenticationService getAuthenticationService() {
+
+        if (authenticationService==null){
+            authenticationService = ServiceGenerator.createService(AuthenticationService.class);
+        }
+        return authenticationService;
+    }
 }

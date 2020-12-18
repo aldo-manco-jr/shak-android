@@ -21,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.aldofrankmarco.shak.R;
+import org.aldofrankmarco.shak.authentication.controllers.AccessActivity;
 import org.aldofrankmarco.shak.models.User;
 import org.aldofrankmarco.shak.services.AuthenticationService;
 import org.aldofrankmarco.shak.services.NotificationsService;
@@ -101,7 +102,7 @@ public class ChangePasswordFragment extends Fragment implements View.OnClickList
      */
     public void changePwd() {
         ChangePasswordRequest changePasswordJson = new ChangePasswordRequest(old, next, confirm);
-        Call<Object> httpRequest = LoggedUserActivity.getAuthenticationService().changePassword(changePasswordJson);
+        Call<Object> httpRequest = AccessActivity.getAuthenticationService().changePassword(changePasswordJson);
         httpRequest.enqueue(new Callback<Object>() {
 
             @Override

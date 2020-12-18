@@ -1,6 +1,5 @@
 package org.aldofrankmarco.shak.services;
 
-import org.aldofrankmarco.shak.people.http.FollowOrUnfollowRequest;
 import org.aldofrankmarco.shak.people.http.GetAllUsersResponse;
 import org.aldofrankmarco.shak.people.http.GetFollowersResponse;
 import org.aldofrankmarco.shak.people.http.GetFollowingResponse;
@@ -36,9 +35,9 @@ public interface UsersService {
     @GET("users/followers/{username}")
     Call<GetFollowersResponse> getFollowers(@Path("username") String username);
 
-    @POST("follow-user")
-    Call<Object> followUser(@Body FollowOrUnfollowRequest followedUserId);
+    @POST("follow-user/{userFollowed}")
+    Call<Object> followUser(@Path("userFollowed") String username);
 
-    @DELETE("unfollow-user/{user}")
-    Call<Object> unfollowUser(@Path("user") Object user);
+    @DELETE("follow-user/{userFollowed}")
+    Call<Object> unfollowUser(@Path("userFollowed") String username);
 }
