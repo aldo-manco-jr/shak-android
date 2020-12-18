@@ -19,37 +19,37 @@ import retrofit2.http.Path;
 
 public interface StreamsService {
 
-    @GET("posts")
+    @GET("streams")
     Call<GetPostsListResponse> getAllPosts();
 
-    @GET("posts/new/{created_at}")
+    @GET("streams/new/{created_at}")
     Call<GetNewPostsListResponse> getAllNewPosts(@Path("created_at") String newPostData);
 
-    @GET("posts/{username}")
+    @GET("streams/{username}")
     Call<GetAllUserPostsResponse> getAllUserPosts(@Path("username") String username);
 
     @GET("post/{id}")
     Call<GetPostResponse> getPost(@Path("id") String postId);
 
-    @POST("post/add-post")
+    @POST("post")
     Call<Object> submitPost(@Body JsonObject postData);
 
-    @DELETE("post/remove-post/{post_id}")
-    Call<Object> deletePost(@Path("post_id") Object postId);
+    @DELETE("post/{idpost}")
+    Call<Object> deletePost(@Path("idpost") Object postId);
 
-    @POST("post/add-like")
+    @POST("post/like")
     Call<Object> likePost(@Body Post post);
 
-    @DELETE("post/remove-like/{post_id}")
+    @DELETE("post/like/{post_id}")
     Call<Object> unlikePost(@Path("post_id") Object postId);
 
-    @GET("comments-list/{id}")
+    @GET("post/comments-list/{id}")
     Call<GetAllPostCommentsResponse> getAllPostComments(@Path("id") String postId);
 
-    @POST("post/add-comment")
+    @POST("post/comment")
     Call<Object> submitComment(@Body AddCommentRequest addCommentRequest);
 
-    @DELETE("post/remove-comment/{post_id}/{comment_id}")
+    @DELETE("post/comment/{post_id}/{comment_id}")
     Call<Object> deleteComment(@Path("post_id") String postId,
                                @Path("comment_id") Object comment_id);
 }

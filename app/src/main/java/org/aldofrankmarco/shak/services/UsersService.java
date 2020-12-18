@@ -17,27 +17,27 @@ import retrofit2.http.Path;
 
 public interface UsersService {
 
-    @GET("users/")
+    @GET("users")
     Call<GetAllUsersResponse> getAllUsers();
 
-    @GET("username/{username}")
+    @GET("user/username/{username}")
     Call<GetUserByUsernameResponse> getUserByUsername(@Path("username") String username);
 
-    @PUT("user/location/{iduser}")
-    Call<Object> setUserLocation(@Path("iduser") String idUser, @Body SetUserLocationRequest setUserLocationRequest);
+    @PUT("user/location/{id}")
+    Call<Object> setUserLocation(@Path("id") String idUser, @Body SetUserLocationRequest setUserLocationRequest);
 
-    @GET("users/is-following/{username}")
+    @GET("user/is-following/{username}")
     Call<IsFollowingResponse> isFollowing(@Path("username") String username);
 
-    @GET("users/following/{username}")
+    @GET("user/following/{username}")
     Call<GetFollowingResponse> getFollowing(@Path("username") String username);
 
-    @GET("users/followers/{username}")
+    @GET("user/followers/{username}")
     Call<GetFollowersResponse> getFollowers(@Path("username") String username);
 
-    @POST("follow-user/{userFollowed}")
+    @POST("user/follow/{userFollowed}")
     Call<Object> followUser(@Path("userFollowed") String username);
 
-    @DELETE("follow-user/{userFollowed}")
+    @DELETE("user/follow/{userFollowed}")
     Call<Object> unfollowUser(@Path("userFollowed") String username);
 }
