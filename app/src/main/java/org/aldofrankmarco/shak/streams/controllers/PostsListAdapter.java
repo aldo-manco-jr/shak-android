@@ -43,18 +43,16 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
 
     private List<Post> listPosts;
     private PostsListFragment fatherListFragment;
-    private View fragmentView;
 
     private final String basicUrlImage = "http://res.cloudinary.com/dfn8llckr/image/upload/v";
 
     public PostsListAdapter(PostsListFragment fatherListFragment, View view) {
         this.fatherListFragment = fatherListFragment;
-        this.fragmentView = view;
         this.listPosts = new ArrayList<>();
     }
 
     public List<Post> getListPosts() {
-        return listPosts;
+        return this.listPosts;
     }
 
     @NonNull
@@ -142,13 +140,20 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
         holder.usernameText.setText(post.getUsernamePublisher());
         holder.postContent.setText(post.getPostContent());
 
-        if (!isLiked(post)) {
+        if (post.getIsLiked()){
+            holder.likeButton.setImageResource(R.drawable.ic_favorite_real_black_24dp);
+            holder.likeButton.setTag("like");
+        } else {
+            holder.likeButton.setImageResource(R.drawable.ic_favorite_border_black_24dp);
+            holder.likeButton.setTag("unlike");
+        }
+        /*if (!isLiked(post)) {
             holder.likeButton.setImageResource(R.drawable.ic_favorite_border_black_24dp);
             holder.likeButton.setTag("unlike");
         } else {
             holder.likeButton.setImageResource(R.drawable.ic_favorite_real_black_24dp);
             holder.likeButton.setTag("like");
-        }
+        }*/
 
         holder.likeButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -181,10 +186,6 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
         }
     }
 
-    protected void setListPosts(List<Post> listPosts){
-        this.listPosts = listPosts;
-    }
-
     /**
      * @param dateString una data in formato UDC contenuta nel database remoto
      * @return un valore di tipo Date convertito da UTC (formato atteso dal server) nel fuso orario
@@ -208,24 +209,18 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
         return listPosts.size();
     }
 
+    /**
+     * @param newListPosts
+    * TODO
+    * */
     public void addPosts(List<Post> newListPosts) {
         assert (newListPosts != null) : "newLIstPost non può essere null";
 
-        List<Post> newAndOldPost = new ArrayList<>();
-        newAndOldPost.addAll(newListPosts);
-        newAndOldPost.addAll(this.listPosts);
+        if (this.listPosts.size() > 0){
+            newListPosts.addAll(this.listPosts);
+        }
 
-        //int originaListPostSize = this.listPosts.size() - 1;
-        this.listPosts = newAndOldPost;
-        //HomeFragment.getHomeFragment().getStreamsFragment().adapter.notifyDataSetChanged();
-        //TODO USARE QUESTO HomeFragment.getHomeFragment().getStreamsFragment().adapter.notifyItemInserted(0);
-        //singolo post nofityiteminserted
-        //this.notifyItemInserted(0);
-        //this.notifyDataSetChanged();
-        //postsListFragment.adapter.notifyDataSetChanged();
-        //postsListFragment.adapter.notifyItemInserted(0);
-        //multiple post notifyitemrangechanged
-        //postsListFragment.adapter.notifyItemRangeChanged(originaListPostSize, listPosts.size());
+        this.listPosts = newListPosts;
     }
 
     /**
@@ -252,7 +247,10 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
      */
     private void likeOrUnlike(final Post post, final PostItemHolder holder, final View view) {
 
-        if (!isLiked(post)) {
+        String type = fatherListFragment.getType();
+
+        //if (!isLiked(post)) {
+        if(!post.getIsLiked()){
             // viene aggiunto ai preferiti
             Call<Object> httpRequest = LoggedUserActivity.getStreamsService().likePost(post);
 
@@ -260,8 +258,9 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
                 @Override
                 public void onResponse(Call<Object> call, Response<Object> response) {
                     if (response.isSuccessful()) {
-                        holder.likeButton.setImageResource(R.drawable.ic_favorite_real_black_24dp);
-                        holder.likeButton.setTag("like");
+                        post.putIsLiked(true);
+                        //holder.likeButton.setImageResource(R.drawable.ic_favorite_real_black_24dp);
+                        //holder.likeButton.setTag("like");
 
                         post.addLiketoArray(LoggedUserActivity.getUsernameLoggedUser());
                         //postsListFragment.adapter.notifyDataSetChanged();
@@ -279,14 +278,15 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
             });
         } else {
             // viene rimosso dai preferiti
-            Call<Object> httpRequest = LoggedUserActivity.getStreamsService().unlikePost(post);
+            Call<Object> httpRequest = LoggedUserActivity.getStreamsService().unlikePost(post.getPostId());
 
             httpRequest.enqueue(new Callback<Object>() {
                 @Override
                 public void onResponse(Call<Object> call, Response<Object> response) {
                     if (response.isSuccessful()) {
-                        holder.likeButton.setImageResource(R.drawable.ic_favorite_border_black_24dp);
-                        holder.likeButton.setTag("unlike");
+                        post.putIsLiked(false);
+                        //holder.likeButton.setImageResource(R.drawable.ic_favorite_border_black_24dp);
+                        //holder.likeButton.setTag("unlike");
 
                         String type = fatherListFragment.getType();
 

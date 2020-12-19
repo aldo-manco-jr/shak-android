@@ -1,16 +1,13 @@
 package org.aldofrankmarco.shak.models;
 
-import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class Post implements Comparable<Post> {
 
     @SerializedName("_id")
-    private JsonElement postId;
+    private Object postId;
 
     @SerializedName("user_id")
     private User userId;
@@ -36,6 +33,9 @@ public class Post implements Comparable<Post> {
     @SerializedName("likes")
     private List<Like> arrayLikes;
 
+    @SerializedName("is_liked")
+    private boolean isLiked;
+
     @SerializedName("created_at")
     private String createdAt;
 
@@ -47,6 +47,14 @@ public class Post implements Comparable<Post> {
         }
 
         return isAdded;
+    }
+
+    public boolean getIsLiked() {
+        return isLiked;
+    }
+
+    public void putIsLiked(boolean newState) {
+        isLiked = newState;
     }
 
     public boolean removeLikeFromArray(String usernamePublisher) {
@@ -70,12 +78,8 @@ public class Post implements Comparable<Post> {
         return isRemoved;
     }
 
-    public JsonElement getPostId() {
+    public Object getPostId() {
         return postId;
-    }
-
-    public String getPostCreatedAt() {
-        return postId.getAsString();
     }
 
     public User getUserId() {

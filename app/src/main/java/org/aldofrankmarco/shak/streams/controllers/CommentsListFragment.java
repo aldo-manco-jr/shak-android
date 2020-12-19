@@ -16,10 +16,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import org.aldofrankmarco.shak.R;
 import org.aldofrankmarco.shak.models.Comment;
 import org.aldofrankmarco.shak.models.Post;
-import org.aldofrankmarco.shak.services.ServiceGenerator;
-import org.aldofrankmarco.shak.services.StreamsService;
 import org.aldofrankmarco.shak.streams.http.GetAllPostCommentsResponse;
-import org.aldofrankmarco.shak.streams.http.GetPostResponse;
 
 import java.util.List;
 
@@ -71,7 +68,7 @@ public class CommentsListFragment extends Fragment implements OnBackPressed {
         // circleimageview = wrap images in a circle
         view = inflater.inflate(R.layout.fragment_comments_list, container, false);
 
-        CommentsListAdapter.postId = post.getPostCreatedAt();
+        postId = post.getPostId().toString();
 
         buttonAddComment = view.findViewById(R.id.fab_add_comment);
 

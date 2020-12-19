@@ -1,7 +1,6 @@
 package org.aldofrankmarco.shak.streams.controllers;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -76,7 +75,7 @@ public class PostsListFragment extends Fragment {
         return fragment;
     }
 
-    protected List<Post> getListPosts(){
+    private List<Post> getListPosts(){
         return this.adapter.getListPosts();
     }
 
@@ -173,8 +172,6 @@ public class PostsListFragment extends Fragment {
                     if (response.isSuccessful()) {
                         assert response.body() != null : "body() non doveva essere null";
 
-                        adapter.setListPosts(response.body().getArrayUserPosts());
-
                         PostsListFragment profileFragment =
                                 ProfileFragment.getProfileFragment().getProfilePostsFragment(username);
                         initializeRecyclerView(
@@ -213,7 +210,10 @@ public class PostsListFragment extends Fragment {
         final String username = arguments.getString("username");
 
         PostsListFragment streamsFragment = HomeFragment.getHomeFragment().getStreamsFragment();
-        final String lastPostDate = HomeFragment.getHomeFragment().getStreamsFragment().getListPosts().get(0).getCreatedAt();
+        final String lastPostDate =
+                (streamsFragment.getListPosts().size() > 0)?
+                        streamsFragment.getListPosts().get(0).getCreatedAt():
+                        "1970-01-01'T'00:00:01.000'Z'";
 
         if (type.equals("all") || type.equals("favourites")) {
             Call<GetNewPostsListResponse> httpRequest = LoggedUserActivity.getStreamsService().getAllNewPosts(lastPostDate);
@@ -221,6 +221,7 @@ public class PostsListFragment extends Fragment {
             httpRequest.enqueue(new Callback<GetNewPostsListResponse>() {
                 @Override
                 public void onResponse(Call<GetNewPostsListResponse> call, Response<GetNewPostsListResponse> response) {
+
                     if (response.isSuccessful()) {
                         assert response.body() != null : "body() non doveva essere null";
 
@@ -329,10 +330,15 @@ public class PostsListFragment extends Fragment {
                                     PostsListAdapter.PostItemHolder holder,
                                     PostsListFragment streamsFragment,
                                     PostsListFragment favouritesFragment){
-        List<Post> listPosts = streamsFragment.adapter.getListPosts();
+        List<Post> listPosts = streamsFragment.getListPosts();
+
+        //holder.likeButton.getTag("unlike");
+        //post.getUzgetUserLike;
 
         for (int i = 0; i < listPosts.size(); i++) {
             if (listPosts.get(i).equals(post)){
+                listPosts.get(i).putIsLiked(false);
+
                 listPosts.get(i).removeLikeFromArray(LoggedUserActivity.getUsernameLoggedUser());
 
                 streamsFragment.adapter.notifyItemChanged(i, listPosts.get(i));
@@ -347,7 +353,7 @@ public class PostsListFragment extends Fragment {
 
         //favouritesFragment.adapter.notifyItemRemoved(holder.getAdapterPosition());
         //favouritesFragment.adapter.notifyItemRangeChanged(holder.getAdapterPosition(), listPosts.size());
-        favouritesFragment.adapter.getListPosts().remove(post);
+        favouritesFragment.getListPosts().remove(post);
         favouritesFragment.adapter.notifyItemRemoved(holder.getAdapterPosition());
     }
 
@@ -355,10 +361,11 @@ public class PostsListFragment extends Fragment {
                                     PostsListAdapter.PostItemHolder holder,
                                     PostsListFragment profilePostsFragment){
 
-        List<Post> listPosts = profilePostsFragment.adapter.getListPosts();
+        List<Post> listPosts = profilePostsFragment.getListPosts();
 
         for (int i = 0; i < listPosts.size(); i++) {
             if (listPosts.get(i).equals(post)){
+                listPosts.get(i).putIsLiked(false);
                 listPosts.get(i).removeLikeFromArray(LoggedUserActivity.getUsernameLoggedUser());
 
                 profilePostsFragment.adapter.notifyItemChanged(i, listPosts.get(i));
@@ -373,34 +380,21 @@ public class PostsListFragment extends Fragment {
         PostsListFragment favouritesFragment = HomeFragment.getHomeFragment().getFavouritesFragment();
         View favoritesView =  favouritesFragment.getView();
         RecyclerView recyclerView = favoritesView.findViewById(R.id.listPosts);
-        List<Post> listPosts = favouritesFragment.adapter.getListPosts();
+        List<Post> listPosts = favouritesFragment.getListPosts();
 
         for (int i = 0; i < listPosts.size(); i++) {
             if (listPosts.get(i).equals(post)){
+                listPosts.get(i).putIsLiked(false);
+
                 recyclerView.removeView(recyclerView);
 
                 favouritesFragment.adapter.notifyItemRemoved(i);
                 favouritesFragment.adapter.notifyItemRangeChanged(i, listPosts.size());
-                favouritesFragment.adapter.getListPosts().remove(post);
+                favouritesFragment.getListPosts().remove(post);
 
                 break;
             }
         }
-    }
-
-    /**
-     * TODO
-     */
-    private int getPostPosition(Post post){
-        List<Post> listPosts = this.getListPosts();
-
-        for (int i = 0; i < listPosts.size(); i++){
-            if (listPosts.get(i).equals(post)){
-                return i;
-            }
-        }
-
-        return -1;
     }
 
     /**
@@ -430,7 +424,6 @@ public class PostsListFragment extends Fragment {
                             removePostFromPrimaryTab(favouritesFragment, selectPost, view, favouritesRecyclerView, holder);
                             removePostFromSecondaryTab(streamsFragment, selectPost);
                         } else if (type.equals("all")) {
-                            Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), "rimuovo anche da favourites", Toast.LENGTH_SHORT).show();
                             removePostFromPrimaryTab(streamsFragment, selectPost, view, streamsRecyclerView, holder);
                             removePostFromSecondaryTab(favouritesFragment, selectPost);
                         }
@@ -468,7 +461,7 @@ public class PostsListFragment extends Fragment {
                                                  View view, RecyclerView recyclerView, PostsListAdapter.PostItemHolder holder){
         recyclerView.removeView(view);
 
-        postListFragment.adapter.getListPosts().remove(post);
+        postListFragment.getListPosts().remove(post);
         postListFragment.adapter.notifyItemRemoved(holder.getAdapterPosition());
     }
 
@@ -479,19 +472,18 @@ public class PostsListFragment extends Fragment {
      *TODO COMMENTARE
      */
     private static void removePostFromSecondaryTab(PostsListFragment postsListFragment, Post selectPost){
-        List<Post> listPosts = postsListFragment.adapter.getListPosts();
+        List<Post> listPosts = postsListFragment.getListPosts();
         for (int i = 0; i < listPosts.size(); i++) {
             if (listPosts.get(i).equals(selectPost)){
                 // rimuovo il post
-                postsListFragment.adapter.getListPosts().remove(listPosts.get(i));
+                postsListFragment.getListPosts().remove(listPosts.get(i));
                 postsListFragment.adapter.notifyItemRemoved(i);
                 postsListFragment.adapter.notifyItemRangeChanged(i, listPosts.size());
 
                 break;
             }
         }
-        Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), "ITERATOOO????::: " + listPosts.size(), Toast.LENGTH_SHORT).show();
-    }
+     }
 
     //TODO IMPLEMENTATO per recuperare l'istanza se non è più in memoria
     @Override

@@ -34,8 +34,10 @@ public interface StreamsService {
     @POST("post")
     Call<Object> submitPost(@Body JsonObject postData);
 
-    @DELETE("post/{idpost}")
-    Call<Object> deletePost(@Path("idpost") Object postId);
+    //@DELETE("post/{idpost}")
+    //Call<Object> deletePost(@Path("idpost") Object postId);
+    @DELETE("post/{post_id}")
+    Call<Object> deletePost(@Path("post_id") Object postId);
 
     @POST("post/like")
     Call<Object> likePost(@Body Post post);

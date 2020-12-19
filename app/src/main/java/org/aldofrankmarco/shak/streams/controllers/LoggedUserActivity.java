@@ -20,13 +20,10 @@ import com.github.nkzawa.socketio.client.Socket;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import org.aldofrankmarco.shak.R;
-import org.aldofrankmarco.shak.models.Image;
-import org.aldofrankmarco.shak.models.Notification;
 import org.aldofrankmarco.shak.models.Post;
 import org.aldofrankmarco.shak.notifications.controllers.NotificationsListFragment;
 import org.aldofrankmarco.shak.people.controllers.PeopleListFragment;
 import org.aldofrankmarco.shak.profile.controllers.ProfileFragment;
-import org.aldofrankmarco.shak.services.AuthenticationService;
 import org.aldofrankmarco.shak.services.ImagesService;
 import org.aldofrankmarco.shak.services.NotificationsService;
 import org.aldofrankmarco.shak.services.ServiceGenerator;
@@ -290,6 +287,7 @@ public class LoggedUserActivity extends AppCompatActivity {
     }
 
     //TODO NON VA BENE QUESTO METODO
+    // le socket vengono ripetute tante volte quante sono le volte in cui il frmmento è STATO creato
     public void changeFragment(Fragment newFragment) {
 //TODO è sbagliata, i frammenti continuano a esistere da qualche parte
         Fragment oldFragment = getSupportFragmentManager().findFragmentById(R.id.logged_user_fragment);
