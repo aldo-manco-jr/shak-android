@@ -1,9 +1,6 @@
-package org.aldofrankmarco.shak.streams.controllers;
+package org.aldofrankmarco.shak.streams.controllers.comments;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -12,19 +9,21 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.fragment.app.Fragment;
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
 import org.aldofrankmarco.shak.R;
-import org.aldofrankmarco.shak.services.ServiceGenerator;
-import org.aldofrankmarco.shak.services.StreamsService;
+import org.aldofrankmarco.shak.streams.controllers.LoggedUserActivity;
+import org.aldofrankmarco.shak.streams.controllers.OnBackPressed;
 import org.aldofrankmarco.shak.streams.http.AddCommentRequest;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static org.aldofrankmarco.shak.streams.controllers.CommentsListAdapter.postId;
+import static org.aldofrankmarco.shak.streams.controllers.comments.CommentsListAdapter.postId;
 
 public class CommentFormFragment extends Fragment implements View.OnClickListener, OnBackPressed {
 

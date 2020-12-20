@@ -1,4 +1,4 @@
-package org.aldofrankmarco.shak.streams.controllers;
+package org.aldofrankmarco.shak.streams.controllers.postslist;
 
 import android.content.Intent;
 import android.view.LayoutInflater;
@@ -21,6 +21,9 @@ import org.aldofrankmarco.shak.models.Post;
 import org.aldofrankmarco.shak.models.User;
 import org.aldofrankmarco.shak.profile.controllers.ImageViewerActivity;
 import org.aldofrankmarco.shak.profile.controllers.ProfileFragment;
+import org.aldofrankmarco.shak.streams.controllers.AdapterNotifyType;
+import org.aldofrankmarco.shak.streams.controllers.HomeFragment;
+import org.aldofrankmarco.shak.streams.controllers.LoggedUserActivity;
 import org.ocpsoft.prettytime.PrettyTime;
 
 import java.text.ParseException;
@@ -171,7 +174,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
         });
 
         holder.likesCounter.setText(post.getTotalLikes() + "");
-        holder.commentsCounter.setText(post.getArrayComments().size() + "");
+        holder.commentsCounter.setText(post.getTotalComments() + "");
 
         if (post.getUsernamePublisher().equals(LoggedUserActivity.getUsernameLoggedUser())) {
             holder.deletePostButton.setVisibility(View.VISIBLE);
@@ -191,7 +194,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
      * @return un valore di tipo Date convertito da UTC (formato atteso dal server) nel fuso orario
      * usato dall'utente
      */
-    protected Date localTimeToUtc(String dateString) throws ParseException {
+    private Date localTimeToUtc(String dateString) throws ParseException {
         TimeZone timeZone = TimeZone.getDefault();
         String[] timeZoneSplitStrings = timeZone.getID().split("(/)");
         String CurrentTimeZone = timeZoneSplitStrings[timeZoneSplitStrings.length - 1];
@@ -262,7 +265,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
                         //holder.likeButton.setImageResource(R.drawable.ic_favorite_real_black_24dp);
                         //holder.likeButton.setTag("like");
 
-                        post.addLiketoArray(LoggedUserActivity.getUsernameLoggedUser());
+                        //post.addLiketoArray(LoggedUserActivity.getUsernameLoggedUser());
                         //postsListFragment.adapter.notifyDataSetChanged();
                         fatherListFragment.adapterNotifyChange(fatherListFragment, AdapterNotifyType.dataSetChanged);
                         HomeFragment.getHomeFragment().getFavouritesFragment().pushOnFavoritesList(post);
@@ -295,7 +298,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
                             PostsListFragment favouritesFragment = HomeFragment.getHomeFragment().getFavouritesFragment();
 
                             if (type.equals("all")) {
-                                post.removeLikeFromArray(LoggedUserActivity.getUsernameLoggedUser());
+                                //post.removeLikeFromArray(LoggedUserActivity.getUsernameLoggedUser());
                                 //HomeFragment.getHomeFragment().getStreamsFragment().adapter.notifyItemChanged(holder.getAdapterPosition());
                                 streamsFragment.adapterNotifyChange(streamsFragment, AdapterNotifyType.dataSetChanged);
                                 favouritesFragment.removeLikeFromFavoritesList(post);

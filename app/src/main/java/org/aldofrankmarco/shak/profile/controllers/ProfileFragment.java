@@ -2,7 +2,6 @@ package org.aldofrankmarco.shak.profile.controllers;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,12 +31,10 @@ import org.aldofrankmarco.shak.people.controllers.PeopleListFragment;
 import org.aldofrankmarco.shak.people.http.GetUserByUsernameResponse;
 import org.aldofrankmarco.shak.people.http.IsFollowingResponse;
 import org.aldofrankmarco.shak.people.http.SetUserLocationRequest;
-import org.aldofrankmarco.shak.services.ServiceGenerator;
-import org.aldofrankmarco.shak.services.UsersService;
 import org.aldofrankmarco.shak.streams.controllers.HomeFragment;
 import org.aldofrankmarco.shak.streams.controllers.LoggedUserActivity;
 import org.aldofrankmarco.shak.streams.controllers.OnBackPressed;
-import org.aldofrankmarco.shak.streams.controllers.PostsListFragment;
+import org.aldofrankmarco.shak.streams.controllers.postslist.PostsListFragment;
 
 import java.util.LinkedList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package org.aldofrankmarco.shak.streams.controllers;
+package org.aldofrankmarco.shak.streams.controllers.postslist;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -15,7 +15,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import org.aldofrankmarco.shak.R;
 import org.aldofrankmarco.shak.models.Post;
 import org.aldofrankmarco.shak.profile.controllers.ProfileFragment;
-import org.aldofrankmarco.shak.services.StreamsService;
+import org.aldofrankmarco.shak.streams.controllers.AdapterNotifyType;
+import org.aldofrankmarco.shak.streams.controllers.HomeFragment;
+import org.aldofrankmarco.shak.streams.controllers.LoggedUserActivity;
 import org.aldofrankmarco.shak.streams.http.GetAllUserPostsResponse;
 import org.aldofrankmarco.shak.streams.http.GetNewPostsListResponse;
 import org.aldofrankmarco.shak.streams.http.GetPostsListResponse;
@@ -31,15 +33,12 @@ import retrofit2.Response;
  */
 public class PostsListFragment extends Fragment {
 
-    protected static int itemRemoved;
-
     private String type;
 
-    protected RecyclerView recyclerView;
+    RecyclerView recyclerView;
     private PostsListAdapter adapter;
 
     private View view;
-    StreamsService streamsService;
 
     public PostsListFragment() {
     }
@@ -112,7 +111,7 @@ public class PostsListFragment extends Fragment {
         recyclerView = view.findViewById(R.id.listPosts);
     }
 
-    protected String getType(){
+    String getType(){
         return this.type;
     }
 
@@ -283,11 +282,15 @@ public class PostsListFragment extends Fragment {
      * Viene collegata la recycler view con l'adapter
      */
     private void initializeRecyclerView(PostsListFragment postsListFragment, List<Post> listPosts) {
-        assert listPosts != null && postsListFragment != null: "listPost e postListFragment non potevano" +
-                "essere null";
+        assert postsListFragment != null: "postsListFragment non poteva essere null";
+        assert listPosts.size() > 0: "listPost doveva avere almeno un elemento";
 
-        postsListFragment.adapter.addPosts(listPosts);
+ //TODO       apparentemente adapter e la view non sono valide, succede solo dopo il login, controllare
+  //             che cosa fà di preciso
 
+        if (postsListFragment != null && postsListFragment.adapter != null && listPosts != null) {
+            postsListFragment.adapter.addPosts(listPosts);
+        }
         //RecyclerView recyclerView = view.findViewById(R.id.listPosts);
         //PostsListFragment.recyclerView = view.findViewById(R.id.listPosts);
         RecyclerView recyclerView = view.findViewById(R.id.listPosts);
@@ -313,7 +316,7 @@ public class PostsListFragment extends Fragment {
         }
     }
 
-    protected void adapterNotifyChange(PostsListFragment fragment, @NonNull AdapterNotifyType notifyType){
+    void adapterNotifyChange(PostsListFragment fragment, @NonNull AdapterNotifyType notifyType){
         if (notifyType.equals(AdapterNotifyType.dataSetChanged)) {
             fragment.adapter.notifyDataSetChanged();
         } else if (notifyType.equals(AdapterNotifyType.itemInserted)) {
@@ -341,7 +344,7 @@ public class PostsListFragment extends Fragment {
             if (listPosts.get(i).equals(post)){
                 listPosts.get(i).putIsLiked(false);
 
-                listPosts.get(i).removeLikeFromArray(LoggedUserActivity.getUsernameLoggedUser());
+                //listPosts.get(i).removeLikeFromArray(LoggedUserActivity.getUsernameLoggedUser());
 
                 streamsFragment.adapter.notifyItemChanged(i, listPosts.get(i));
 
@@ -367,8 +370,7 @@ public class PostsListFragment extends Fragment {
 
         for (int i = 0; i < listPosts.size(); i++) {
             if (listPosts.get(i).equals(post)){
-                listPosts.get(i).putIsLiked(false);
-                listPosts.get(i).removeLikeFromArray(LoggedUserActivity.getUsernameLoggedUser());
+                //listPosts.get(i).removeLikeFromArray(LoggedUserActivity.getUsernameLoggedUser());
 
                 profilePostsFragment.adapter.notifyItemChanged(i, listPosts.get(i));
 
@@ -386,8 +388,6 @@ public class PostsListFragment extends Fragment {
 
         for (int i = 0; i < listPosts.size(); i++) {
             if (listPosts.get(i).equals(post)){
-                listPosts.get(i).putIsLiked(false);
-
                 recyclerView.removeView(recyclerView);
 
                 favouritesFragment.adapter.notifyItemRemoved(i);

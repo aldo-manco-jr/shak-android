@@ -1,4 +1,4 @@
-package org.aldofrankmarco.shak.streams.controllers;
+package org.aldofrankmarco.shak.streams.controllers.comments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -16,15 +16,19 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import org.aldofrankmarco.shak.R;
 import org.aldofrankmarco.shak.models.Comment;
 import org.aldofrankmarco.shak.models.Post;
+import org.aldofrankmarco.shak.streams.controllers.HomeFragment;
+import org.aldofrankmarco.shak.streams.controllers.LoggedUserActivity;
+import org.aldofrankmarco.shak.streams.controllers.OnBackPressed;
 import org.aldofrankmarco.shak.streams.http.GetAllPostCommentsResponse;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static org.aldofrankmarco.shak.streams.controllers.CommentsListAdapter.postId;
+import static org.aldofrankmarco.shak.streams.controllers.comments.CommentsListAdapter.postId;
 
 public class CommentsListFragment extends Fragment implements OnBackPressed {
     private List<Comment> listPostComments;
@@ -36,6 +40,7 @@ public class CommentsListFragment extends Fragment implements OnBackPressed {
     private FloatingActionButton buttonAddComment;
 
     public CommentsListFragment() {
+        this.listPostComments = new ArrayList<>();
     }
 
     /**
@@ -121,8 +126,8 @@ public class CommentsListFragment extends Fragment implements OnBackPressed {
 
                     //TODO ERA NULL
                     listPostComments = response.body().getCommentsList();
-                    initializeRecyclerView();
 
+                    initializeRecyclerView();
                 } else {
                     Toast.makeText(getActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                 }

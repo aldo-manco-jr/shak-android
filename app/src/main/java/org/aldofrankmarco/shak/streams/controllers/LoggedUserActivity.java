@@ -32,6 +32,9 @@ import org.aldofrankmarco.shak.services.UsersService;
 import org.aldofrankmarco.shak.settings.controllers.AboutFragment;
 import org.aldofrankmarco.shak.settings.controllers.ChangePasswordFragment;
 import org.aldofrankmarco.shak.settings.controllers.SettingsFragment;
+import org.aldofrankmarco.shak.streams.controllers.comments.CommentFormFragment;
+import org.aldofrankmarco.shak.streams.controllers.comments.CommentsListFragment;
+import org.aldofrankmarco.shak.streams.controllers.postslist.PostFormFragment;
 import org.json.JSONException;
 import org.json.JSONObject;
 

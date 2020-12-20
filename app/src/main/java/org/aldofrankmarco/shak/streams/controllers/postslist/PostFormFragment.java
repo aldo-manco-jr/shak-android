@@ -1,4 +1,4 @@
-package org.aldofrankmarco.shak.streams.controllers;
+package org.aldofrankmarco.shak.streams.controllers.postslist;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -25,8 +25,8 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.JsonObject;
 
 import org.aldofrankmarco.shak.R;
-import org.aldofrankmarco.shak.services.ServiceGenerator;
-import org.aldofrankmarco.shak.services.StreamsService;
+import org.aldofrankmarco.shak.streams.controllers.LoggedUserActivity;
+import org.aldofrankmarco.shak.streams.controllers.OnBackPressed;
 
 import java.io.ByteArrayOutputStream;
 

@@ -30,6 +30,9 @@ public class Post implements Comparable<Post> {
     @SerializedName("total_likes")
     private int totalLikes;
 
+    @SerializedName("total_comments")
+    private int totalComments;
+
     @SerializedName("likes")
     private List<Like> arrayLikes;
 
@@ -54,6 +57,12 @@ public class Post implements Comparable<Post> {
     }
 
     public void putIsLiked(boolean newState) {
+        if (newState){
+            totalLikes++;
+        } else {
+            totalLikes--;
+        }
+        
         isLiked = newState;
     }
 
@@ -124,6 +133,10 @@ public class Post implements Comparable<Post> {
 
     public int getTotalLikes() {
         return totalLikes;
+    }
+
+    public int getTotalComments() {
+        return totalComments;
     }
 
     public List<Like> getArrayLikes() {

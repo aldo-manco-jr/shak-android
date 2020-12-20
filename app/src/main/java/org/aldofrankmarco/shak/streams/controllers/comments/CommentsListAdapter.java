@@ -1,4 +1,4 @@
-package org.aldofrankmarco.shak.streams.controllers;
+package org.aldofrankmarco.shak.streams.controllers.comments;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,13 +15,9 @@ import com.bumptech.glide.Glide;
 
 import org.aldofrankmarco.shak.R;
 import org.aldofrankmarco.shak.models.Comment;
-import org.aldofrankmarco.shak.models.Post;
 import org.aldofrankmarco.shak.profile.controllers.ProfileFragment;
 import org.aldofrankmarco.shak.profile.http.GetUserProfileImageResponse;
-import org.aldofrankmarco.shak.services.ImagesService;
-import org.aldofrankmarco.shak.services.ServiceGenerator;
-import org.aldofrankmarco.shak.services.StreamsService;
-import org.aldofrankmarco.shak.streams.http.DeleteCommentRequest;
+import org.aldofrankmarco.shak.streams.controllers.LoggedUserActivity;
 import org.ocpsoft.prettytime.PrettyTime;
 
 import java.text.ParseException;
@@ -49,8 +45,11 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
 
         this.listComments = new ArrayList<>();
 
-        for (int i = listComments.size() - 1; i >= 0; i--) {
-            this.listComments.add(listComments.get(i));
+        if (listComments != null) {
+            // se effettivamente esistevano già dei commenti
+            for (int i = listComments.size() - 1; i >= 0; i--) {
+                this.listComments.add(listComments.get(i));
+            }
         }
     }
 
@@ -92,7 +91,7 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
             holder.deleteCommentButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    deleteComment(CommentsListAdapter.postId, comment);
+                    deleteComment(comment);
                 }
             });
         } else {
@@ -172,10 +171,9 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
      * Questa funzione è accesibile solo per i post dell'utente autenticato e invia una richiesta
      * http in cui richieste la cancellazione del post.
      */
-    private void deleteComment(String postId, Comment comment) {
-        Call<Object> httpRequest = LoggedUserActivity.getStreamsService().deleteComment(postId, comment.getCommentId());
-
-        //@DELETE("post/remove-comment/{deleteCommentRequest}")
+    private void deleteComment(Comment comment) {
+        Call<Object> httpRequest = LoggedUserActivity.getStreamsService()
+                .deleteComment(CommentsListAdapter.postId, comment.getCommentId());
 
         httpRequest.enqueue(new Callback<Object>() {
             @Override
