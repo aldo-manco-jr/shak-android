@@ -98,8 +98,6 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
 
         if (!user.getUsername().equals(LoggedUserActivity.getUsernameLoggedUser())){
             isFollow(user, holder);
-            holder.followButton.setVisibility(View.VISIBLE);
-            holder.loadingFollow.setVisibility(View.VISIBLE);
 
             holder.followButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -170,6 +168,8 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
      * @return true se l'utente selezionato è un follower, false altrimenti
      */
     private void isFollow(User user, final UserItemHolder holder) {
+
+        holder.loadingFollow.setVisibility(View.VISIBLE);
 
         holder.followButton.setText("follow");
 
