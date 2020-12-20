@@ -17,22 +17,22 @@ import retrofit2.http.Path;
 
 public interface UsersService {
 
-    @GET("users")
+    @GET("user/list/all")
     Call<GetAllUsersResponse> getAllUsers();
 
-    @GET("user/username/{username}")
+    @GET("user/{username}")
     Call<GetUserByUsernameResponse> getUserByUsername(@Path("username") String username);
 
     @PUT("user/location/{id}")
     Call<Object> setUserLocation(@Path("id") String idUser, @Body SetUserLocationRequest setUserLocationRequest);
 
-    @GET("user/is-following/{username}")
+    @GET("user/follow/{username}")
     Call<IsFollowingResponse> isFollowing(@Path("username") String username);
 
-    @GET("user/following/{username}")
+    @GET("user/list/following/{username}")
     Call<GetFollowingResponse> getFollowing(@Path("username") String username);
 
-    @GET("user/followers/{username}")
+    @GET("user/list/followers/{username}")
     Call<GetFollowersResponse> getFollowers(@Path("username") String username);
 
     @POST("user/follow/{userFollowed}")

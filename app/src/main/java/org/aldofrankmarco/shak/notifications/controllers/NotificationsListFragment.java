@@ -67,6 +67,8 @@ public class NotificationsListFragment extends Fragment {
      * Consente di recuperare tutte le notifiche
      */
     public void getAllNotifications() {
+
+
         Call<GetNotificationsListResponse> httpRequest = LoggedUserActivity.getNotificationsService().getAllNotifications();
 
         httpRequest.enqueue(new Callback<GetNotificationsListResponse>() {

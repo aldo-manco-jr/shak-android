@@ -2,6 +2,7 @@ package org.aldofrankmarco.shak.profile.controllers;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -194,6 +195,19 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
         return profileFragment;
     }
 
+    private static void addNotificationProfileViewed(String userId){
+
+        Call<Object> httpRequest = LoggedUserActivity.getNotificationsService().addNotificationProfileViewed(userId);
+
+        httpRequest.enqueue(new Callback<Object>() {
+            @Override
+            public void onResponse(Call<Object> call, Response<Object> response) { }
+
+            @Override
+            public void onFailure(Call<Object> call, Throwable t) { }
+        });
+    }
+
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
@@ -358,7 +372,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
         return profileImagesFragment;
     }
 
-    public void userDataBinding(String username) {
+    public void userDataBinding(final String username) {
         Call<GetUserByUsernameResponse> httpRequest = LoggedUserActivity.getUsersService().getUserByUsername(username);
 
         httpRequest.enqueue(new Callback<GetUserByUsernameResponse>() {
@@ -422,6 +436,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
 
                     if (user.getUsername().equals(LoggedUserActivity.getUsernameLoggedUser())) {
                         followButton.setVisibility(View.GONE);
+                    }else {
+                        addNotificationProfileViewed(user.getId());
                     }
 
                     profileImage.setOnClickListener(new View.OnClickListener() {

@@ -12,12 +12,12 @@ import retrofit2.http.POST;
 
 public interface AuthenticationService {
 
-    @POST("login")
+    @POST("auth/login")
     Call<LoginResponse> login(@Body LoginRequest loginRequest);
 
-    @POST("register")
-    Call<SignupResponse> register(@Body SignupRequest signupRequest);
+    @POST("auth/signup")
+    Call<SignupResponse> signup(@Body SignupRequest signupRequest);
 
-    @POST("change-password")
+    @POST("auth/change-password")
     Call<Object> changePassword(@Body ChangePasswordRequest changePasswordRequest);
 }

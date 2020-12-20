@@ -6,24 +6,26 @@ import org.aldofrankmarco.shak.settings.http.ChangePasswordRequest;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Path;
 
 public interface NotificationsService {
 
-    @GET("notifications-list")
+    @GET("notification/list")
     Call<GetNotificationsListResponse> getAllNotifications();
 
-    @POST("notification/delete/{id}")
+    @DELETE("notification/{id}")
     Call<Object> deleteNotification(@Path("id") String notificationId);
 
-    @POST("notification/mark/{id}")
+    @PUT("notification/{id}")
     Call<Object> markNotificationAsRead(@Path("id") String notificationId);
 
-    @POST("mark-all")
+    @POST("notification/mark-all")
     Call<Object> markAllNotificationsAsRead();
 
-    @POST("user/view-profile")
-    Call<Object> addNotificationProfileViewed(@Body String userId);
+    @POST("notification/profile-viewed/{id}")
+    Call<Object> addNotificationProfileViewed(@Path("id") String userId);
 }

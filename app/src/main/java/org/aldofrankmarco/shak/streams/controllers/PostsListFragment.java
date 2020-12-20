@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import org.aldofrankmarco.shak.R;
 import org.aldofrankmarco.shak.models.Post;
 import org.aldofrankmarco.shak.profile.controllers.ProfileFragment;
+import org.aldofrankmarco.shak.services.StreamsService;
 import org.aldofrankmarco.shak.streams.http.GetAllUserPostsResponse;
 import org.aldofrankmarco.shak.streams.http.GetNewPostsListResponse;
 import org.aldofrankmarco.shak.streams.http.GetPostsListResponse;
@@ -38,6 +39,7 @@ public class PostsListFragment extends Fragment {
     private PostsListAdapter adapter;
 
     private View view;
+    StreamsService streamsService;
 
     public PostsListFragment() {
     }

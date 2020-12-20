@@ -97,12 +97,14 @@ public class SettingsFragment extends Fragment {
                 if (position == 3){
 
                     SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.remove("authToken");
+                    editor.remove(getString(R.string.sharedpreferences_token));
                     editor.commit();
+
                     LoggedUserActivity.getSocket().disconnect();
+
                     Intent intent = new Intent(getActivity(), MainActivity.class);
                     startActivity(intent);
-                    LoggedUserActivity.getLoggedUserActivity().finish();
+                    getActivity().finishAffinity();
                 }
             }
         });

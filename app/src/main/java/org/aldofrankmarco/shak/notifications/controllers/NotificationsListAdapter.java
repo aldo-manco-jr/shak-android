@@ -136,9 +136,7 @@ public class NotificationsListAdapter extends RecyclerView.Adapter<Notifications
 
     private void setSenderImageProfile(final String senderUsername, final NotifyItemHolder holder) {
 
-        ImagesService imagesService = ServiceGenerator.createService(ImagesService.class, LoggedUserActivity.getToken());
-
-        Call<GetUserProfileImageResponse> httpRequest = imagesService.getUserProfileImage(senderUsername);
+        Call<GetUserProfileImageResponse> httpRequest = LoggedUserActivity.getImagesService().getUserProfileImage(senderUsername);
 
         httpRequest.enqueue(new Callback<GetUserProfileImageResponse>() {
             @Override
@@ -227,7 +225,6 @@ public class NotificationsListAdapter extends RecyclerView.Adapter<Notifications
                 Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
-
     }
 
     private void markNotificationAsRead(final Notification notification, final NotifyItemHolder holder) {
@@ -250,7 +247,6 @@ public class NotificationsListAdapter extends RecyclerView.Adapter<Notifications
                 Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
-
     }
 
     public class NotifyItemHolder extends RecyclerView.ViewHolder {

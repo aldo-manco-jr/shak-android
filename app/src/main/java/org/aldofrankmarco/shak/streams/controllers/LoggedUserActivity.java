@@ -155,10 +155,7 @@ public class LoggedUserActivity extends AppCompatActivity {
 
             switch (navigationSectionIdentifier) {
                 case R.id.navigation_home:
-                    if (homeFragment == null) {
-                        homeFragment = new HomeFragment();
-                    }
-
+                    homeFragment = new HomeFragment();
                     selectedFragment = homeFragment;
                     break;
                 case R.id.navigation_profile:
@@ -166,10 +163,7 @@ public class LoggedUserActivity extends AppCompatActivity {
                     selectedFragment = profileFragment;
                     break;
                 case R.id.navigation_users:
-                    if (peopleFragment == null) {
-                        peopleFragment = PeopleListFragment.newInstance("all");
-                    }
-
+                    peopleFragment = PeopleListFragment.newInstance("all");
                     selectedFragment = peopleFragment;
                     break;
                 case R.id.navigation_notifications:
@@ -177,10 +171,7 @@ public class LoggedUserActivity extends AppCompatActivity {
                     selectedFragment = notificationsFragment;
                     break;
                 case R.id.navigation_settings:
-                    if (settingsFragment == null) {
-                        settingsFragment = new SettingsFragment();
-                    }
-
+                    settingsFragment = new SettingsFragment();
                     selectedFragment = settingsFragment;
                     break;
             }
@@ -195,7 +186,7 @@ public class LoggedUserActivity extends AppCompatActivity {
 
     public static StreamsService getStreamsService() {
 
-        if (streamsService==null){
+        if (streamsService == null) {
             streamsService = ServiceGenerator.createService(StreamsService.class, getToken());
         }
         return streamsService;
@@ -203,7 +194,7 @@ public class LoggedUserActivity extends AppCompatActivity {
 
     public static UsersService getUsersService() {
 
-        if (usersService==null){
+        if (usersService == null) {
             usersService = ServiceGenerator.createService(UsersService.class, getToken());
         }
         return usersService;
@@ -211,7 +202,7 @@ public class LoggedUserActivity extends AppCompatActivity {
 
     public static ImagesService getImagesService() {
 
-        if (imagesService==null){
+        if (imagesService == null) {
             imagesService = ServiceGenerator.createService(ImagesService.class, getToken());
         }
         return imagesService;
@@ -219,7 +210,7 @@ public class LoggedUserActivity extends AppCompatActivity {
 
     public static NotificationsService getNotificationsService() {
 
-        if (notificationsService==null){
+        if (notificationsService == null) {
             notificationsService = ServiceGenerator.createService(NotificationsService.class, getToken());
         }
         return notificationsService;
@@ -239,9 +230,21 @@ public class LoggedUserActivity extends AppCompatActivity {
 
     @Override
     public void onDestroy() {
+        homeFragment = null;
+        profileFragment = null;
+        peopleFragment = null;
+        notificationsFragment = null;
+        settingsFragment = null;
+
+        streamsService = null;
+        imagesService = null;
+        usersService = null;
+        notificationsService = null;
+
         socket.disconnect();
-        super.onDestroy();
         //socket.off("disconnect");
+
+        super.onDestroy();
     }
 
     @Override

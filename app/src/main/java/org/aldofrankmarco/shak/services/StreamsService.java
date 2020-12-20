@@ -19,13 +19,13 @@ import retrofit2.http.Path;
 
 public interface StreamsService {
 
-    @GET("streams")
+    @GET("post/list/all")
     Call<GetPostsListResponse> getAllPosts();
 
-    @GET("streams/new/{created_at}")
+    @GET("post/list/new/{created_at}")
     Call<GetNewPostsListResponse> getAllNewPosts(@Path("created_at") String newPostData);
 
-    @GET("streams/{username}")
+    @GET("post/list/{username}")
     Call<GetAllUserPostsResponse> getAllUserPosts(@Path("username") String username);
 
     @GET("post/{id}")
@@ -34,8 +34,6 @@ public interface StreamsService {
     @POST("post")
     Call<Object> submitPost(@Body JsonObject postData);
 
-    //@DELETE("post/{idpost}")
-    //Call<Object> deletePost(@Path("idpost") Object postId);
     @DELETE("post/{post_id}")
     Call<Object> deletePost(@Path("post_id") Object postId);
 
@@ -45,7 +43,7 @@ public interface StreamsService {
     @DELETE("post/like/{post_id}")
     Call<Object> unlikePost(@Path("post_id") Object postId);
 
-    @GET("post/comments-list/{id}")
+    @GET("post/comment/list/{id}")
     Call<GetAllPostCommentsResponse> getAllPostComments(@Path("id") String postId);
 
     @POST("post/comment")

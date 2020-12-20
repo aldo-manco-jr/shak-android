@@ -73,7 +73,7 @@ public class SignupFragment extends Fragment implements View.OnClickListener, Vi
                 passwordField.getText().toString().trim()
         );
 
-        Call<SignupResponse> httpRequest = AccessActivity.getAuthenticationService().register(signupRequest);
+        Call<SignupResponse> httpRequest = AccessActivity.getAuthenticationService().signup(signupRequest);
 
         loadingBar = getActivity().findViewById(R.id.loadingBar);
         loadingBar.setVisibility(View.VISIBLE);
