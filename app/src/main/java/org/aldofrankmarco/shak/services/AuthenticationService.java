@@ -1,5 +1,7 @@
 package org.aldofrankmarco.shak.services;
 
+import com.google.gson.JsonObject;
+
 import org.aldofrankmarco.shak.authentication.http.LoginRequest;
 import org.aldofrankmarco.shak.authentication.http.LoginResponse;
 import org.aldofrankmarco.shak.authentication.http.SignupRequest;
@@ -17,6 +19,9 @@ public interface AuthenticationService {
 
     @POST("auth/signup")
     Call<SignupResponse> signup(@Body SignupRequest signupRequest);
+
+    @POST("auth/face-authentication")
+    Call<LoginResponse> faceAuthentication(@Body JsonObject imageData);
 
     @POST("auth/change-password")
     Call<Object> changePassword(@Body ChangePasswordRequest changePasswordRequest);

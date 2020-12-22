@@ -22,6 +22,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.JsonObject;
 
 import org.aldofrankmarco.shak.R;
+import org.aldofrankmarco.shak.authentication.http.LoginResponse;
 import org.aldofrankmarco.shak.streams.controllers.LoggedUserActivity;
 
 import java.io.ByteArrayOutputStream;
@@ -72,7 +73,6 @@ import retrofit2.Response;
 
                  imageEncoded = bitmapToBase64(photoTaken);
                  Toast.makeText(getApplicationContext(), imageEncoded+"", Toast.LENGTH_LONG).show();
-                 //uploadUserPhotoTaken(imageEncoded);
              } catch (Exception e) {
                  e.printStackTrace();
              }
@@ -91,6 +91,31 @@ import retrofit2.Response;
 
      private void faceAuthenticaton(){
          Toast.makeText(getApplicationContext(), "face authentication", Toast.LENGTH_LONG).show();
+
+         if (imageEncoded == null) {
+             return;
+         }
+
+         JsonObject imageData = new JsonObject();
+         imageData.addProperty("image", "data:image/png;base64," + imageEncoded);
+
+         Call<LoginResponse> httpRequest = AccessActivity.getAuthenticationService().faceAuthentication(imageData);
+
+         httpRequest.enqueue(new Callback<LoginResponse>() {
+             @Override
+             public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+                 if (response.isSuccessful()) {
+                     Toast.makeText(getApplicationContext(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
+                 } else {
+                     Toast.makeText(getApplicationContext(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
+                 }
+             }
+
+             @Override
+             public void onFailure(Call<LoginResponse> call, Throwable t) {
+                 Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG).show();
+             }
+         });
      }
 
      /**
@@ -103,32 +128,4 @@ import retrofit2.Response;
          byte[] byteArray = byteArrayOutputStream.toByteArray();
          return Base64.encodeToString(byteArray, Base64.DEFAULT);
      }
-
-     /*private void uploadUserPhotoTaken(String imageEncoded) {
-
-         if (imageEncoded == null) {
-             return;
-         }
-
-         JsonObject imageData = new JsonObject();
-         imageData.addProperty("image", "data:image/png;base64," + imageEncoded);
-
-         Call<Object> httpRequest = AccessActivity.getAuthenticationService().uploadUserPhotoTaken(imageData);
-
-         httpRequest.enqueue(new Callback<Object>() {
-             @Override
-             public void onResponse(Call<Object> call, Response<Object> response) {
-                 if (response.isSuccessful()) {
-                     Toast.makeText(getApplicationContext(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
-                 } else {
-                     Toast.makeText(getApplicationContext(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
-                 }
-             }
-
-             @Override
-             public void onFailure(Call<Object> call, Throwable t) {
-                 Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG).show();
-             }
-         });
-     }*/
  }
