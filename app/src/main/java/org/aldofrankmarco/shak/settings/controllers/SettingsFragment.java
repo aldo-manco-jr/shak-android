@@ -16,6 +16,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import org.aldofrankmarco.shak.R;
 import org.aldofrankmarco.shak.authentication.controllers.MainActivity;
 import org.aldofrankmarco.shak.streams.controllers.LoggedUserActivity;
@@ -98,7 +100,7 @@ public class SettingsFragment extends Fragment {
 
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.remove(getString(R.string.sharedpreferences_token));
-                    editor.commit();
+                    editor.apply();
 
                     LoggedUserActivity.getSocket().disconnect();
 

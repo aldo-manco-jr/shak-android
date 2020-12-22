@@ -78,6 +78,27 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         homeTabs.getTabAt(0).setIcon(R.drawable.ic_library_books_black_24dp);
         homeTabs.getTabAt(1).setIcon(R.drawable.ic_favorite_black_24dp);
 
+        homeTabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                if (tab.getPosition()==0){
+                    LoggedUserActivity.getLoggedUserActivity().getFavouritesFragment().eraseSearch();
+                }else {
+                    LoggedUserActivity.getLoggedUserActivity().getStreamsFragment().eraseSearch();
+                }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
+
         fab.setOnClickListener(this);
 
         return homeFragmentView;

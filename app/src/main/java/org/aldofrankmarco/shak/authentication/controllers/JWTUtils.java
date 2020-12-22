@@ -1,6 +1,7 @@
 package org.aldofrankmarco.shak.authentication.controllers;
 
 import android.util.Base64;
+import android.util.Log;
 
 import org.json.JSONObject;
 
@@ -17,8 +18,8 @@ public class JWTUtils {
         JSONObject tokenDataJson = null;
 
         String[] split = JWTEncoded.split("\\.");
-        //Log.d("JWT_DECODED", "Header: " + getJson(split[0]));
-        //Log.d("JWT_DECODED", "Body: " + getJson(split[1]));
+        Log.d("JWT_DECODED", "Header: " + getJson(split[0]));
+        Log.d("JWT_DECODED", "Body: " + getJson(split[1]));
 
         if (split != null && split.length > 1) {
             JSONObject json = new JSONObject(getJson(split[1]));
