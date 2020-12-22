@@ -93,14 +93,19 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
             holder.imageProfile.setVisibility(View.GONE);
         }
 
-       isFollow(user, holder);
+        if (!user.getUsername().equals(LoggedUserActivity.getUsernameLoggedUser())){
+            isFollow(user, holder);
 
-        holder.followButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                followOrUnfollow(listUsers.get(position), holder);
-            }
-        });
+            holder.followButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    followOrUnfollow(listUsers.get(position), holder);
+                }
+            });
+        }else {
+            holder.followButton.setVisibility(View.GONE);
+            holder.loadingFollow.setVisibility(View.GONE);
+        }
 
         holder.layoutItem.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -141,9 +146,9 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
             public void onResponse(Call<Object> call, Response<Object> response) {
                 if (response.isSuccessful()) {
 
-                    if (holder.followButton.getText().equals("unfollow")){
+                    if (holder.followButton.getText().equals("unfollow")) {
                         holder.followButton.setText("follow");
-                    }else if (holder.followButton.getText().equals("follow")){
+                    } else if (holder.followButton.getText().equals("follow")) {
                         holder.followButton.setText("unfollow");
                     }
                     //LoggedUserActivity.getSocket().emit("refresh");
@@ -166,6 +171,8 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
      */
     private void isFollow(User user, final UserItemHolder holder) {
 
+        holder.loadingFollow.setVisibility(View.VISIBLE);
+
         holder.followButton.setText("follow");
 
         Call<IsFollowingResponse> httpRequest = LoggedUserActivity.getUsersService().isFollowing(user.getUsername());
@@ -175,7 +182,7 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
             public void onResponse(Call<IsFollowingResponse> call, Response<IsFollowingResponse> response) {
                 if (response.isSuccessful()) {
                     if (response.body().getMessage().equals("yes")) {
-                            holder.followButton.setText("unfollow");
+                        holder.followButton.setText("unfollow");
                     }
 
                     holder.loadingFollow.setVisibility(View.GONE);
@@ -192,7 +199,6 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
             }
         });
     }
-
 
 
     public class UserItemHolder extends RecyclerView.ViewHolder {
@@ -221,7 +227,7 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
             locationText = itemView.findViewById(R.id.location_comment_text);
             imageButton = itemView.findViewById(R.id.imageButton);
             followButton = itemView.findViewById(R.id.follow);
-            loadingFollow =itemView.findViewById(R.id.loading_follow);
+            loadingFollow = itemView.findViewById(R.id.loading_follow);
         }
     }
 }
