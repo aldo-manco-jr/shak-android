@@ -102,16 +102,24 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
             }
         }
-
+        @Override
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        }
+/*
+TODO
+ non è corretto, lancia due volte getAllPosts durante il caricamento inziale, senza che l'utente
+ faccia nulla, occorre rimediare
         @Override
         public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
             if (charSequence.toString().equals("") || charSequence.toString() == null) {
+                Log.v("bug", "111111");
                 HomeFragment.getHomeFragment().getStreamsFragment().getAllPosts();
             } else {
+                Log.v("bug", "222222");
                 HomeFragment.getHomeFragment().getStreamsFragment().getAllPosts(charSequence.toString());
             }
         }
-
+*/
         @Override
         public void afterTextChanged(Editable editable) {
         }

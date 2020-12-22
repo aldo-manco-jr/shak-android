@@ -1,12 +1,10 @@
 package org.aldofrankmarco.shak.streams.controllers.postslist;
 
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -146,7 +144,7 @@ public class PostsListFragment extends Fragment {
             if (type.equals("profile")) {
                 // non ci sono altri frammenti simili in profile, può essere inizializzato direttamente
                 HomeFragment.getHomeFragment().getSearchField().setVisibility(View.GONE);
-                getAllPosts();
+//TODO Aldo non hai capito le modifiche che ho fatto se mi metti qui getAllPosts();
             } else {
                 HomeFragment.getHomeFragment().getSearchField().setVisibility(View.VISIBLE);
             }
@@ -160,16 +158,16 @@ public class PostsListFragment extends Fragment {
     }
 
     /**
-     * Consente di recuperare tutti i post:
+     * Consente di recuperare tutti i post tramite una richiesta http al server:
      * - streams: lista dei post dell'utente e dei suoi following
      * - favorites: sono i post a cui l'utente ha espresso la preferenza
-     * Viene mandata una richiesta http per recuperati i dal server.
+     * - profile: sono i post di un utente specifico (sono visualizzati nel profilo di quell'utente)
      */
     public void getAllPosts() {
         if (getArguments() == null) {
             return;
         }
-
+        Log.v("cambi", "lacnciaaa");
         this.type = getArguments().getString("type");
         final String username = getArguments().getString("username");
 

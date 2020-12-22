@@ -78,7 +78,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
 
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString(getString(R.string.sharedpreferences_token), token);
-                    editor.commit();
+                    editor.apply();
 
                     Intent intentLoggedUser = new Intent(getActivity(), LoggedUserActivity.class);
                     intentLoggedUser.putExtra("authToken", token);
