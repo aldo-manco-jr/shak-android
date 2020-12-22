@@ -95,6 +95,15 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         return homeFragmentView;
     }
 
+
+    /*
+    * TODO Se vuoi effettuare una ricerca devi stampare i risultati in una lista diversa e mostrare
+    *  quella e quando la lista si resetta (campo vuoto) mostri nuovamente la lista originaria),
+    *  non puoi fare la chiamata continuamente a getAllPost quando non è più attiva la ricerca, perchè
+    *  stò inserendo un limite dimensionale ai risultati trovati e con il tuo approccio cancelli tutto
+    *  quello che è stato stampato in precedenza. Occorre quindi visualizzare i rusultati prendendoli
+    *  da un'altra lista che non sia listPosts, la quale invece deve rimanere invariata
+    * */
     TextWatcher getSearchedPosts = new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
