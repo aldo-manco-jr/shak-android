@@ -45,6 +45,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
     private TextView passwordAlert;
 
     private Button loginButton;
+    private Button faceRecognitionButton;
 
     private ProgressBar loadingBar;
 
@@ -139,6 +140,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
         passwordField = loginFragmentView.findViewById(R.id.passwordField);
         passwordAlert = loginFragmentView.findViewById(R.id.alert_password_invalid);
         loginButton = loginFragmentView.findViewById(R.id.loginButton);
+        faceRecognitionButton = loginFragmentView.findViewById(R.id.faceRecognitionButton);
 
         usernameField.setTag("username");
         passwordField.setTag("password");
@@ -147,6 +149,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
         passwordField.addTextChangedListener(checkPasswordField);
 
         loginButton.setOnClickListener(this);
+        faceRecognitionButton.setOnClickListener(this);
         passwordField.setOnTouchListener(this);
 
         sharedPreferences = getActivity().getSharedPreferences(getString(R.string.sharedpreferences_authentication), Context.MODE_PRIVATE);
@@ -220,6 +223,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
     public void onClick(View view) {
         if (view.getId() == R.id.loginButton) {
             login();
+        }else if (view.getId() == R.id.faceRecognitionButton){
+            faceRecognition();
         }
     }
 
@@ -262,5 +267,10 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
             }
         }
         return false;
+    }
+
+    private void faceRecognition(){
+        Intent intent = new Intent(getActivity(), FaceRecognitionActivity.class);
+        getActivity().startActivity(intent);
     }
 }

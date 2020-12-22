@@ -357,7 +357,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
                             location.append(country);
                             locationTextView.setText(location);
                         } {
-                            location.append(location).append(", ").append(country);
+                            location.append(city).append(", ").append(country);
                             locationTextView.setText(location);
                         }
                         setLocationButton.setVisibility(View.GONE);

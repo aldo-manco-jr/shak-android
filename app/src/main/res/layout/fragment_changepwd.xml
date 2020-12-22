@@ -21,7 +21,7 @@
 
     <LinearLayout
         android:id="@+id/linearLayout2"
-        android:layout_width="403dp"
+        android:layout_width="match_parent"
         android:layout_height="526dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -33,7 +33,7 @@
         <EditText
             android:id="@+id/oldPassword"
             android:layout_width="match_parent"
-            android:layout_height="77dp"
+            android:layout_height="50dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
@@ -63,7 +63,7 @@
         <EditText
             android:id="@+id/newPassword"
             android:layout_width="match_parent"
-            android:layout_height="77dp"
+            android:layout_height="50dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
@@ -93,7 +93,7 @@
         <EditText
             android:id="@+id/confirmPassword"
             android:layout_width="match_parent"
-            android:layout_height="77dp"
+            android:layout_height="50dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"

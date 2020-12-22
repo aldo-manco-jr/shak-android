@@ -22,6 +22,9 @@ public interface StreamsService {
     @GET("post/list/all")
     Call<GetPostsListResponse> getAllPosts();
 
+    @GET("post/list/all/{post}")
+    Call<GetPostsListResponse> getAllSearchedPosts(@Path("post") String postContent);
+
     @GET("post/list/new/{created_at}")
     Call<GetNewPostsListResponse> getAllNewPosts(@Path("created_at") String newPostData);
 

@@ -133,6 +133,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
                         .getProfileFragments();
                 ProfileFragment userInformationProfile = profileFragment
                         .newInstanceUserViewInformation(holder.usernameText.getText().toString().trim());
+                fatherListFragment.eraseSearch();
                 LoggedUserActivity.getLoggedUserActivity().changeFragment(userInformationProfile);
             }
         });
@@ -144,6 +145,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
                         .getProfileFragments();
                 ProfileFragment userInformationProfile = profileFragment
                         .newInstanceUserViewInformation(holder.usernameText.getText().toString().trim());
+                fatherListFragment.eraseSearch();
                 LoggedUserActivity.getLoggedUserActivity().changeFragment(userInformationProfile);
             }
         });
@@ -178,6 +180,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
         holder.commentButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                fatherListFragment.eraseSearch();
                 LoggedUserActivity.getLoggedUserActivity().changeFragment(LoggedUserActivity.getLoggedUserActivity().getCommentsListFragment(post));
             }
         });
@@ -233,6 +236,10 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
             // i nuovi messaggi vengono aggiunti in cima alla lista
             this.listPosts.add(0, newListPosts.get(i));
         }
+    }
+
+    public void setListPosts(List<Post> listPosts) {
+        this.listPosts = listPosts;
     }
 
     /**

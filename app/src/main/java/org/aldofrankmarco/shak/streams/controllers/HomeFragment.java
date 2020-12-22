@@ -87,6 +87,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     public void onClick(View view) {
         if (view.getId() == R.id.fab_switch_to_post_form) {
             // viene mostrata la form di inserimento del nuovo post
+            LoggedUserActivity.getLoggedUserActivity().getStreamsFragment().eraseSearch();
+            LoggedUserActivity.getLoggedUserActivity().getFavouritesFragment().eraseSearch();
             FragmentTransaction transactionsManager = getFragmentManager().beginTransaction();
             transactionsManager
                     .replace(R.id.home_fragment, new PostFormFragment())
