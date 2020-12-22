@@ -41,7 +41,6 @@ public class PostsListFragment extends Fragment {
     RecyclerView recyclerView;
     private PostsListAdapter adapter;
 
-    private EditText searchField;
     private View view;
 
     public PostsListFragment() {
@@ -108,8 +107,6 @@ public class PostsListFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        searchField = view.findViewById(R.id.searchField);
-
         type = getArguments().getString("type");
 
         //TODO verificare se la viene aggiornata se nel caso in cui ci si trovi in un'altra schermata e
@@ -123,20 +120,20 @@ public class PostsListFragment extends Fragment {
                         "essere sempre specificato l'username nel bundle";
                 String username = getArguments().getString("username");
 
-                searchField.setVisibility(View.GONE);
+                HomeFragment.getHomeFragment().getSearchField().setVisibility(View.GONE);
 
                 initializeRecyclerView(
                         LoggedUserActivity.getLoggedUserActivity().getProfilePostsFragment(username),
                         null
                 );
             } else if (type.equals("all")) {
-                searchField.setVisibility(View.VISIBLE);
+                HomeFragment.getHomeFragment().getSearchField().setVisibility(View.VISIBLE);
 
                 LoggedUserActivity.getLoggedUserActivity().getStreamsFragment().initializeRecyclerView(
                         LoggedUserActivity.getLoggedUserActivity().getStreamsFragment(),
                         null);
             } else if (type.equals("favourites")) {
-                searchField.setVisibility(View.VISIBLE);
+                HomeFragment.getHomeFragment().getSearchField().setVisibility(View.VISIBLE);
 
                 LoggedUserActivity.getLoggedUserActivity().getFavouritesFragment().initializeRecyclerView(
                         LoggedUserActivity.getLoggedUserActivity().getFavouritesFragment(),
@@ -148,43 +145,19 @@ public class PostsListFragment extends Fragment {
         } else {
             if (type.equals("profile")) {
                 // non ci sono altri frammenti simili in profile, può essere inizializzato direttamente
-                searchField.setVisibility(View.GONE);
+                HomeFragment.getHomeFragment().getSearchField().setVisibility(View.GONE);
                 getAllPosts();
             } else {
-                searchField.setVisibility(View.VISIBLE);
+                HomeFragment.getHomeFragment().getSearchField().setVisibility(View.VISIBLE);
             }
         }
 
         recyclerView = view.findViewById(R.id.listPosts);
-
-        searchField.addTextChangedListener(getSearchedPosts);
     }
 
     String getType() {
         return this.type;
     }
-
-    TextWatcher getSearchedPosts = new TextWatcher() {
-        @Override
-        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            if (!charSequence.toString().equals("")) {
-
-            }
-        }
-
-        @Override
-        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            if (charSequence.toString().equals("") || charSequence.toString() == null) {
-                getAllPosts();
-            } else {
-                getAllPosts(charSequence.toString());
-            }
-        }
-
-        @Override
-        public void afterTextChanged(Editable editable) {
-        }
-    };
 
     /**
      * Consente di recuperare tutti i post:
@@ -390,7 +363,7 @@ public class PostsListFragment extends Fragment {
         assert postsListFragment != null : "postsListFragment non poteva essere null";
         assert listPosts.size() > 0 : "listPost doveva avere almeno un elemento";
 
-        if (searchField.getText().toString().trim().equals("") || searchField == null) {
+        if (HomeFragment.getHomeFragment().getSearchField().getText().toString().trim().equals("") || HomeFragment.getHomeFragment().getSearchField() == null) {
             if (postsListFragment != null && postsListFragment.adapter != null && listPosts != null) {
                 postsListFragment.adapter.addPosts(listPosts);
             }
@@ -629,20 +602,10 @@ public class PostsListFragment extends Fragment {
     }
 
     public void eraseSearch() {
-        if (searchField != null) {
-            searchField.setText("");
+        if (HomeFragment.getHomeFragment().getSearchField() != null) {
+            HomeFragment.getHomeFragment().getSearchField().setText("");
         }
     }
-
-    /*@Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-        if (isVisibleToUser) {
-            LoggedUserActivity.getLoggedUserActivity().getStreamsFragment().eraseSearch();
-            LoggedUserActivity.getLoggedUserActivity().getFavouritesFragment().eraseSearch();
-            Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), "pro", Toast.LENGTH_LONG).show();
-        }
-    }*/
 
     @Override
     public void onResume() {

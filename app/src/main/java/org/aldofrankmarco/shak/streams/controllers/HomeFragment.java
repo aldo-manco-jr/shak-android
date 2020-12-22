@@ -1,9 +1,12 @@
 package org.aldofrankmarco.shak.streams.controllers;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -32,6 +35,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     private ViewPager viewPager;
 
     private TabLayout homeTabs;
+    private EditText searchField;
 
     private PostFormFragment postFormFragment;
     private PostsListFragment streamsFragment;
@@ -48,6 +52,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+    }
+
+    public EditText getSearchField() {
+        return searchField;
     }
 
     @Nullable
@@ -78,31 +86,36 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         homeTabs.getTabAt(0).setIcon(R.drawable.ic_library_books_black_24dp);
         homeTabs.getTabAt(1).setIcon(R.drawable.ic_favorite_black_24dp);
 
-        homeTabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                if (tab.getPosition()==0){
-                    LoggedUserActivity.getLoggedUserActivity().getFavouritesFragment().eraseSearch();
-                }else {
-                    LoggedUserActivity.getLoggedUserActivity().getStreamsFragment().eraseSearch();
-                }
-            }
+        searchField = homeFragmentView.findViewById(R.id.searchField);
 
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-
-            }
-        });
+        HomeFragment.getHomeFragment().getSearchField().addTextChangedListener(getSearchedPosts);
 
         fab.setOnClickListener(this);
 
         return homeFragmentView;
     }
+
+    TextWatcher getSearchedPosts = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            if (!charSequence.toString().equals("")) {
+
+            }
+        }
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            if (charSequence.toString().equals("") || charSequence.toString() == null) {
+                HomeFragment.getHomeFragment().getStreamsFragment().getAllPosts();
+            } else {
+                HomeFragment.getHomeFragment().getStreamsFragment().getAllPosts(charSequence.toString());
+            }
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+        }
+    };
 
     @Override
     public void onClick(View view) {

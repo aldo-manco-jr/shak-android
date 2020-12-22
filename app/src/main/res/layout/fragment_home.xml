@@ -40,6 +40,24 @@
 
             </com.google.android.material.tabs.TabLayout>
 
+            <EditText
+                android:id="@+id/searchField"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/field_wrap"
+                android:drawableLeft="@drawable/ic_search_white_24"
+                android:drawablePadding="6dp"
+                android:ems="10"
+                android:hint="Search"
+                android:inputType="textPersonName"
+                android:paddingLeft="8dip"
+                android:singleLine="true"
+                android:textColor="@color/white"
+                android:textColorHint="@color/white"
+                android:textSize="14dip"
+                app:layout_constraintTop_toTopOf="parent" />
+
             <androidx.viewpager.widget.ViewPager
                 android:id="@+id/view_pager"
                 android:layout_width="match_parent"
