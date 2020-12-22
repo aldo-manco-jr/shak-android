@@ -1,16 +1,18 @@
 package org.aldofrankmarco.shak.streams.controllers.comments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.github.nkzawa.emitter.Emitter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.aldofrankmarco.shak.R;
@@ -61,8 +63,6 @@ public class CommentsListFragment extends Fragment implements OnBackPressed {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        LoggedUserActivity.getSocket().on("refreshPage", updatePostCommentsList);
     }
 
     @Override
@@ -73,14 +73,33 @@ public class CommentsListFragment extends Fragment implements OnBackPressed {
         // circleimageview = wrap images in a circle
         view = inflater.inflate(R.layout.fragment_comments_list, container, false);
 
-        postId = post.getPostId().toString();
+        Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
+        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_24dp);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
 
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // è stato premuto il tasto indietro offerto dalla toolbar (unico tasto presente)
+                LoggedUserActivity.getLoggedUserActivity().getSupportFragmentManager()
+                        .beginTransaction().replace(
+                        R.id.logged_user_fragment,
+                        HomeFragment.getHomeFragment())
+                        .commit();
+            }
+        });
+
+        postId = post.getPostId().toString();
         buttonAddComment = view.findViewById(R.id.fab_add_comment);
 
         buttonAddComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                    LoggedUserActivity.getLoggedUserActivity().getSupportFragmentManager().beginTransaction().replace(R.id.logged_user_fragment, LoggedUserActivity.getLoggedUserActivity().getCommentFormFragment()).commit();
+                    LoggedUserActivity.getLoggedUserActivity().getSupportFragmentManager()
+                            .beginTransaction().replace(
+                                    R.id.logged_user_fragment,
+                            LoggedUserActivity.getLoggedUserActivity().getCommentFormFragment())
+                            .commit();
             }
         });
 
@@ -89,31 +108,17 @@ public class CommentsListFragment extends Fragment implements OnBackPressed {
         return view;
     }
 
-    /**
-     * Quando un post viene pubblicato la home page viene aggiornata.
-     */
-    public static Emitter.Listener updatePostCommentsList = new Emitter.Listener() {
-
-        @Override
-        public void call(final Object... args) {
-            if (LoggedUserActivity.getLoggedUserActivity() != null) {
-                LoggedUserActivity.getLoggedUserActivity().runOnUiThread(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        // quando un post viene pubblicato la socket avvisa del necessario aggiornmento
-                        LoggedUserActivity.getLoggedUserActivity().getCommentsListFragment().getAllPostComments();
-                    }
-                });
-            }
-        }
-    };
+    public Post getPost() {
+        return post;
+    }
 
     public void getAllPostComments() {
 
         if (post == null) {
             return;
         }
+
+        Log.v("refres", "renro fetAllpost");
 
         Call<GetAllPostCommentsResponse> httpRequest = LoggedUserActivity.getStreamsService().getAllPostComments(postId);
 
@@ -124,6 +129,7 @@ public class CommentsListFragment extends Fragment implements OnBackPressed {
 
                 if (response.isSuccessful()) {
 
+                    Log.v("refres", "resuccess");
                     //TODO ERA NULL
                     listPostComments = response.body().getCommentsList();
 

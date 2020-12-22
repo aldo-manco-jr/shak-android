@@ -18,8 +18,6 @@ import org.aldofrankmarco.shak.models.User;
 import org.aldofrankmarco.shak.people.http.GetAllUsersResponse;
 import org.aldofrankmarco.shak.people.http.GetFollowersResponse;
 import org.aldofrankmarco.shak.people.http.GetFollowingResponse;
-import org.aldofrankmarco.shak.services.ServiceGenerator;
-import org.aldofrankmarco.shak.services.UsersService;
 import org.aldofrankmarco.shak.streams.controllers.LoggedUserActivity;
 
 import java.util.List;
@@ -42,11 +40,21 @@ public class PeopleListFragment extends Fragment {
 
     private static PeopleListFragment peopleListFragment;
 
-    public PeopleListFragment() {
-    }
-
     public static PeopleListFragment getPeopleListFragment() {
         return peopleListFragment;
+    }
+
+    /**
+     * Costruttore di default del frammento, prevede l'uso del tipo "all"
+     */
+    public static PeopleListFragment newInstance() {
+        PeopleListFragment fragment = new PeopleListFragment();
+
+        Bundle args = new Bundle();
+        args.putString("type", "all");
+        fragment.setArguments(args);
+
+        return fragment;
     }
 
     /**

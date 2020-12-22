@@ -16,16 +16,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import org.aldofrankmarco.shak.R;
 import org.aldofrankmarco.shak.authentication.http.SignupRequest;
 import org.aldofrankmarco.shak.authentication.http.SignupResponse;
-import org.aldofrankmarco.shak.services.AuthenticationService;
-import org.aldofrankmarco.shak.services.ServiceGenerator;
 import org.aldofrankmarco.shak.streams.controllers.LoggedUserActivity;
 
 import java.util.regex.Matcher;
@@ -94,6 +92,11 @@ public class SignupFragment extends Fragment implements View.OnClickListener, Vi
                     Intent intentLoggedUser = new Intent(getActivity(), LoggedUserActivity.class);
                     intentLoggedUser.putExtra("authToken", token);
                     startActivity(intentLoggedUser);
+
+                    Intent intent = new Intent(getActivity(), AccessActivity.class);
+                    getActivity().stopService(intent);
+
+                    ActivityCompat.finishAffinity(getActivity());
                 } else {
 
                     if (response.code() == 409) {

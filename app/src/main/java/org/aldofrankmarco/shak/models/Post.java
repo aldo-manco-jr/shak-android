@@ -87,6 +87,14 @@ public class Post implements Comparable<Post> {
         return isRemoved;
     }
 
+    public int incrementTotalComments(){
+        return ++totalComments;
+    }
+
+    public int decrementTotalComments(){
+        return --totalComments;
+    }
+
     public Object getPostId() {
         return postId;
     }

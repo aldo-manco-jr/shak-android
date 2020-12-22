@@ -15,14 +15,8 @@ import com.bumptech.glide.request.target.Target;
 
 import org.aldofrankmarco.shak.R;
 import org.aldofrankmarco.shak.models.Notification;
-import org.aldofrankmarco.shak.models.User;
-import org.aldofrankmarco.shak.people.http.GetUserByUsernameResponse;
 import org.aldofrankmarco.shak.profile.controllers.ProfileFragment;
 import org.aldofrankmarco.shak.profile.http.GetUserProfileImageResponse;
-import org.aldofrankmarco.shak.services.ImagesService;
-import org.aldofrankmarco.shak.services.NotificationsService;
-import org.aldofrankmarco.shak.services.ServiceGenerator;
-import org.aldofrankmarco.shak.services.UsersService;
 import org.aldofrankmarco.shak.streams.controllers.LoggedUserActivity;
 import org.ocpsoft.prettytime.PrettyTime;
 
@@ -160,16 +154,24 @@ public class NotificationsListAdapter extends RecyclerView.Adapter<Notifications
                     holder.imageProfile.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            ProfileFragment profileFragment = ProfileFragment.newInstance(senderUsername);
-                            LoggedUserActivity.getLoggedUserActivity().changeFragment(profileFragment);
+                            ProfileFragment profileFragment = LoggedUserActivity.getLoggedUserActivity()
+                                    .getProfileFragments();
+                            ProfileFragment userInformationProfile = profileFragment
+                                    .newInstanceUserViewInformation(senderUsername);
+                            LoggedUserActivity.getLoggedUserActivity().changeFragment(userInformationProfile);
                         }
                     });
 
                     holder.notifyContent.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            ProfileFragment profileFragment = ProfileFragment.newInstance(senderUsername);
-                            LoggedUserActivity.getLoggedUserActivity().changeFragment(profileFragment);
+                            //ProfileFragment profileFragment = ProfileFragment.newInstance(senderUsername);
+                            //LoggedUserActivity.getLoggedUserActivity().changeFragment(profileFragment);
+                            ProfileFragment profileFragment = LoggedUserActivity.getLoggedUserActivity()
+                                    .getProfileFragments();
+                            ProfileFragment userInformationProfile = profileFragment
+                                    .newInstanceUserViewInformation(senderUsername);
+                            LoggedUserActivity.getLoggedUserActivity().changeFragment(userInformationProfile);
                         }
                     });
                 } else {

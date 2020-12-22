@@ -39,8 +39,6 @@ public class CommentFormFragment extends Fragment implements View.OnClickListene
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        LoggedUserActivity.getSocket().on("refreshPage", CommentsListFragment.updatePostCommentsList);
     }
 
     @Override
@@ -91,7 +89,6 @@ public class CommentFormFragment extends Fragment implements View.OnClickListene
             public void onResponse(Call<Object> call, Response<Object> response) {
                 if (response.isSuccessful()) {
                     assert getView() != null : "getView() non doveva essere null";
-                    assert getFragmentManager() != null : "getFragmentManager() non doveva essere null";
 
                     Snackbar.make(getView(), "Comment Added Successfully!!", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
@@ -99,7 +96,7 @@ public class CommentFormFragment extends Fragment implements View.OnClickListene
                     // il fragment chiude se stesso
                     closeCommentBox();
 
-                    //LoggedUserActivity.getSocket().emit("refresh");
+                    LoggedUserActivity.getSocket().emit("refreshListAfterInsertionComment");
                 } else {
                     Toast.makeText(getActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                 }
@@ -117,7 +114,8 @@ public class CommentFormFragment extends Fragment implements View.OnClickListene
      */
     private void closeCommentBox() {
 
-        LoggedUserActivity.getLoggedUserActivity().changeFragment(LoggedUserActivity.getLoggedUserActivity().getCommentsListFragment());
+        LoggedUserActivity.getLoggedUserActivity().changeFragment(
+                LoggedUserActivity.getLoggedUserActivity().getCommentsListFragment());
 
         commentContentField.setText("");
         //getFragmentManager().beginTransaction().remove(HomeFragment.getHomeFragment().getCommentFormFragment()).commitAllowingStateLoss();

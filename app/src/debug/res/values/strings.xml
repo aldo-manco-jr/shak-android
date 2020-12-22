@@ -18,6 +18,8 @@
     <string name="title_chat">Chat</string>
     <string name="title_settings">Settings</string>
 
+    <string name="title_back">Back</string>
+
     <string name="title_streams_tab">Streams</string>
     <string name="title_favourites_tab">Favourites</string>
     <string name="title_users_list">Users List</string>

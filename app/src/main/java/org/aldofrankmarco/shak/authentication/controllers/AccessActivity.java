@@ -134,10 +134,10 @@ public class AccessActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     public static AuthenticationService getAuthenticationService() {
-
         if (authenticationService==null){
             authenticationService = ServiceGenerator.createService(AuthenticationService.class);
         }
+
         return authenticationService;
     }
 }

@@ -131,14 +131,12 @@ public class PostFormFragment extends Fragment implements View.OnClickListener, 
             public void onResponse(Call<Object> call, Response<Object> response) {
                 if (response.isSuccessful()) {
                     assert getView() != null : "getView() non doveva essere null";
-                    assert getFragmentManager() != null : "getFragmentManager() non doveva essere null";
 
                     Snackbar.make(getView(), "Post Added Successfully!!", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
 
                     //LoggedUserActivity.getSocket().emit("refresh");
                     LoggedUserActivity.getSocket().emit("refreshPosts");
-
 
                     // ripristino stato iniziale del contenitore
                     ConstraintLayout.LayoutParams layoutParams =

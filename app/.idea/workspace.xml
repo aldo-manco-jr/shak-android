@@ -4,19 +4,7 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a4928c45-9a95-433b-bb23-131037aca638" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/res/values/strings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/aldofrankmarco/shak/models/Post.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/aldofrankmarco/shak/models/Post.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/aldofrankmarco/shak/services/StreamsService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/aldofrankmarco/shak/services/StreamsService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/aldofrankmarco/shak/streams/controllers/CommentsListFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/aldofrankmarco/shak/streams/controllers/CommentsListFragment.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/aldofrankmarco/shak/streams/controllers/LoggedUserActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/aldofrankmarco/shak/streams/controllers/LoggedUserActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/aldofrankmarco/shak/streams/controllers/PostsListAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/aldofrankmarco/shak/streams/controllers/PostsListAdapter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/aldofrankmarco/shak/streams/controllers/PostsListFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/aldofrankmarco/shak/streams/controllers/PostsListFragment.java" afterDir="false" />
-    </list>
+    <list default="true" id="a4928c45-9a95-433b-bb23-131037aca638" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />

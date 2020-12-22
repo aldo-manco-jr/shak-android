@@ -1,5 +1,6 @@
 package org.aldofrankmarco.shak.profile.controllers;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -46,7 +47,7 @@ import retrofit2.Response;
 
 public class ProfileFragment extends Fragment implements View.OnClickListener, OnBackPressed {
 
-    private User user;
+    private User user = null;
 
     private final String basicUrlImage = "http://res.cloudinary.com/dfn8llckr/image/upload/v";
 
@@ -66,14 +67,16 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
 
     private TabLayout profileTabs;
 
-    private PostsListFragment profilePostsFragment;
-    private PeopleListFragment profileFollowingFragment;
-    private PeopleListFragment profileFollowersFragment;
-    private ImagesListFragment profileImagesFragment;
+    private PostsListFragment profilePostsFragment = null;
+    private PeopleListFragment profileFollowingFragment = null;
+    private PeopleListFragment profileFollowersFragment = null;
+    private ImagesListFragment profileImagesFragment = null;
 
     private static ProfileFragment profileFragment;
 
     private View view;
+
+    private ProfileFragment userViewInformationFragment = null;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -99,12 +102,12 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
             @Nullable Bundle savedInstanceState
     ) {
         view = inflater.inflate(R.layout.fragment_profile, container, false);
+
         return view;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-
         view.setVisibility(View.GONE);
         Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
         toolbar.setTitle("");
@@ -137,10 +140,27 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
 
         userDataBinding(getArguments().getString("username"));
 
-        getProfilePostsFragment(getArguments().getString("username"));
-        getProfileFollowingFragment(getArguments().getString("username"));
-        getProfileFollowersFragment(getArguments().getString("username"));
-        getProfileImagesFragment(getArguments().getString("username"));
+        boolean isUserOwner = getArguments().getString("username").equals(LoggedUserActivity.getUsernameLoggedUser());
+        if (isUserOwner) {
+            // il frammento riguarda l'utente che ha effettuato il login
+            boolean isExistStreamsFragment = LoggedUserActivity.getLoggedUserActivity().checkStreamsProfileFragmentExist();
+            if (isExistStreamsFragment) {
+                // esiste già un profilo utente caricato e deve essere ripreso
+                profilePostsFragment = LoggedUserActivity.getLoggedUserActivity()
+                        .getProfilePostsFragment(null);
+            } else {
+                // occorre creare il frammento con il profilo dell'utente che ha effettuato l'accesso
+                profilePostsFragment = LoggedUserActivity.getLoggedUserActivity()
+                        .getProfilePostsFragment(LoggedUserActivity.getUsernameLoggedUser());
+            }
+        } else {
+            // è stato aperto per visualizzare le info di un utente diverso dall'utilizzatore
+            profilePostsFragment = getProfilePostsFragment(getArguments().getString("username"));
+        }
+
+        profileFollowingFragment = getProfileFollowingFragment(getArguments().getString("username"));
+        profileFollowingFragment = getProfileFollowersFragment(getArguments().getString("username"));
+        profileImagesFragment = getProfileImagesFragment(getArguments().getString("username"));
 
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getChildFragmentManager(), 0);
         viewPagerAdapter.addFragment(profilePostsFragment, "Streams");
@@ -181,15 +201,33 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
         return profileFragment;
     }
 
-    public static ProfileFragment newInstance(String username) {
+    private ProfileFragment(){
+        //TODO TOGLIERE
+    }
+
+    /**
+     * Il costruttore precefinito (senza argomenti) prevede di creare l'istanza per l'utente loggato
+     */
+    public static ProfileFragment newInstance() {
 
         ProfileFragment profileFragment = new ProfileFragment();
 
         Bundle args = new Bundle();
-        args.putString("username", username);
+        args.putString("username", LoggedUserActivity.getUsernameLoggedUser());
         profileFragment.setArguments(args);
 
         return profileFragment;
+    }
+
+    public ProfileFragment newInstanceUserViewInformation(String username) {
+
+        userViewInformationFragment = new ProfileFragment();
+
+        Bundle args = new Bundle();
+        args.putString("username", username);
+        userViewInformationFragment.setArguments(args);
+
+        return userViewInformationFragment;
     }
 
     private static void addNotificationProfileViewed(String userId){
@@ -205,6 +243,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
         });
     }
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
@@ -311,15 +350,19 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
                 public void onResponse(Call<Object> call, Response<Object> response) {
                     if (response.isSuccessful()) {
 
-                        if (city == null && country != null) {
-                            locationTextView.setText("@" + country);
-                        } else if (city != null && country != null) {
-                            locationTextView.setText("@" + city + ", " + country);
+                        StringBuilder location = new StringBuilder();
+                        location.append("@");
+
+                        if (city == null) {
+                            location.append(country);
+                            locationTextView.setText(location);
+                        } {
+                            location.append(location).append(", ").append(country);
+                            locationTextView.setText(location);
                         }
                         setLocationButton.setVisibility(View.GONE);
                         locationTextView.setVisibility(View.VISIBLE);
                         LoggedUserActivity.getSocket().emit("refresh");
-
                     } else {
                         Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                     }
@@ -333,9 +376,9 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
         }
     }
 
-    public PostsListFragment getProfilePostsFragment(String username) {
+    public PostsListFragment getProfilePostsFragment(@Nullable String username) {
 
-        if (this.profilePostsFragment == null) {
+        if (this.profilePostsFragment == null && username != null) {
             this.profilePostsFragment = PostsListFragment.newInstance("profile", username);
         }
 
@@ -399,7 +442,10 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
                     emailTextView.setText(user.getEmail());
 
                     if (user.getCity() != null && user.getCountry() != null) {
-                        locationTextView.setText("@" + user.getCity() + ", " + user.getCountry());
+                        StringBuilder location = new StringBuilder();
+                        location.append("@").append(user.getCity()).append(", ").append(user.getCountry());
+
+                        locationTextView.setText(location);
                         if (user.getUsername().equals(LoggedUserActivity.getUsernameLoggedUser())) {
                             locationTextView.setVisibility(View.VISIBLE);
                             setLocationButton.setVisibility(View.GONE);

@@ -143,16 +143,26 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
                     holder.imageProfile.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            ProfileFragment profileFragment = ProfileFragment.newInstance(username);
-                            LoggedUserActivity.getLoggedUserActivity().changeFragment(profileFragment);
+                            //ProfileFragment profileFragment = ProfileFragment.newInstance(username);
+                            //LoggedUserActivity.getLoggedUserActivity().changeFragment(profileFragment);
+                            ProfileFragment profileFragment = LoggedUserActivity.getLoggedUserActivity()
+                                    .getProfileFragments();
+                            ProfileFragment userInformationProfile = profileFragment
+                                    .newInstanceUserViewInformation(holder.usernameText.getText().toString().trim());
+                            LoggedUserActivity.getLoggedUserActivity().changeFragment(userInformationProfile);
                         }
                     });
 
                     holder.usernameText.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            ProfileFragment profileFragment = ProfileFragment.newInstance(username);
-                            LoggedUserActivity.getLoggedUserActivity().changeFragment(profileFragment);
+                            //ProfileFragment profileFragment = ProfileFragment.newInstance(username);
+                            //LoggedUserActivity.getLoggedUserActivity().changeFragment(profileFragment);
+                            ProfileFragment profileFragment = LoggedUserActivity.getLoggedUserActivity()
+                                    .getProfileFragments();
+                            ProfileFragment userInformationProfile = profileFragment
+                                    .newInstanceUserViewInformation(holder.usernameText.getText().toString().trim());
+                            LoggedUserActivity.getLoggedUserActivity().changeFragment(userInformationProfile);
                         }
                     });
                 } else {
@@ -179,7 +189,7 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
             @Override
             public void onResponse(Call<Object> call, Response<Object> response) {
                 if (response.isSuccessful()) {
-                    LoggedUserActivity.getSocket().emit("refresh");
+                    LoggedUserActivity.getSocket().emit("refreshListAfterDeleteComment");
                 } else {
                     Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                 }

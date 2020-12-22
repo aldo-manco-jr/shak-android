@@ -5,13 +5,14 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.Ack;
@@ -35,6 +36,7 @@ import org.aldofrankmarco.shak.settings.controllers.SettingsFragment;
 import org.aldofrankmarco.shak.streams.controllers.comments.CommentFormFragment;
 import org.aldofrankmarco.shak.streams.controllers.comments.CommentsListFragment;
 import org.aldofrankmarco.shak.streams.controllers.postslist.PostFormFragment;
+import org.aldofrankmarco.shak.streams.controllers.postslist.PostsListFragment;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -51,13 +53,17 @@ public class LoggedUserActivity extends AppCompatActivity {
     private static String token;
     private static String usernameLoggedUser;
     private static String idLoggedUser;
-    private static boolean isSocketCorrectlyCreate = false;
 
-    private HomeFragment homeFragment;
-    private ProfileFragment profileFragment;
-    private PeopleListFragment peopleFragment;
-    private NotificationsListFragment notificationsFragment;
-    private SettingsFragment settingsFragment;
+    private HomeFragment homeFragment = null;
+    private ProfileFragment profileFragment = null;
+    private PeopleListFragment peopleFragment = null;
+    private NotificationsListFragment notificationsFragment = null;
+    private SettingsFragment settingsFragment = null;
+    private PostsListFragment streamsFragment = null;
+    private PostsListFragment favouritesFragment = null;
+    private PostsListFragment profileFragments = null;
+    private PostsListFragment streamsProfileFragments = null;
+    private PostsListFragment profilePostsFragment = null;
 
     private CommentsListFragment commentsListFragment;
     private CommentFormFragment commentFormFragment;
@@ -72,7 +78,6 @@ public class LoggedUserActivity extends AppCompatActivity {
     private static NotificationsService notificationsService;
 
     private static Socket socket;
-
     {
         try {
             socket = IO.socket("http://10.0.2.2:3000/");
@@ -108,6 +113,9 @@ public class LoggedUserActivity extends AppCompatActivity {
             // stabilita correttamente
             socket.on("online", onLoginEmitter);
             socket.connect();
+            socket.on("refreshListPosts", updatePostsList);
+            socket.on("refreshAddedCommentToList", updateAddedPostCommentsList);
+            socket.on("refreshRemovedCommentFromList", updateRemovedPostCommentsList);
             // invio tramite acknowledgement, per stabilire se l'utente ha impostato i dati del
             // socket correttamente
             socket.emit("online", infoSocketConnection, new Ack() {
@@ -117,7 +125,6 @@ public class LoggedUserActivity extends AppCompatActivity {
                     if (args != null) {
                         assert args[0] != null : "arg doveva essere un array non vuoto";
 
-                        isSocketCorrectlyCreate = true;
                         System.out.println("sendMessage IOAcknowledge" + args[0].toString());
                     }
                 }
@@ -127,11 +134,7 @@ public class LoggedUserActivity extends AppCompatActivity {
         }
 
         sharedPreferences = getSharedPreferences(getString(R.string.sharedpreferences_authentication), Context.MODE_PRIVATE);
-        homeFragment = new HomeFragment();
-        //profileFragment = ProfileFragment.newInstance(usernameLoggedUser);
-        // sostituisce il fragment attuale con un HomeFragment
-        /*getSupportFragmentManager().beginTransaction()
-                .replace(R.id.logged_user_fragment, homeFragment).commit();*/
+        homeFragment = (HomeFragment) createNewInstanceIfNecessary(homeFragment, FragmentsIdentifier.home);
         changeFragment(homeFragment);
     }
 
@@ -148,44 +151,132 @@ public class LoggedUserActivity extends AppCompatActivity {
         }
     };
 
-    private BottomNavigationView.OnNavigationItemSelectedListener navbarListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
+    /**
+     * Quando un post viene pubblicato la home page viene aggiornata.
+     */
+    private Emitter.Listener updatePostsList = new Emitter.Listener() {
+
+        @Override
+        public void call(final Object... args) {
+            if (loggedUserActivity != null){
+                loggedUserActivity.runOnUiThread(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        // quando un post viene pubblicato la socket avvisa del necessario aggiornmento
+                        getStreamsFragment().getAllNewPosts();
+                    }
+                });
+            }
+        }
+    };
+
+    /**
+     * Quando un commento viene pubblicato la home page viene aggiornata.
+     */
+    public static Emitter.Listener updateAddedPostCommentsList = new Emitter.Listener() {
+
+        @Override
+        public void call(final Object... args) {
+            if (LoggedUserActivity.getLoggedUserActivity() != null) {
+                LoggedUserActivity.getLoggedUserActivity().runOnUiThread(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        // quando un commento viene pubblicato la socket avvisa del necessario aggiornmento
+                        Log.v("refres", "ALLPOST refresh socket success dlete");
+                        LoggedUserActivity.getLoggedUserActivity().getCommentsListFragment().getAllPostComments();
+                        LoggedUserActivity.getLoggedUserActivity().getCommentsListFragment()
+                                .getPost().incrementTotalComments();
+                    }
+                });
+            }
+        }
+    };
+
+    /**
+     * Quando un commento viene pubblicato la home page viene aggiornata.
+     */
+    public static Emitter.Listener updateRemovedPostCommentsList = new Emitter.Listener() {
+
+        @Override
+        public void call(final Object... args) {
+            if (LoggedUserActivity.getLoggedUserActivity() != null) {
+                LoggedUserActivity.getLoggedUserActivity().runOnUiThread(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        // quando un commento viene cancellato la socket avvisa del necessario aggiornmento
+                        Log.v("refres", "ALLPOST refresh socket success dlete");
+                        LoggedUserActivity.getLoggedUserActivity().getCommentsListFragment().getAllPostComments();
+                        LoggedUserActivity.getLoggedUserActivity().getCommentsListFragment()
+                                .getPost().decrementTotalComments();
+                    }
+                });
+            }
+        }
+    };
+
+    private BottomNavigationView.OnNavigationItemSelectedListener navbarListener =
+            new BottomNavigationView.OnNavigationItemSelectedListener() {
 
         @SuppressLint("NonConstantResourceId")
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            Fragment selectedFragment = null;
-            Integer navigationSectionIdentifier = item.getItemId();
+            int navigationSectionIdentifier = item.getItemId();
 
             switch (navigationSectionIdentifier) {
                 case R.id.navigation_home:
-                    homeFragment = new HomeFragment();
-                    selectedFragment = homeFragment;
+                    homeFragment = (HomeFragment) createNewInstanceIfNecessary(homeFragment, FragmentsIdentifier.home);
+                    changeFragment(homeFragment);
                     break;
                 case R.id.navigation_profile:
-                    profileFragment = ProfileFragment.newInstance(LoggedUserActivity.getUsernameLoggedUser());
-                    selectedFragment = profileFragment;
+                    profileFragment = (ProfileFragment)
+                            createNewInstanceIfNecessary(profileFragment,  FragmentsIdentifier.profile);
+                    changeFragment(profileFragment);
                     break;
                 case R.id.navigation_users:
-                    peopleFragment = PeopleListFragment.newInstance("all");
-                    selectedFragment = peopleFragment;
+                    peopleFragment = (PeopleListFragment)
+                            createNewInstanceIfNecessary(peopleFragment,  FragmentsIdentifier.people);
+                    changeFragment(peopleFragment);
                     break;
                 case R.id.navigation_notifications:
-                    notificationsFragment = new NotificationsListFragment();
-                    selectedFragment = notificationsFragment;
+                    notificationsFragment = (NotificationsListFragment)
+                            createNewInstanceIfNecessary(notificationsFragment,  FragmentsIdentifier.notifications);
+                    changeFragment(notificationsFragment);
                     break;
                 case R.id.navigation_settings:
-                    settingsFragment = new SettingsFragment();
-                    selectedFragment = settingsFragment;
+                    settingsFragment = (SettingsFragment)
+                            createNewInstanceIfNecessary(settingsFragment,  FragmentsIdentifier.settings);
+                    changeFragment(settingsFragment);
                     break;
             }
-
-            // sostituisce il fragment attuale con un fragment scelto
-            assert selectedFragment != null : "selectedFragment non poteva essere null";
-            changeFragment(selectedFragment);
 
             return true;
         }
     };
+
+
+    private Fragment createNewInstanceIfNecessary(Fragment fragment, FragmentsIdentifier identifier){
+        if (fragment == null) {
+            try {
+                if (identifier == FragmentsIdentifier.home) {
+                    fragment = HomeFragment.newInstance();
+                } else if (identifier == FragmentsIdentifier.people) {
+                    fragment = PeopleListFragment.newInstance();
+                } else if (identifier == FragmentsIdentifier.profile) {
+                    fragment = ProfileFragment.newInstance();
+                } else if (identifier == FragmentsIdentifier.notifications) {
+                    fragment = NotificationsListFragment.class.newInstance();
+                } else if (identifier == FragmentsIdentifier.settings) {
+                    fragment = SettingsFragment.class.newInstance();
+                }
+            } catch (Exception ignored) {
+            }
+        }
+
+        return fragment;
+    }
 
     public static StreamsService getStreamsService() {
 
@@ -233,7 +324,7 @@ public class LoggedUserActivity extends AppCompatActivity {
 
     @Override
     public void onDestroy() {
-        homeFragment = null;
+        /*homeFragment = null;
         profileFragment = null;
         peopleFragment = null;
         notificationsFragment = null;
@@ -242,7 +333,7 @@ public class LoggedUserActivity extends AppCompatActivity {
         streamsService = null;
         imagesService = null;
         usersService = null;
-        notificationsService = null;
+        notificationsService = null;*/
 
         socket.disconnect();
         //socket.off("disconnect");
@@ -294,9 +385,15 @@ public class LoggedUserActivity extends AppCompatActivity {
 
     //TODO NON VA BENE QUESTO METODO
     // le socket vengono ripetute tante volte quante sono le volte in cui il frmmento è STATO creato
-    public void changeFragment(Fragment newFragment) {
+    public void changeFragment(Fragment selectedFragment) {//newFragment) {
 //TODO è sbagliata, i frammenti continuano a esistere da qualche parte
-        Fragment oldFragment = getSupportFragmentManager().findFragmentById(R.id.logged_user_fragment);
+        try {
+            //selectedFragment = (Fragment) fragmentClass.newInstance();
+            // Insert the fragment by replacing any existing fragment
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.beginTransaction().replace(R.id.logged_user_fragment, selectedFragment).commit();
+        } catch (Exception ignored) {}
+        /*Fragment oldFragment = getSupportFragmentManager().findFragmentById(R.id.logged_user_fragment);
 
         if (oldFragment != newFragment) {
 
@@ -306,14 +403,14 @@ public class LoggedUserActivity extends AppCompatActivity {
             if (oldFragment != null) {
                 transactionsManager
                         .replace(R.id.logged_user_fragment, newFragment)
-                        .remove(oldFragment)
+                        //.remove(oldFragment)
                         .commit();
             } else {
                 transactionsManager
                         .replace(R.id.logged_user_fragment, newFragment)
                         .commit();
             }
-        }
+        }*/
     }
 
     public static Socket getSocket() {
@@ -324,5 +421,53 @@ public class LoggedUserActivity extends AppCompatActivity {
         return loggedUserActivity;
     }
 
+    public PostsListFragment getStreamsFragment() {
+        if (streamsFragment == null) {
+            streamsFragment = PostsListFragment.newInstance("all");
+            streamsFragment.getAllPosts();
+        }
 
+        return streamsFragment;
+    }
+
+    public PostsListFragment getFavouritesFragment() {
+        if (favouritesFragment == null) {
+            favouritesFragment = PostsListFragment.newInstance("favourites");
+        }
+
+        return favouritesFragment;
+    }
+
+    public ProfileFragment getProfileFragments() {
+        if (profileFragment == null) {
+            profileFragment = ProfileFragment.newInstance();
+        }
+
+        return profileFragment;
+    }
+
+    /*public PostsListFragment getStreamsProfileFragments() {
+        if (this.streamsProfileFragments == null) {
+            this.streamsProfileFragments = PostsListFragment.newInstance("profile");
+        }
+        Log.v("rrr", "creato streams o ripreso");
+
+        return this.streamsProfileFragments;
+    }*/
+
+    public PostsListFragment getProfilePostsFragment(@Nullable String username) {
+        if (this.profilePostsFragment == null && username != null) {
+            this.profilePostsFragment = PostsListFragment.newInstance("profile", username);
+        }
+
+        return profilePostsFragment;
+    }
+
+    public boolean checkProfileFragmentExist() {
+        return (profileFragment != null);
+    }
+
+    public boolean checkStreamsProfileFragmentExist() {
+        return (this.profilePostsFragment != null);
+    }
 }

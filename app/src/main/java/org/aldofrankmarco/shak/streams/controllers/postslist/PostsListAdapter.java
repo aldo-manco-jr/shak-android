@@ -124,19 +124,27 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
             holder.imagePost.setVisibility(View.GONE);
         }
 
+
+        //TODO OCCORRE DISTRUGGERE I FRAMMENTI EXTRA CREATI O RIUSARE SEMPRE LO STESSO
         holder.usernameText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ProfileFragment profileFragment = ProfileFragment.newInstance(holder.usernameText.getText().toString().trim());
-                LoggedUserActivity.getLoggedUserActivity().changeFragment(profileFragment);
+                ProfileFragment profileFragment = LoggedUserActivity.getLoggedUserActivity()
+                        .getProfileFragments();
+                ProfileFragment userInformationProfile = profileFragment
+                        .newInstanceUserViewInformation(holder.usernameText.getText().toString().trim());
+                LoggedUserActivity.getLoggedUserActivity().changeFragment(userInformationProfile);
             }
         });
 
         holder.imageProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ProfileFragment profileFragment = ProfileFragment.newInstance(holder.usernameText.getText().toString().trim());
-                LoggedUserActivity.getLoggedUserActivity().changeFragment(profileFragment);
+                ProfileFragment profileFragment = LoggedUserActivity.getLoggedUserActivity()
+                        .getProfileFragments();
+                ProfileFragment userInformationProfile = profileFragment
+                        .newInstanceUserViewInformation(holder.usernameText.getText().toString().trim());
+                LoggedUserActivity.getLoggedUserActivity().changeFragment(userInformationProfile);
             }
         });
 
@@ -158,6 +166,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
             holder.likeButton.setTag("like");
         }*/
 
+        // se l'utente non è il proprietario del post è possibile mettere like
         holder.likeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -215,16 +224,45 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
     /**
      * @param newListPosts
     * TODO
-    * */
+    */
     public void addPosts(List<Post> newListPosts) {
         assert (newListPosts != null) : "newLIstPost non può essere null";
 
-        if (this.listPosts.size() > 0){
-            newListPosts.addAll(this.listPosts);
+        int newListMaxIndex = (newListPosts.size() -1);
+        for (int i = newListMaxIndex; i >= 0; i--) {
+            // i nuovi messaggi vengono aggiunti in cima alla lista
+            this.listPosts.add(0, newListPosts.get(i));
         }
-
-        this.listPosts = newListPosts;
     }
+
+    /**
+     * @param newListPosts la lista dei nuovi post
+     *
+     * Il metodo prende una lista di post e verifica quali post siano dell'utente che ha effettuato
+     * il login, successivamente aggiunge solo i post opportuni alla lista dei post considerati
+     */
+    public void addLoggedUserPosts(List<Post> newListPosts) {
+        assert (newListPosts != null) : "newLIstPost non può essere null";
+
+        int newListMaxIndex = (newListPosts.size() -1);
+        for (int i = newListMaxIndex; i >= 0; i--) {
+            // i nuovi messaggi vengono aggiunti in cima alla lista
+            boolean isUserPost = (newListPosts.get(i).getUsernamePublisher().equals(
+                    LoggedUserActivity.getUsernameLoggedUser()));
+            if (isUserPost){
+                // i nuovi messaggi dell'utente vengono aggiunti in cima alla lista
+                this.listPosts.add(0, newListPosts.get(i));
+            }
+        }
+        /*for (Post post: newListPosts) {
+            boolean isUserPost = (post.getUsernamePublisher().equals(LoggedUserActivity.getUsernameLoggedUser()));
+            if (isUserPost){
+                // i nuovi messaggi vengono aggiunti in cima alla lista
+                this.listPosts.add(0, post);
+            }
+        }*/
+    }
+
 
     /**
      * @param post un post generico in input
@@ -250,10 +288,16 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
      */
     private void likeOrUnlike(final Post post, final PostItemHolder holder, final View view) {
 
-        String type = fatherListFragment.getType();
+        final LoggedUserActivity userActivity =
+                LoggedUserActivity.getLoggedUserActivity();
+        final PostsListFragment streamsFragment =
+                HomeFragment.getHomeFragment().getStreamsFragment();
+        final PostsListFragment favouritesFragment =
+                HomeFragment.getHomeFragment().getFavouritesFragment();
 
         //if (!isLiked(post)) {
-        if(!post.getIsLiked()){
+        boolean isUnlikePost = !post.getIsLiked();
+        if(isUnlikePost){
             // viene aggiunto ai preferiti
             Call<Object> httpRequest = LoggedUserActivity.getStreamsService().likePost(post);
 
@@ -262,13 +306,25 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
                 public void onResponse(Call<Object> call, Response<Object> response) {
                     if (response.isSuccessful()) {
                         post.putIsLiked(true);
+
+                        ProfileFragment profileFragment = ProfileFragment.getProfileFragment();
+                        if (profileFragment != null) {
+                            PostsListFragment profilePostsFragment = profileFragment.getProfilePostsFragment(post.getUsernamePublisher());
+                            profilePostsFragment.pullPost(profilePostsFragment, post);
+                            profilePostsFragment.adapterNotifyChange(profilePostsFragment, AdapterNotifyType.dataSetChanged);
+                        }
+
+                        streamsFragment.pullPost(streamsFragment, post);
+                        streamsFragment.adapterNotifyChange(streamsFragment, AdapterNotifyType.dataSetChanged);
+                        favouritesFragment.pushOnFavoritesList(post);
+                        /*post.putIsLiked(true);
                         //holder.likeButton.setImageResource(R.drawable.ic_favorite_real_black_24dp);
                         //holder.likeButton.setTag("like");
 
                         //post.addLiketoArray(LoggedUserActivity.getUsernameLoggedUser());
                         //postsListFragment.adapter.notifyDataSetChanged();
                         fatherListFragment.adapterNotifyChange(fatherListFragment, AdapterNotifyType.dataSetChanged);
-                        HomeFragment.getHomeFragment().getFavouritesFragment().pushOnFavoritesList(post);
+                        HomeFragment.getHomeFragment().getFavouritesFragment().pushOnFavoritesList(post);*/
                     } else {
                         Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                     }
@@ -288,27 +344,60 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
                 public void onResponse(Call<Object> call, Response<Object> response) {
                     if (response.isSuccessful()) {
                         post.putIsLiked(false);
+
+                        ProfileFragment profileFragment = ProfileFragment.getProfileFragment();
+                        if (profileFragment != null) {
+                            PostsListFragment profilePostsFragment = profileFragment.getProfilePostsFragment(post.getUsernamePublisher());
+                            profilePostsFragment.pullPost(profilePostsFragment, post);
+                            profilePostsFragment.adapterNotifyChange(profilePostsFragment, AdapterNotifyType.dataSetChanged);
+                        }
+
+                        streamsFragment.pullPost(streamsFragment, post);
+                        streamsFragment.adapterNotifyChange(streamsFragment, AdapterNotifyType.dataSetChanged);
+                        favouritesFragment.removeLikeFromFavoritesList(post);
                         //holder.likeButton.setImageResource(R.drawable.ic_favorite_border_black_24dp);
                         //holder.likeButton.setTag("unlike");
-
-                        String type = fatherListFragment.getType();
-
-                        if (!type.equals("profile")) {
-                            PostsListFragment streamsFragment = HomeFragment.getHomeFragment().getStreamsFragment();
-                            PostsListFragment favouritesFragment = HomeFragment.getHomeFragment().getFavouritesFragment();
+                        //post.putIsLiked(false);
+                        /*ProfileFragment profileFragment = ProfileFragment.getProfileFragment();
+                        if (profileFragment != null) {
+                            PostsListFragment profilePostsFragment = profileFragment.getProfilePostsFragment(post.getUsernamePublisher());
+                            fatherListFragment.removeLikeFromProfilePostsList(post, holder, profilePostsFragment);
+                        }
+                        favouritesFragment.removeLikeFromFavoritesList(post);
+                        streamsFragment.removeLikeFromStreamsList(post, holder, streamsFragment, favouritesFragment);
+                        /*if (!type.equals("profile")) {
 
                             if (type.equals("all")) {
+                                post.putIsLiked(false);
                                 //post.removeLikeFromArray(LoggedUserActivity.getUsernameLoggedUser());
                                 //HomeFragment.getHomeFragment().getStreamsFragment().adapter.notifyItemChanged(holder.getAdapterPosition());
                                 streamsFragment.adapterNotifyChange(streamsFragment, AdapterNotifyType.dataSetChanged);
                                 favouritesFragment.removeLikeFromFavoritesList(post);
+
+                                // in entrambi i casi sopra citati occorre verificare se il like deve essere
+                                //tolto anche in profile
+                                if (userActivity.checkProfilePostsFragmentExist() &&
+                                        userActivity.getProfileFragments().getOwnerUsername()
+                                                .equals(LoggedUserActivity.getUsernameLoggedUser())){
+                                    // esiste e con l'utente loggato, devono essere aggiornati i messaggi personali
+                                    if (userActivity.checkProfilePostsFragmentExist()) {
+                                        fatherListFragment.removeLikeFromProfilePostsList(post, holder,  userActivity.getProfilePostsFragment(null));
+                                    }
+                                }
                             } else if (type.equals("favourites")) {
-                                fatherListFragment.removeLikeFromStreamsList(post, holder, streamsFragment, favouritesFragment);
+                                post.putIsLiked(false);
+                                streamsFragment.removeLikeFromStreamsList(post, holder, streamsFragment, favouritesFragment);
+                                if (userActivity.checkProfilePostsFragmentExist()) {
+                                    fatherListFragment.removeLikeFromProfilePostsList(post, holder, userActivity.getProfilePostsFragment(null));
+                                }
                             }
                         } else {
-                            PostsListFragment profilePostsFragment = ProfileFragment.getProfileFragment().getProfilePostsFragment(post.getUsernamePublisher());
-                            fatherListFragment.removeLikeFromProfilePostsList(post, holder, profilePostsFragment);
-                        }
+                            post.putIsLiked(false);
+                            //PostsListFragment profilePostsFragment = ProfileFragment.getProfileFragment().getProfilePostsFragment(post.getUsernamePublisher());
+                            //fatherListFragment.removeLikeFromProfilePostsList(post, holder, profilePostsFragment);
+                            favouritesFragment.removeLikeFromFavoritesList(post);
+                            streamsFragment.removeLikeFromStreamsList(post, holder, streamsFragment, favouritesFragment);
+                        }*/
                     } else {
                         Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                     }

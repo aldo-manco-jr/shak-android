@@ -16,7 +16,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
@@ -25,8 +24,6 @@ import androidx.fragment.app.Fragment;
 import org.aldofrankmarco.shak.R;
 import org.aldofrankmarco.shak.authentication.http.LoginRequest;
 import org.aldofrankmarco.shak.authentication.http.LoginResponse;
-import org.aldofrankmarco.shak.services.AuthenticationService;
-import org.aldofrankmarco.shak.services.ServiceGenerator;
 import org.aldofrankmarco.shak.streams.controllers.LoggedUserActivity;
 
 import retrofit2.Call;
@@ -88,6 +85,10 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
                     intentLoggedUser.putExtra("_id", response.body().getUserFound().getId());
                     intentLoggedUser.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intentLoggedUser);
+
+                    Intent intent = new Intent(getActivity(), AccessActivity.class);
+                    getActivity().stopService(intent);
+
                     ActivityCompat.finishAffinity(getActivity());
                 } else {
 

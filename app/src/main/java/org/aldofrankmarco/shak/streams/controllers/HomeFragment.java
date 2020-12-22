@@ -13,7 +13,6 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.viewpager.widget.ViewPager;
 
-import com.github.nkzawa.emitter.Emitter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 
@@ -34,17 +33,21 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
     private TabLayout homeTabs;
 
+    private PostFormFragment postFormFragment;
     private PostsListFragment streamsFragment;
     private PostsListFragment favouritesFragment;
-    private PostFormFragment postFormFragment;
 
     private static HomeFragment homeFragment;
+
+    public static HomeFragment newInstance() {
+        HomeFragment fragment = new HomeFragment();
+
+        return fragment;
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        LoggedUserActivity.getSocket().on("refreshListPosts", updatePostsList);
     }
 
     @Nullable
@@ -56,38 +59,24 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     ) {
         View homeFragmentView = inflater.inflate(R.layout.fragment_home, container, false);
 
-        //TODO Aldo non mi dire che questa riga è il costruttore, visto che manca ma la instanzi lo stesso
         homeFragment = this;
-
-        // TODO Aldo ho bisogno di resettare i pannelli perchè hai aggiunto il comportamento di
-        // cancellare i frammenti che vengono chiusi e causa problemi, LE ALTRE CLASSI NON VENGONO
-        // INSTANZIATE NUOVAMENTE
-        streamsFragment = null;
-        favouritesFragment = null;
-        postFormFragment = null;
 
         viewPager = homeFragmentView.findViewById(R.id.view_pager);
         homeTabs = homeFragmentView.findViewById(R.id.home_tabs);
         FloatingActionButton fab = homeFragmentView.findViewById(R.id.fab_switch_to_post_form);
 
-        getStreamsFragment();
-        getFavouritesFragment();
+        streamsFragment = getStreamsFragment();
+        favouritesFragment = getFavouritesFragment();
 
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getChildFragmentManager(), 0);
-        viewPagerAdapter.addFragment(streamsFragment, "Streams");
-        viewPagerAdapter.addFragment(favouritesFragment, "Favourites");
+        viewPagerAdapter.addFragment(getStreamsFragment(), "Streams");
+        viewPagerAdapter.addFragment(getFavouritesFragment(), "Favourites");
         viewPager.setAdapter(viewPagerAdapter);
 
         homeTabs.setupWithViewPager(viewPager);
 
         homeTabs.getTabAt(0).setIcon(R.drawable.ic_library_books_black_24dp);
         homeTabs.getTabAt(1).setIcon(R.drawable.ic_favorite_black_24dp);
-
-        /*
-        BadgeDrawable unreadPostsBadge = homeTabs.getTabAt(0).getOrCreateBadge();
-        unreadPostsBadge.setVisible(true);
-        unreadPostsBadge.setNumber(12);
-         */
 
         fab.setOnClickListener(this);
 
@@ -105,47 +94,16 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    /**
-     * Quando un post viene pubblicato la home page viene aggiornata.
-     */
-    private Emitter.Listener updatePostsList = new Emitter.Listener() {
-
-        @Override
-        public void call(final Object... args) {
-            if (getActivity() != null){
-                getActivity().runOnUiThread(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        // quando un post viene pubblicato la socket avvisa del necessario aggiornmento
-                        HomeFragment.getHomeFragment().getStreamsFragment().getAllNewPosts();
-                    }
-                });
-            }
-        }
-    };
-
     public static HomeFragment getHomeFragment() {
         return homeFragment;
     }
 
     public PostsListFragment getStreamsFragment() {
-
-        if (this.streamsFragment == null) {
-            this.streamsFragment = PostsListFragment.newInstance("all");
-            this.streamsFragment.getAllPosts();
-        }
-
-        return streamsFragment;
+        return LoggedUserActivity.getLoggedUserActivity().getStreamsFragment();
     }
 
     public PostsListFragment getFavouritesFragment() {
-
-        if (this.favouritesFragment == null) {
-            this.favouritesFragment = PostsListFragment.newInstance("favourites");
-        }
-
-        return favouritesFragment;
+        return LoggedUserActivity.getLoggedUserActivity().getFavouritesFragment();
     }
 
     private class ViewPagerAdapter extends FragmentPagerAdapter {

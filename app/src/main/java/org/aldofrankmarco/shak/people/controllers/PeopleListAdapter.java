@@ -1,6 +1,5 @@
 package org.aldofrankmarco.shak.people.controllers;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,8 +20,6 @@ import org.aldofrankmarco.shak.R;
 import org.aldofrankmarco.shak.models.User;
 import org.aldofrankmarco.shak.people.http.IsFollowingResponse;
 import org.aldofrankmarco.shak.profile.controllers.ProfileFragment;
-import org.aldofrankmarco.shak.services.ServiceGenerator;
-import org.aldofrankmarco.shak.services.UsersService;
 import org.aldofrankmarco.shak.streams.controllers.LoggedUserActivity;
 
 import java.util.List;
@@ -108,8 +105,13 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
         holder.layoutItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ProfileFragment profileFragment = ProfileFragment.newInstance(holder.usernameText.getText().toString().trim());
-                LoggedUserActivity.getLoggedUserActivity().changeFragment(profileFragment);
+                //ProfileFragment profileFragment = ProfileFragment.newInstance(holder.usernameText.getText().toString().trim());
+                //LoggedUserActivity.getLoggedUserActivity().changeFragment(profileFragment);
+                ProfileFragment profileFragment = LoggedUserActivity.getLoggedUserActivity()
+                        .getProfileFragments();
+                ProfileFragment userInformationProfile = profileFragment
+                        .newInstanceUserViewInformation(holder.usernameText.getText().toString().trim());
+                LoggedUserActivity.getLoggedUserActivity().changeFragment(userInformationProfile);
             }
         });
     }

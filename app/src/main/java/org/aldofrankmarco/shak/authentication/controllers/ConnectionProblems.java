@@ -43,6 +43,10 @@ public class ConnectionProblems extends AppCompatActivity implements View.OnClic
 
             intentFirstActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intentFirstActivity);
+
+            Intent intent = new Intent(this, ConnectionProblems.class);
+            stopService(intent);
+
             ActivityCompat.finishAffinity(this);
         }
     }
