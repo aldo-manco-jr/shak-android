@@ -37,20 +37,18 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
 
     private List<Comment> listComments;
 
+    private CommentsListFragment fatherFragment;
+
     public static String postId;
 
     private final String basicUrlImage = "http://res.cloudinary.com/dfn8llckr/image/upload/v";
 
-    public CommentsListAdapter(List<Comment> listComments) {
+    public CommentsListAdapter(List<Comment> listComments, CommentsListFragment commentsListFragment) {
 
+        this.fatherFragment = commentsListFragment;
         this.listComments = new ArrayList<>();
 
-        if (listComments != null) {
-            // se effettivamente esistevano già dei commenti
-            for (int i = listComments.size() - 1; i >= 0; i--) {
-                this.listComments.add(listComments.get(i));
-            }
-        }
+        this.listComments.addAll(listComments);
     }
 
     @NonNull
@@ -190,6 +188,7 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
             public void onResponse(Call<Object> call, Response<Object> response) {
                 if (response.isSuccessful()) {
                     LoggedUserActivity.getSocket().emit("refreshListAfterDeleteComment");
+                    fatherFragment.getAllPostComments();
                 } else {
                     Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                 }

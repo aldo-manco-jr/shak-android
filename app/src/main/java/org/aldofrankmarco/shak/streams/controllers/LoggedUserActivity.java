@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
@@ -62,7 +61,6 @@ public class LoggedUserActivity extends AppCompatActivity {
     private PostsListFragment streamsFragment = null;
     private PostsListFragment favouritesFragment = null;
     private PostsListFragment profileFragments = null;
-    private PostsListFragment streamsProfileFragments = null;
     private PostsListFragment profilePostsFragment = null;
 
     private CommentsListFragment commentsListFragment;
@@ -184,10 +182,13 @@ public class LoggedUserActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         // quando un commento viene pubblicato la socket avvisa del necessario aggiornmento
-                        Log.v("refres", "ALLPOST refresh socket success dlete");
-                        LoggedUserActivity.getLoggedUserActivity().getCommentsListFragment().getAllPostComments();
+                        Post post = LoggedUserActivity.getLoggedUserActivity().getCommentsListFragment()
+                                .getPost();
+                        LoggedUserActivity.getLoggedUserActivity().incrementAllListsForAddAction(post);
+                        /*LoggedUserActivity.getLoggedUserActivity().getCommentsListFragment().getAllPostComments();
                         LoggedUserActivity.getLoggedUserActivity().getCommentsListFragment()
                                 .getPost().incrementTotalComments();
+                         */
                     }
                 });
             }
@@ -207,15 +208,41 @@ public class LoggedUserActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         // quando un commento viene cancellato la socket avvisa del necessario aggiornmento
-                        Log.v("refres", "ALLPOST refresh socket success dlete");
+                        Post post = LoggedUserActivity.getLoggedUserActivity().getCommentsListFragment()
+                                .getPost();
+                        LoggedUserActivity.getLoggedUserActivity().decrementAllListsForAddAction(post);
+                        /*
                         LoggedUserActivity.getLoggedUserActivity().getCommentsListFragment().getAllPostComments();
                         LoggedUserActivity.getLoggedUserActivity().getCommentsListFragment()
                                 .getPost().decrementTotalComments();
+                        */
                     }
                 });
             }
         }
     };
+
+    private void incrementAllListsForAddAction(Post post){
+        if (post.getUsernamePublisher().equals(getUsernameLoggedUser())) {
+            streamsFragment.incrementNumberOfTotalCommentsIfExist(post);
+            favouritesFragment.incrementNumberOfTotalCommentsIfExist(post);
+
+            if (checkStreamsProfileFragmentExist()) {
+                profilePostsFragment.incrementNumberOfTotalCommentsIfExist(post);
+            }
+        }
+    }
+
+    private void decrementAllListsForAddAction(Post post){
+        if (post.getUsernamePublisher().equals(getUsernameLoggedUser())) {
+            streamsFragment.decrementNumberOfTotalCommentsIfExist(post);
+            favouritesFragment.decrementNumberOfTotalCommentsIfExist(post);
+
+            if (checkStreamsProfileFragmentExist()) {
+                profilePostsFragment.decrementNumberOfTotalCommentsIfExist(post);
+            }
+        }
+    }
 
     private BottomNavigationView.OnNavigationItemSelectedListener navbarListener =
             new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -423,7 +450,7 @@ public class LoggedUserActivity extends AppCompatActivity {
 
     public PostsListFragment getStreamsFragment() {
         if (streamsFragment == null) {
-            streamsFragment = PostsListFragment.newInstance("all");
+            streamsFragment = PostsListFragment.newInstance("streams");
             streamsFragment.getAllPosts();
         }
 
@@ -450,7 +477,6 @@ public class LoggedUserActivity extends AppCompatActivity {
         if (this.streamsProfileFragments == null) {
             this.streamsProfileFragments = PostsListFragment.newInstance("profile");
         }
-        Log.v("rrr", "creato streams o ripreso");
 
         return this.streamsProfileFragments;
     }*/
@@ -468,6 +494,6 @@ public class LoggedUserActivity extends AppCompatActivity {
     }
 
     public boolean checkStreamsProfileFragmentExist() {
-        return (this.profilePostsFragment != null);
+        return (this.profileFragment != null && this.profilePostsFragment != null);
     }
 }

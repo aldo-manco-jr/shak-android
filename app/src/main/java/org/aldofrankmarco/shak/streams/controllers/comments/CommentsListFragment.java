@@ -1,7 +1,6 @@
 package org.aldofrankmarco.shak.streams.controllers.comments;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -118,8 +117,6 @@ public class CommentsListFragment extends Fragment implements OnBackPressed {
             return;
         }
 
-        Log.v("refres", "renro fetAllpost");
-
         Call<GetAllPostCommentsResponse> httpRequest = LoggedUserActivity.getStreamsService().getAllPostComments(postId);
 
         httpRequest.enqueue(new Callback<GetAllPostCommentsResponse>() {
@@ -128,12 +125,19 @@ public class CommentsListFragment extends Fragment implements OnBackPressed {
             public void onResponse(Call<GetAllPostCommentsResponse> call, Response<GetAllPostCommentsResponse> response) {
 
                 if (response.isSuccessful()) {
-
-                    Log.v("refres", "resuccess");
-                    //TODO ERA NULL
                     listPostComments = response.body().getCommentsList();
 
                     initializeRecyclerView();
+
+                    if (listPostComments.size() != post.getTotalComments()){
+                        // se le liste sono diverse occorre aggiornare il numero dei commenti
+                        while (post.getTotalComments() < listPostComments.size()){
+                            post.incrementTotalComments();
+                        }
+                        while (post.getTotalComments() > listPostComments.size()){
+                            post.decrementTotalComments();
+                        }
+                    }
                 } else {
                     Toast.makeText(getActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                 }
@@ -151,7 +155,7 @@ public class CommentsListFragment extends Fragment implements OnBackPressed {
      */
     private void initializeRecyclerView() {
         RecyclerView recyclerView = view.findViewById(R.id.listComments);
-        CommentsListAdapter adapter = new CommentsListAdapter(this.listPostComments);
+        CommentsListAdapter adapter = new CommentsListAdapter(this.listPostComments, this);
 
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));

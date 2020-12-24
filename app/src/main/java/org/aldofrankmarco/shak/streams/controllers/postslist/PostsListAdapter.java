@@ -44,6 +44,9 @@ import retrofit2.Response;
  */
 public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.PostItemHolder> {
 
+    private boolean allOldPostsAreLoaded = false;
+
+    private List<Post> lastNewElementFound = new ArrayList<>();
     private List<Post> listPosts;
     private PostsListFragment fatherListFragment;
 
@@ -55,6 +58,9 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
     }
 
     public List<Post> getListPosts() {
+        if (this.listPosts == null){
+            this.listPosts = new ArrayList<>();
+        }
         return this.listPosts;
     }
 
@@ -68,14 +74,25 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
         return viewHolder;
     }
 
+    boolean setSwitchAllPostsAreNotLoaded() {
+        return (this.allOldPostsAreLoaded = !this.allOldPostsAreLoaded);
+    }
+
     /**
      * Questo metodo viene eseguito per ogni elemento nella lista, ogni elemento quindi viene
      * processato e aggiunto alla lista.
      */
     @Override
     public void onBindViewHolder(@NonNull final PostItemHolder holder, final int position) {
-        final Post post = listPosts.get(position);
+        final Post post = this.listPosts.get(position);
         final User user = post.getUserId();
+
+        if ((!allOldPostsAreLoaded) && this.listPosts.get(this.listPosts.size() - 1).equals(post)){
+            // quando viene creato se è l'ultimo elemento e se non è stato rimosso il
+//TODO, OCCORRE FERMARLO SE I RISULTATI AGGIUNTI SONO DA AGGIUNGERE SONO 0, NON CI SONO MESSAGGI,
+            // QUINID NON OCCORRE CHIAMARE PIù
+            this.fatherListFragment.getAllPosts();
+        }
 
         final String urlImageProfileUser = this.basicUrlImage + user.getProfileImageVersion() + "/"
                 + user.getProfileImageId();
@@ -234,7 +251,55 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
         int newListMaxIndex = (newListPosts.size() -1);
         for (int i = newListMaxIndex; i >= 0; i--) {
             // i nuovi messaggi vengono aggiunti in cima alla lista
-            this.listPosts.add(0, newListPosts.get(i));
+            if (!this.listPosts.contains(newListPosts.get(i))) {
+                // se l'elemento non è già presente nella lista viene aggiunto
+                this.listPosts.add(0, newListPosts.get(i));
+            }
+        }
+    }
+
+    /**
+     * @param newListPosts
+     * TODO
+     */
+    public void addProfilePosts(List<Post> newListPosts) {
+        assert (newListPosts != null) : "newLIstPost non può essere null";
+
+        int newListMaxIndex = (newListPosts.size() -1);
+        for (int i = newListMaxIndex; i >= 0; i--) {
+            // i nuovi messaggi vengono aggiunti in cima alla lista
+            boolean isLoggedUserOwner = newListPosts.get(i).getUsernamePublisher()
+                    .equals(LoggedUserActivity.getUsernameLoggedUser());
+
+            if (isLoggedUserOwner &&!this.listPosts.contains(newListPosts.get(i))) {
+                // se l'elemento non è già presente nella lista viene aggiunto
+                this.listPosts.add(0, newListPosts.get(i));
+            }
+        }
+    }
+
+    public void addOldPosts(List<Post> newListPosts) {
+        assert (newListPosts != null) : "newLIstPost non può essere null";
+
+        if (this.listPosts.size() == 0) {
+            this.listPosts.addAll(newListPosts);
+
+            return;
+        } else if (this.listPosts.get(this.listPosts.size() - 1).equals(newListPosts.get(newListPosts.size() - 1))){
+            // viene fermata la ricerca di nuovi post e svuotata la variabile di appoggio
+            this.allOldPostsAreLoaded = true;
+
+            return;
+        }
+
+        //int newListMaxIndex = (newListPosts.size() - 1);
+        for (int i = 0; i < newListPosts.size(); i++) {
+            // i nuovi messaggi vengono aggiunti in cima alla lista
+            // TODO è QUI IL PROBLEMA, NON AGGIUNGE
+            if (!this.listPosts.contains(newListPosts.get(i))) {
+                // se l'elemento non è già presente viene aggiunto
+                this.listPosts.add(newListPosts.get(i));
+            }
         }
     }
 
@@ -256,7 +321,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
             // i nuovi messaggi vengono aggiunti in cima alla lista
             boolean isUserPost = (newListPosts.get(i).getUsernamePublisher().equals(
                     LoggedUserActivity.getUsernameLoggedUser()));
-            if (isUserPost){
+            if (isUserPost && !this.listPosts.contains(newListPosts.get(i))){
                 // i nuovi messaggi dell'utente vengono aggiunti in cima alla lista
                 this.listPosts.add(0, newListPosts.get(i));
             }
@@ -270,6 +335,27 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
         }*/
     }
 
+
+    /**
+     * @param newListPosts la lista dei nuovi post
+     *
+     * Il metodo prende una lista di post e verifica quali post siano dell'utente che ha effettuato
+     * il login, successivamente aggiunge solo i post opportuni alla lista dei post considerati
+     */
+    public void addLoggedUserOldPosts(List<Post> newListPosts) {
+        assert (newListPosts != null) : "newLIstPost non può essere null";
+
+        int newListMaxIndex = (newListPosts.size() -1);
+        for (int i = newListMaxIndex; i >= 0; i--) {
+            // i nuovi messaggi vengono aggiunti in cima alla lista
+            boolean isUserPost = (newListPosts.get(i).getUsernamePublisher().equals(
+                    LoggedUserActivity.getUsernameLoggedUser()));
+            if (isUserPost && !this.listPosts.contains(newListPosts.get(i))) {
+                // i nuovi messaggi dell'utente vengono aggiunti in cima alla lista
+                this.listPosts.add((this.listPosts.size() - 1), newListPosts.get(i));
+            }
+        }
+    }
 
     /**
      * @param post un post generico in input
@@ -374,7 +460,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
                         streamsFragment.removeLikeFromStreamsList(post, holder, streamsFragment, favouritesFragment);
                         /*if (!type.equals("profile")) {
 
-                            if (type.equals("all")) {
+                            if (type.equals("streams")) {
                                 post.putIsLiked(false);
                                 //post.removeLikeFromArray(LoggedUserActivity.getUsernameLoggedUser());
                                 //HomeFragment.getHomeFragment().getStreamsFragment().adapter.notifyItemChanged(holder.getAdapterPosition());

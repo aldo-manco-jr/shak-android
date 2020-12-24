@@ -157,6 +157,27 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
             // è stato aperto per visualizzare le info di un utente diverso dall'utilizzatore
             profilePostsFragment = getProfilePostsFragment(getArguments().getString("username"));
         }
+        /*boolean isUserOwner = getArguments().getString("username")
+                .equals(LoggedUserActivity.getUsernameLoggedUser());
+        if (isUserOwner) {
+            profilePostsFragment = getProfilePostsFragment(getArguments().getString("username"));
+            //profilePostsFragment = LoggedUserActivity.getLoggedUserActivity()
+            //        .getProfilePostsFragment(LoggedUserActivity.getUsernameLoggedUser());
+            // il frammento riguarda l'utente che ha effettuato il login
+            /*boolean isExistStreamsFragment = LoggedUserActivity.getLoggedUserActivity().checkStreamsProfileFragmentExist();
+            if (isExistStreamsFragment) {
+                // esiste già un profilo utente caricato e deve essere ripreso
+                profilePostsFragment = LoggedUserActivity.getLoggedUserActivity()
+                        .getProfilePostsFragment(null);
+            } else {
+                // occorre creare il frammento con il profilo dell'utente che ha effettuato l'accesso
+                profilePostsFragment = LoggedUserActivity.getLoggedUserActivity()
+                        .getProfilePostsFragment(LoggedUserActivity.getUsernameLoggedUser());
+            }
+        } else {
+            // è stato aperto per visualizzare le info di un utente diverso dall'utilizzatore
+            profilePostsFragment = getProfilePostsFragment(getArguments().getString("username"));
+        }*/
 
         profileFollowingFragment = getProfileFollowingFragment(getArguments().getString("username"));
         profileFollowingFragment = getProfileFollowersFragment(getArguments().getString("username"));
@@ -195,6 +216,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
             public void onTabReselected(TabLayout.Tab ignored) {
             }
         });
+
+        profilePostsFragment.getAllPosts();
     }
 
     public static ProfileFragment getProfileFragment() {

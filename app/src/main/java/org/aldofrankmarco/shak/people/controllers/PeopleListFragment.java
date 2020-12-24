@@ -45,13 +45,13 @@ public class PeopleListFragment extends Fragment {
     }
 
     /**
-     * Costruttore di default del frammento, prevede l'uso del tipo "all"
+     * Costruttore di default del frammento, prevede l'uso del tipo "streams"
      */
     public static PeopleListFragment newInstance() {
         PeopleListFragment fragment = new PeopleListFragment();
 
         Bundle args = new Bundle();
-        args.putString("type", "all");
+        args.putString("type", "streams");
         fragment.setArguments(args);
 
         return fragment;
@@ -147,7 +147,7 @@ public class PeopleListFragment extends Fragment {
         final String type = getArguments().getString("type");
         username = getArguments().getString("username");
 
-        if (type.equals("all")) {
+        if (type.equals("streams")) {
 
             titleTextView.setVisibility(View.VISIBLE);
 

@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Comment{
+public class Comment implements Comparable<Comment> {
 
     @SerializedName("_id")
     private Object commentId;
@@ -58,5 +58,30 @@ public class Comment{
 
     public String getCreatedAt() {
         return createdAt;
+    }
+
+    @Override
+    public int hashCode() {
+        return this.usernamePublisher.hashCode() + this.createdAt.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Comment))
+            return false;
+        Comment anotherElement = (Comment) o;
+        return this.createdAt.equals(anotherElement.createdAt)
+                && this.usernamePublisher.equals(anotherElement.usernamePublisher);
+    }
+
+    @Override
+    public int compareTo(Comment comment) {
+        int usernameComparationResult = this.usernamePublisher.compareTo(comment.usernamePublisher);
+        int createdAtComparationResult = this.createdAt.compareTo(comment.createdAt);
+
+        if (usernameComparationResult == 0 && createdAtComparationResult == 0)
+            return 0;
+        else
+            return createdAtComparationResult;
     }
 }

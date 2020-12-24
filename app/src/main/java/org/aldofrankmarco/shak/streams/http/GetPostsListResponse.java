@@ -11,10 +11,10 @@ public class GetPostsListResponse {
     @SerializedName("message")
     String message;
 
-    @SerializedName("allPosts")
-    List<Post> arrayPosts;
+    @SerializedName("streamPosts")
+    List<Post> streamPosts;
 
-    @SerializedName("top")
+    @SerializedName("favouritePosts")
     List<Post> favouritePosts;
 
     public String getMessage() {
@@ -22,7 +22,7 @@ public class GetPostsListResponse {
     }
 
     public List<Post> getStreamPosts() {
-        return arrayPosts;
+        return streamPosts;
     }
 
     public List<Post> getFavouritePosts() {

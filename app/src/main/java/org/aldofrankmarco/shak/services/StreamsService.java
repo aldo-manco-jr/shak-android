@@ -19,8 +19,16 @@ import retrofit2.http.Path;
 
 public interface StreamsService {
 
-    @GET("post/list/all")
-    Call<GetPostsListResponse> getAllPosts();
+    @GET("post/list/all/{type}/{created_at}")
+    Call<GetPostsListResponse> getAllPosts(@Path("type") String type,
+                                           @Path("created_at") String oldPostData);
+
+    @GET("post/list/all/streams/{type}/{created_at}")
+    Call<GetPostsListResponse> getAllStreamsPosts(@Path("type") String type,
+                                                  @Path("created_at") String oldPostData);
+
+    @GET("post/list/all/favourites/{created_at}")
+    Call<GetPostsListResponse> getAllFavouritesPosts(@Path("created_at") String oldPostData);
 
     @GET("post/list/all/{post}")
     Call<GetPostsListResponse> getAllSearchedPosts(@Path("post") String postContent);
@@ -28,8 +36,9 @@ public interface StreamsService {
     @GET("post/list/new/{created_at}")
     Call<GetNewPostsListResponse> getAllNewPosts(@Path("created_at") String newPostData);
 
-    @GET("post/list/{username}")
-    Call<GetAllUserPostsResponse> getAllUserPosts(@Path("username") String username);
+    @GET("post/list/{username}/{created_at}")
+    Call<GetAllUserPostsResponse> getAllUserPosts(@Path("username") String username,
+                                                  @Path("created_at") String oldPostData);
 
     @GET("post/{id}")
     Call<GetPostResponse> getPost(@Path("id") String postId);
