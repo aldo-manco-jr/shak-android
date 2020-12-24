@@ -6,11 +6,12 @@ import org.aldofrankmarco.shak.authentication.http.LoginRequest;
 import org.aldofrankmarco.shak.authentication.http.LoginResponse;
 import org.aldofrankmarco.shak.authentication.http.SignupRequest;
 import org.aldofrankmarco.shak.authentication.http.SignupResponse;
-import org.aldofrankmarco.shak.settings.http.ChangePasswordRequest;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
 
 public interface AuthenticationService {
 
@@ -20,9 +21,9 @@ public interface AuthenticationService {
     @POST("auth/signup")
     Call<SignupResponse> signup(@Body SignupRequest signupRequest);
 
-    @POST("auth/face-authentication")
-    Call<LoginResponse> faceAuthentication(@Body JsonObject imageData);
+    @GET("auth/login/face-authentication/{username}")
+    Call<LoginResponse> loginFaceAuthentication(@Path("username") String username);
 
-    @POST("auth/change-password")
-    Call<Object> changePassword(@Body ChangePasswordRequest changePasswordRequest);
+    @POST("auth/upload/face")
+    Call<Object> uploadFacePhoto(@Body JsonObject imageData);
 }

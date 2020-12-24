@@ -6,6 +6,7 @@ import org.aldofrankmarco.shak.people.http.GetFollowingResponse;
 import org.aldofrankmarco.shak.people.http.GetUserByUsernameResponse;
 import org.aldofrankmarco.shak.people.http.IsFollowingResponse;
 import org.aldofrankmarco.shak.people.http.SetUserLocationRequest;
+import org.aldofrankmarco.shak.settings.http.ChangePasswordRequest;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -40,4 +41,7 @@ public interface UsersService {
 
     @DELETE("user/follow/{userFollowed}")
     Call<Object> unfollowUser(@Path("userFollowed") String username);
+
+    @POST("auth/change-password")
+    Call<Object> changePassword(@Body ChangePasswordRequest changePasswordRequest);
 }

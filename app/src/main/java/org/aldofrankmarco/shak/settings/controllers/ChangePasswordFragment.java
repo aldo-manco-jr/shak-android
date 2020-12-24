@@ -102,7 +102,7 @@ public class ChangePasswordFragment extends Fragment implements View.OnClickList
      */
     public void changePwd() {
         ChangePasswordRequest changePasswordJson = new ChangePasswordRequest(old, next, confirm);
-        Call<Object> httpRequest = AccessActivity.getAuthenticationService().changePassword(changePasswordJson);
+        Call<Object> httpRequest = LoggedUserActivity.getUsersService().changePassword(changePasswordJson);
         httpRequest.enqueue(new Callback<Object>() {
 
             @Override
