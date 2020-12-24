@@ -48,8 +48,11 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
         this.fatherFragment = commentsListFragment;
         this.listComments = new ArrayList<>();
 
-        this.listComments.addAll(listComments);
-    }
+
+        for (int i = (listComments.size() - 1); i >= 0; i--) {
+            this.listComments.add(listComments.get(i));
+        }
+     }
 
     @NonNull
     @Override
