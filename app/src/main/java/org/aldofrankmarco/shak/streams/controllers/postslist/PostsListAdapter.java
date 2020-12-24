@@ -51,6 +51,8 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
     private PostsListFragment fatherListFragment;
 
     private final String basicUrlImage = "http://res.cloudinary.com/dfn8llckr/image/upload/v";
+    // quantità massima di post estratti dal database per volta
+    private final int maximumNumberOfExtractableElements = 5;
 
     public PostsListAdapter(PostsListFragment fatherListFragment, View view) {
         this.fatherListFragment = fatherListFragment;
@@ -285,7 +287,9 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
             this.listPosts.addAll(newListPosts);
 
             return;
-        } else if (this.listPosts.get(this.listPosts.size() - 1).equals(newListPosts.get(newListPosts.size() - 1))){
+        } else if (newListPosts.size() < maximumNumberOfExtractableElements
+                || (this.listPosts.get(this.listPosts.size() - 1)
+                .equals(newListPosts.get(newListPosts.size() - 1)))){
             // viene fermata la ricerca di nuovi post e svuotata la variabile di appoggio
             this.allOldPostsAreLoaded = true;
 
