@@ -404,16 +404,16 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
                     if (response.isSuccessful()) {
                         post.putIsLiked(true);
 
+                        streamsFragment.pullPost(streamsFragment, post);
+                        streamsFragment.adapterNotifyChange(streamsFragment, AdapterNotifyType.dataSetChanged);
+                        favouritesFragment.pushOnFavoritesList(post);
+
                         ProfileFragment profileFragment = ProfileFragment.getProfileFragment();
                         if (profileFragment != null) {
                             PostsListFragment profilePostsFragment = profileFragment.getProfilePostsFragment(post.getUsernamePublisher());
                             profilePostsFragment.pullPost(profilePostsFragment, post);
                             profilePostsFragment.adapterNotifyChange(profilePostsFragment, AdapterNotifyType.dataSetChanged);
                         }
-
-                        streamsFragment.pullPost(streamsFragment, post);
-                        streamsFragment.adapterNotifyChange(streamsFragment, AdapterNotifyType.dataSetChanged);
-                        favouritesFragment.pushOnFavoritesList(post);
                         /*post.putIsLiked(true);
                         //holder.likeButton.setImageResource(R.drawable.ic_favorite_real_black_24dp);
                         //holder.likeButton.setTag("like");
@@ -442,16 +442,16 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
                     if (response.isSuccessful()) {
                         post.putIsLiked(false);
 
+                        streamsFragment.pullPost(streamsFragment, post);
+                        streamsFragment.adapterNotifyChange(streamsFragment, AdapterNotifyType.dataSetChanged);
+                        favouritesFragment.removeLikeFromFavoritesList(post);
+
                         ProfileFragment profileFragment = ProfileFragment.getProfileFragment();
                         if (profileFragment != null) {
                             PostsListFragment profilePostsFragment = profileFragment.getProfilePostsFragment(post.getUsernamePublisher());
                             profilePostsFragment.pullPost(profilePostsFragment, post);
                             profilePostsFragment.adapterNotifyChange(profilePostsFragment, AdapterNotifyType.dataSetChanged);
                         }
-
-                        streamsFragment.pullPost(streamsFragment, post);
-                        streamsFragment.adapterNotifyChange(streamsFragment, AdapterNotifyType.dataSetChanged);
-                        favouritesFragment.removeLikeFromFavoritesList(post);
                         //holder.likeButton.setImageResource(R.drawable.ic_favorite_border_black_24dp);
                         //holder.likeButton.setTag("unlike");
                         //post.putIsLiked(false);
