@@ -2,7 +2,7 @@ package org.aldofrankmarco.shak.services;
 
 import com.google.gson.JsonObject;
 
-import org.aldofrankmarco.shak.people.http.GetUserByUsernameResponse;
+import org.aldofrankmarco.shak.profile.http.ImagesResponse;
 import org.aldofrankmarco.shak.profile.http.GetImagesListResponse;
 import org.aldofrankmarco.shak.profile.http.GetUserProfileImageResponse;
 
@@ -22,11 +22,11 @@ public interface ImagesService {
     Call<GetUserProfileImageResponse> getUserProfileImage(@Path("username") String username);
 
     @POST("image")
-    Call<Object> uploadImage(@Body JsonObject imageData);
+    Call<ImagesResponse> uploadImage(@Body JsonObject imageData);
 
     @PUT("image/profile/{imageId}/{imageVersion}")
-    Call<Object> setUserProfilePhoto(@Path("imageId") String imageId, @Path("imageVersion") String imageVersion);
+    Call<ImagesResponse> setUserProfilePhoto(@Path("imageId") String imageId, @Path("imageVersion") String imageVersion);
 
     @PUT("image/cover/{imageId}/{imageVersion}")
-    Call<Object> setUserCoverPhoto(@Path("imageId") String imageId, @Path("imageVersion") String imageVersion);
+    Call<ImagesResponse> setUserCoverPhoto(@Path("imageId") String imageId, @Path("imageVersion") String imageVersion);
 }

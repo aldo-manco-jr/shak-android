@@ -14,6 +14,11 @@ public class Image{
     @SerializedName("imageVersion")
     private String imageVersion;
 
+    public Image(String imageId, String imageVersion) {
+        this.imageId = imageId;
+        this.imageVersion = imageVersion;
+    }
+
     public String getImageDatabaseId() {
         return imageDatabaseId.getAsString();
     }

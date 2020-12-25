@@ -24,12 +24,8 @@ import com.google.gson.JsonObject;
 
 import org.aldofrankmarco.shak.R;
 import org.aldofrankmarco.shak.models.Image;
-import org.aldofrankmarco.shak.models.User;
-import org.aldofrankmarco.shak.people.http.GetUserByUsernameResponse;
+import org.aldofrankmarco.shak.profile.http.ImagesResponse;
 import org.aldofrankmarco.shak.profile.http.GetImagesListResponse;
-import org.aldofrankmarco.shak.services.ImagesService;
-import org.aldofrankmarco.shak.services.ServiceGenerator;
-import org.aldofrankmarco.shak.services.UsersService;
 import org.aldofrankmarco.shak.streams.controllers.LoggedUserActivity;
 
 import java.io.ByteArrayOutputStream;
@@ -60,6 +56,9 @@ public class ImagesListFragment extends Fragment {
 
     private ImageView chosenImagePost;
 
+    private ImagesListAdapter adapter;
+    private RecyclerView recyclerView;
+
     public ImagesListFragment() {
     }
 
@@ -83,16 +82,7 @@ public class ImagesListFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        LoggedUserActivity.getSocket().on("refreshPage", updateUserImagesList);
     }
-
-    Emitter.Listener updateUserImagesList = new Emitter.Listener() {
-        @Override
-        public void call(Object... args) {
-            getAllUserImages();
-        }
-    };
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -163,11 +153,11 @@ public class ImagesListFragment extends Fragment {
         JsonObject imageData = new JsonObject();
         imageData.addProperty("image", "data:image/png;base64," + imageEncoded);
 
-        Call<Object> httpRequest = LoggedUserActivity.getImagesService().uploadImage(imageData);
+        Call<ImagesResponse> httpRequest = LoggedUserActivity.getImagesService().uploadImage(imageData);
 
-        httpRequest.enqueue(new Callback<Object>() {
+        httpRequest.enqueue(new Callback<ImagesResponse>() {
             @Override
-            public void onResponse(Call<Object> call, Response<Object> response) {
+            public void onResponse(Call<ImagesResponse> call, Response<ImagesResponse> response) {
                 if (response.isSuccessful()) {
                     assert getView() != null : "getView() non doveva essere null";
                     assert getFragmentManager() != null : "getFragmentManager() non doveva essere null";
@@ -175,7 +165,10 @@ public class ImagesListFragment extends Fragment {
                     Snackbar.make(getView(), "Image Added Successfully!!", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
 
-                    LoggedUserActivity.getSocket().emit("refresh");
+                    Image uploadedImage = new Image(response.body().getImageId(), response.body().getImageVersion());
+
+                    listImages.add(0, uploadedImage);
+                    adapter.notifyItemInserted(0);
 
                     Toast.makeText(getActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                 } else {
@@ -184,7 +177,7 @@ public class ImagesListFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(Call<Object> call, Throwable t) {
+            public void onFailure(Call<ImagesResponse> call, Throwable t) {
                 Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
@@ -230,8 +223,8 @@ public class ImagesListFragment extends Fragment {
      * Viene collegata la recycler view con l'adapter
      */
     private void initializeRecyclerView() {
-        RecyclerView recyclerView = view.findViewById(R.id.listImages);
-        ImagesListAdapter adapter = new ImagesListAdapter(this.listImages, this.username);
+         recyclerView = view.findViewById(R.id.listImages);
+         adapter = new ImagesListAdapter(this.listImages, this.username);
 
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new GridLayoutManager(LoggedUserActivity.getLoggedUserActivity(), 2));

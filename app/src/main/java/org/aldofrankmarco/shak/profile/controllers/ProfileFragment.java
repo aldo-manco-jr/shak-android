@@ -435,6 +435,26 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
         return profileImagesFragment;
     }
 
+    public void changeImageProfile(String imageId, String imageVersion){
+        final String urlImageProfileUser = basicUrlImage + imageVersion + "/"
+                + imageId;
+
+        Glide.with(LoggedUserActivity.getLoggedUserActivity())
+                .asBitmap()
+                .load(urlImageProfileUser)
+                .into(profileImage);
+    }
+
+    public void changeImageCover(String imageId, String imageVersion){
+        final String urlImageCoverUser = basicUrlImage + imageVersion + "/"
+                + imageId;
+
+        Glide.with(LoggedUserActivity.getLoggedUserActivity())
+                .asBitmap()
+                .load(urlImageCoverUser)
+                .into(coverImage);
+    }
+
     public void userDataBinding(final String username) {
         Call<GetUserByUsernameResponse> httpRequest = LoggedUserActivity.getUsersService().getUserByUsername(username);
 

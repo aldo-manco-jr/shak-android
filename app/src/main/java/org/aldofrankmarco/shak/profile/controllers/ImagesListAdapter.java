@@ -19,6 +19,7 @@ import com.google.android.material.snackbar.Snackbar;
 import org.aldofrankmarco.shak.R;
 import org.aldofrankmarco.shak.models.Image;
 import org.aldofrankmarco.shak.models.User;
+import org.aldofrankmarco.shak.profile.http.ImagesResponse;
 import org.aldofrankmarco.shak.services.ImagesService;
 import org.aldofrankmarco.shak.services.ServiceGenerator;
 import org.aldofrankmarco.shak.streams.controllers.LoggedUserActivity;
@@ -41,30 +42,7 @@ public class ImagesListAdapter extends RecyclerView.Adapter<ImagesListAdapter.Im
     public ImagesListAdapter(List<Image> listImages, String username) {
         this.listImages = listImages;
         this.username = username;
-
-        LoggedUserActivity.getSocket().on("refreshPage", updateImagesList);
     }
-
-    /**
-     * Quando un post viene pubblicato la home page viene aggiornata.
-     */
-    private Emitter.Listener updateImagesList = new Emitter.Listener() {
-
-        @Override
-        public void call(final Object... args) {
-            if (LoggedUserActivity.getLoggedUserActivity() != null) {
-                LoggedUserActivity.getLoggedUserActivity().runOnUiThread(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        // quando un post viene pubblicato la socket avvisa del necessario aggiornmento
-                        LoggedUserActivity.getSocket().on("refreshPage",
-                                ProfileFragment.getProfileFragment().getProfileImagesFragment(LoggedUserActivity.getUsernameLoggedUser()).updateUserImagesList);
-                    }
-                });
-            }
-        }
-    };
 
     @NonNull
     @Override
@@ -131,46 +109,46 @@ public class ImagesListAdapter extends RecyclerView.Adapter<ImagesListAdapter.Im
     }
 
     private void setAsDefaultImage(String imageVersion, String imageId, final ImagesListAdapter.ImageItemHolder holder) {
-        Call<Object> httpRequest = LoggedUserActivity.getImagesService().setUserProfilePhoto(imageId, imageVersion);
+        Call<ImagesResponse> httpRequest = LoggedUserActivity.getImagesService().setUserProfilePhoto(imageId, imageVersion);
 
-        httpRequest.enqueue(new Callback<Object>() {
+        httpRequest.enqueue(new Callback<ImagesResponse>() {
             @Override
-            public void onResponse(Call<Object> call, Response<Object> response) {
+            public void onResponse(Call<ImagesResponse> call, Response<ImagesResponse> response) {
                 if (response.isSuccessful()) {
                     Snackbar.make(ProfileFragment.getProfileFragment().getView(), "Image Set As Profile Successfully!!", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
 
-                    LoggedUserActivity.getSocket().emit("refresh");
+                    ProfileFragment.getProfileFragment().changeImageProfile(response.body().getImageId(), response.body().getImageVersion());
                 } else {
                     Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
-            public void onFailure(Call<Object> call, Throwable t) {
+            public void onFailure(Call<ImagesResponse> call, Throwable t) {
                 Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
 
     private void setAsCoverImage(String imageVersion, String imageId, final ImagesListAdapter.ImageItemHolder holder) {
-        Call<Object> httpRequest = LoggedUserActivity.getImagesService().setUserCoverPhoto(imageId, imageVersion);
+        Call<ImagesResponse> httpRequest = LoggedUserActivity.getImagesService().setUserCoverPhoto(imageId, imageVersion);
 
-        httpRequest.enqueue(new Callback<Object>() {
+        httpRequest.enqueue(new Callback<ImagesResponse>() {
             @Override
-            public void onResponse(Call<Object> call, Response<Object> response) {
+            public void onResponse(Call<ImagesResponse> call, Response<ImagesResponse> response) {
                 if (response.isSuccessful()) {
                     Snackbar.make(ProfileFragment.getProfileFragment().getView(), "Image Set As Cover Successfully!!", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
 
-                    LoggedUserActivity.getSocket().emit("refresh");
+                    ProfileFragment.getProfileFragment().changeImageCover(response.body().getImageId(), response.body().getImageVersion());
                 } else {
                     Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
-            public void onFailure(Call<Object> call, Throwable t) {
+            public void onFailure(Call<ImagesResponse> call, Throwable t) {
                 Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
