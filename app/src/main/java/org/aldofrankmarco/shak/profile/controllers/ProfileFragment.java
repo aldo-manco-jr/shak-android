@@ -217,7 +217,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
             }
         });
 
-        profilePostsFragment.getAllPosts();
+        //profilePostsFragment.getAllPosts();
     }
 
     public static ProfileFragment getProfileFragment() {
@@ -400,16 +400,14 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
     }
 
     public PostsListFragment getProfilePostsFragment(@Nullable String username) {
-
         if (this.profilePostsFragment == null && username != null) {
             this.profilePostsFragment = PostsListFragment.newInstance("profile", username);
         }
 
-        return profilePostsFragment;
+        return this.profilePostsFragment;
     }
 
     public PeopleListFragment getProfileFollowingFragment(String username) {
-
         if (this.profileFollowingFragment == null) {
             this.profileFollowingFragment = PeopleListFragment.newInstance("following", username);
         }
@@ -418,7 +416,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
     }
 
     public PeopleListFragment getProfileFollowersFragment(String username) {
-
         if (this.profileFollowersFragment == null) {
             this.profileFollowersFragment = PeopleListFragment.newInstance("followers", username);
         }
@@ -427,7 +424,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
     }
 
     public ImagesListFragment getProfileImagesFragment(String username) {
-
         if (this.profileImagesFragment == null) {
             this.profileImagesFragment = ImagesListFragment.newInstance(username);
         }
@@ -572,6 +568,27 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
         @Override
         public CharSequence getPageTitle(int position) {
             return listProfileFragmentsTitles.get(position);
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        resetFollowList();
+        resetUnfollowList();
+    }
+
+    private void resetFollowList(){
+        if (profileFollowersFragment != null) {
+            profileFollowersFragment.resetList();
+            profileFollowersFragment = null;
+        }
+    }
+
+    private void resetUnfollowList(){
+        if (profileFollowingFragment != null) {
+            profileFollowingFragment.resetList();
+            profileFollowingFragment = null;
         }
     }
 }

@@ -28,11 +28,10 @@ import retrofit2.Response;
 
 public class PeopleListFragment extends Fragment {
 
-    private List<User> listUsers;
-
     private PeopleListAdapter adapter;
 
     private String username;
+    private String type;
 
     private TextView titleTextView;
 
@@ -63,22 +62,6 @@ public class PeopleListFragment extends Fragment {
      *
      * @return A new instance of fragment PostsListFragment.
      */
-    public static PeopleListFragment newInstance(String type) {
-        PeopleListFragment fragment = new PeopleListFragment();
-
-        Bundle args = new Bundle();
-        args.putString("type", type);
-        fragment.setArguments(args);
-
-        return fragment;
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @return A new instance of fragment PostsListFragment.
-     */
     public static PeopleListFragment newInstance(String type, String username) {
         PeopleListFragment fragment = new PeopleListFragment();
 
@@ -93,6 +76,9 @@ public class PeopleListFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        type = getArguments().getString("type");
+        username = getArguments().getString("username");
     }
 
     @Override
@@ -144,9 +130,6 @@ public class PeopleListFragment extends Fragment {
             return;
         }
 
-        final String type = getArguments().getString("type");
-        username = getArguments().getString("username");
-
         if (type.equals("streams")) {
 
             titleTextView.setVisibility(View.VISIBLE);
@@ -159,8 +142,7 @@ public class PeopleListFragment extends Fragment {
                     if (response.isSuccessful()) {
                         assert response.body() != null : "body() non doveva essere null";
 
-                        listUsers = response.body().getAllUsers();
-                        initializeRecyclerView();
+                        initializeRecyclerView(response.body().getAllUsers());
                     }
                 }
 
@@ -181,11 +163,7 @@ public class PeopleListFragment extends Fragment {
                     if (response.isSuccessful()) {
                         assert response.body() != null : "body() non doveva essere null";
 
-                        if (response.body().getFollowingList() != null) {
-                            listUsers = response.body().getFollowingList();
-                        }
-
-                        initializeRecyclerView();
+                        initializeRecyclerView(response.body().getFollowingList());
                     }else {
                         Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                     }
@@ -208,11 +186,7 @@ public class PeopleListFragment extends Fragment {
                     if (response.isSuccessful()) {
                         assert response.body() != null : "body() non doveva essere null";
 
-                        if (response.body().getFollowersList() != null) {
-                            listUsers = response.body().getFollowersList();
-                        }
-
-                        initializeRecyclerView();
+                        initializeRecyclerView(response.body().getFollowersList());
                     }else {
                         Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                     }
@@ -230,13 +204,21 @@ public class PeopleListFragment extends Fragment {
     /**
      * Viene collegata la recycler view con l'adapter
      */
-    private void initializeRecyclerView() {
+    private void initializeRecyclerView(List<User> listUsers) {
         RecyclerView recyclerView = view.findViewById(R.id.list_users);
         if (adapter == null){
-            adapter = new PeopleListAdapter(this.listUsers);
+            adapter = new PeopleListAdapter(listUsers, type);
         }
 
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+    }
+
+    public void resetList(){
+        if (adapter != null && adapter.getList() != null) {
+            while (adapter.getList().size() != 0) {
+                adapter.getList().remove(0);
+            }
+        }
     }
 }
