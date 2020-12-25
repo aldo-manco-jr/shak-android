@@ -189,4 +189,9 @@ TODO
             return listHomeFragmentsTitles.get(position);
         }
     }
+
+    public void resetAll(){
+        streamsFragment.resetAdapter();
+        favouritesFragment.resetAdapter();
+    }
 }

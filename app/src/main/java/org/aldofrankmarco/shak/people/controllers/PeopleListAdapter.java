@@ -36,10 +36,13 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
 
     private List<User> listUsers;
 
+    private String type;
+
     private final String basicUrlImage = "http://res.cloudinary.com/dfn8llckr/image/upload/v";
 
-    public PeopleListAdapter(List<User> listUsers) {
+    public PeopleListAdapter(List<User> listUsers, String type) {
         this.listUsers = listUsers;
+        this.type = type;
     }
 
     @NonNull
@@ -151,7 +154,8 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
                     } else if (holder.followButton.getText().equals("follow")) {
                         holder.followButton.setText("unfollow");
                     }
-                    //LoggedUserActivity.getSocket().emit("refresh");
+
+                    LoggedUserActivity.getLoggedUserActivity().resetHomeFragment();
                 } else {
                     Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + "   " + response.message(), Toast.LENGTH_LONG).show();
                 }
@@ -229,5 +233,9 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
             followButton = itemView.findViewById(R.id.follow);
             loadingFollow = itemView.findViewById(R.id.loading_follow);
         }
+    }
+
+    List<User> getList(){
+        return this.listUsers;
     }
 }

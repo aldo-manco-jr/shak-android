@@ -451,8 +451,14 @@ public class LoggedUserActivity extends AppCompatActivity {
     public PostsListFragment getStreamsFragment() {
         if (streamsFragment == null) {
             streamsFragment = PostsListFragment.newInstance("streams");
-            streamsFragment.getAllPosts();
         }
+        /* else if (streamsFragment.get){
+
+        }/*streamsFragment.getAllPosts();
+        djdjdjd
+    qui vanno messi se maggiore di 0, o un check oppure divetto in get allPosts, che se non è a 0
+    salta il comando, quindi verrebbe chiamato solo se maggiore di 0,
+        aggiungere un ritorno dimensioni adapter)*/
 
         return streamsFragment;
     }
@@ -495,5 +501,9 @@ public class LoggedUserActivity extends AppCompatActivity {
 
     public boolean checkStreamsProfileFragmentExist() {
         return (this.profileFragment != null && this.profilePostsFragment != null);
+    }
+
+    public void resetHomeFragment() {
+        homeFragment.resetAll();
     }
 }
