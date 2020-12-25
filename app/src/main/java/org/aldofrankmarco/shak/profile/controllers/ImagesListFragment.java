@@ -51,10 +51,7 @@ public class ImagesListFragment extends Fragment {
     private String imageEncoded;
 
     private Uri uri;
-    private final int spaceOccupiedByTheImage = 850;
     private final int SELECT_PHOTO = 1;
-
-    private ImageView chosenImagePost;
 
     private ImagesListAdapter adapter;
     private RecyclerView recyclerView;
@@ -170,7 +167,6 @@ public class ImagesListFragment extends Fragment {
                     listImages.add(0, uploadedImage);
                     adapter.notifyItemInserted(0);
 
-                    Toast.makeText(getActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                 } else {
                     Toast.makeText(getActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                 }

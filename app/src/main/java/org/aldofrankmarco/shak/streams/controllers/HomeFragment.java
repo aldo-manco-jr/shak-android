@@ -20,8 +20,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 
 import org.aldofrankmarco.shak.R;
-import org.aldofrankmarco.shak.streams.controllers.postslist.PostFormFragment;
-import org.aldofrankmarco.shak.streams.controllers.postslist.PostsListFragment;
+import org.aldofrankmarco.shak.streams.controllers.posts.PostFormFragment;
+import org.aldofrankmarco.shak.streams.controllers.posts.PostsListFragment;
 
 import java.util.LinkedList;
 import java.util.List;

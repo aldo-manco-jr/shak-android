@@ -1,4 +1,4 @@
-package org.aldofrankmarco.shak.streams.controllers.postslist;
+package org.aldofrankmarco.shak.streams.controllers.posts;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;

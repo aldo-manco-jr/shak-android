@@ -35,7 +35,7 @@ import org.aldofrankmarco.shak.people.http.SetUserLocationRequest;
 import org.aldofrankmarco.shak.streams.controllers.HomeFragment;
 import org.aldofrankmarco.shak.streams.controllers.LoggedUserActivity;
 import org.aldofrankmarco.shak.streams.controllers.OnBackPressed;
-import org.aldofrankmarco.shak.streams.controllers.postslist.PostsListFragment;
+import org.aldofrankmarco.shak.streams.controllers.posts.PostsListFragment;
 
 import java.util.LinkedList;
 import java.util.List;
