@@ -2,6 +2,7 @@ package org.aldofrankmarco.shak.profile.controllers;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.ProxyInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -52,6 +53,7 @@ public class ImagesListFragment extends Fragment {
 
     private Uri uri;
     private final int SELECT_PHOTO = 1;
+    private final int TAKE_PHOTO = 100;
 
     private ImagesListAdapter adapter;
     private RecyclerView recyclerView;
@@ -108,6 +110,11 @@ public class ImagesListFragment extends Fragment {
         startActivityForResult(intent, SELECT_PHOTO);
     }
 
+    protected void takeUserImage() {
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(intent, TAKE_PHOTO);
+    }
+
     /**
      * @param bitmap un'immagine in formato bitmap
      * @return una stringa che rappresenta un'immagine codificata secondo Base64
@@ -134,6 +141,14 @@ public class ImagesListFragment extends Fragment {
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), uri);
                 imageEncoded = bitmapToBase64(bitmap);
+                addUserImage(imageEncoded);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }else if(requestCode == TAKE_PHOTO){
+            try {
+                Bitmap photoTaken = (Bitmap) data.getExtras().get("data");
+                imageEncoded = bitmapToBase64(photoTaken);
                 addUserImage(imageEncoded);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -219,8 +234,8 @@ public class ImagesListFragment extends Fragment {
      * Viene collegata la recycler view con l'adapter
      */
     private void initializeRecyclerView() {
-         recyclerView = view.findViewById(R.id.listImages);
-         adapter = new ImagesListAdapter(this.listImages, this.username);
+        recyclerView = view.findViewById(R.id.listImages);
+        adapter = new ImagesListAdapter(this.listImages, this.username);
 
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new GridLayoutManager(LoggedUserActivity.getLoggedUserActivity(), 2));

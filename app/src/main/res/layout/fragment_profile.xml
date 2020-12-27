@@ -182,6 +182,18 @@
         <include layout="@layout/netested_profile_content_scrolling" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_take_user_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="15dp"
+            android:layout_marginBottom="75dp"
+            app:backgroundTint="@color/colorSHAK"
+            android:clickable="true"
+            android:visibility="gone"
+            android:src="@drawable/ic_camera_white_24"
+            android:layout_gravity="bottom|right" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_add_user_image"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

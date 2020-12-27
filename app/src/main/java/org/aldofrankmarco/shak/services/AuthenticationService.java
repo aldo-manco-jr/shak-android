@@ -24,6 +24,5 @@ public interface AuthenticationService {
     @GET("auth/login/face-authentication/{username}")
     Call<LoginResponse> loginFaceAuthentication(@Path("username") String username);
 
-    @POST("auth/upload/face")
-    Call<Object> uploadFacePhoto(@Body JsonObject imageData);
+    // @Body JsonObject imageData
 }

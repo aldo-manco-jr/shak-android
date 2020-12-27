@@ -42,6 +42,8 @@ public class FaceRecognitionActivity extends AppCompatActivity implements View.O
     private Button openCameraButton;
     private Button faceAuthenticationButton;
 
+    private int TAKE_PHOTO = 100;
+
     private String imageEncoded;
 
     private Python py;
@@ -67,7 +69,7 @@ public class FaceRecognitionActivity extends AppCompatActivity implements View.O
                     FaceRecognitionActivity.this,
                     new String[]{
                             Manifest.permission.CAMERA
-                    }, 100);
+                    }, TAKE_PHOTO);
         }
 
         /*if (!Python.isStarted()) {
@@ -84,7 +86,7 @@ public class FaceRecognitionActivity extends AppCompatActivity implements View.O
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 100) {
+        if (requestCode == TAKE_PHOTO) {
             try {
                 Bitmap photoTaken = (Bitmap) data.getExtras().get("data");
                 this.photoTaken.setImageBitmap(photoTaken);
@@ -101,7 +103,7 @@ public class FaceRecognitionActivity extends AppCompatActivity implements View.O
     public void onClick(View view) {
         if (view.getId() == R.id.open_camera_button) {
             Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            startActivityForResult(intent, 100);
+            startActivityForResult(intent, TAKE_PHOTO);
         } else if (view.getId() == R.id.login_face_recognition_button) {
 
             // mettere nome funzione python al posto di "main", poi inserire i parametri con la virgola
@@ -113,38 +115,16 @@ public class FaceRecognitionActivity extends AppCompatActivity implements View.O
         }
     }
 
-    private void uploadFacePhoto() {
-        Toast.makeText(getApplicationContext(), "face authentication", Toast.LENGTH_LONG).show();
+    private void loginFaceAuthenticaton(String username) {
 
-        if (imageEncoded == null) {
+         /*if (imageEncoded == null) {
             Snackbar.make(getWindow().getDecorView().getRootView(), "Can't Login Without Taking Photo of Yourself.", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
             return;
         }
 
         JsonObject imageData = new JsonObject();
-        imageData.addProperty("image", "data:image/png;base64," + imageEncoded);
-
-        Call<Object> httpRequest = AccessActivity.getAuthenticationService().uploadFacePhoto(imageData);
-
-        httpRequest.enqueue(new Callback<Object>() {
-            @Override
-            public void onResponse(Call<Object> call, Response<Object> response) {
-                if (response.isSuccessful()) {
-                    Toast.makeText(getApplicationContext(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(getApplicationContext(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Object> call, Throwable t) {
-                Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        });
-    }
-
-    private void loginFaceAuthenticaton(String username) {
+        imageData.addProperty("image", "data:image/png;base64," + imageEncoded);*/
 
         Call<LoginResponse> httpRequest = AccessActivity.getAuthenticationService().loginFaceAuthentication(username);
 

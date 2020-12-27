@@ -61,7 +61,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
 
     private Button followButton;
 
-    private FloatingActionButton addUserImageButton;
+    private FloatingActionButton uploadUserImageButton;
+    private FloatingActionButton takeUserImageButton;
 
     private ViewPager viewPager;
 
@@ -116,9 +117,9 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
 /*        toolBarLayout.addOnLayoutChangeListener(this);
 
         if (username.equals(LoggedUserActivity.getUsernameLoggedUser())){
-            addUserImageButton.setVisibility(View.VISIBLE);
+            uploadUserImageButton.setVisibility(View.VISIBLE);
         }else {
-            addUserImageButton.setVisibility(View.GONE);
+            uploadUserImageButton.setVisibility(View.GONE);
         }
 */
         coverImage = view.findViewById(R.id.profile_cover_image);
@@ -130,13 +131,15 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
         followButton = view.findViewById(R.id.followUser);
         viewPager = view.findViewById(R.id.view_pager_profile);
         profileTabs = view.findViewById(R.id.profile_tabs);
-        addUserImageButton = view.findViewById(R.id.fab_add_user_image);
+        uploadUserImageButton = view.findViewById(R.id.fab_add_user_image);
+        takeUserImageButton = view.findViewById(R.id.fab_take_user_image);
 
         emailTextView.setOnClickListener(this);
         locationTextView.setOnClickListener(this);
         setLocationButton.setOnClickListener(this);
         followButton.setOnClickListener(this);
-        addUserImageButton.setOnClickListener(this);
+        uploadUserImageButton.setOnClickListener(this);
+        takeUserImageButton.setOnClickListener(this);
 
         userDataBinding(getArguments().getString("username"));
 
@@ -192,19 +195,22 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
 
         profileTabs.setupWithViewPager(viewPager);
 
-        // addUserImageButton è usato solo per il tab di ImageListFragment e solo se l'utente
+        // uploadUserImageButton è usato solo per il tab di ImageListFragment e solo se l'utente
         // è l'utente connesso è anche l'utente visualizzato
         profileTabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 if (tab.getPosition() == 3) {
                     if (user.getUsername().equals(LoggedUserActivity.getUsernameLoggedUser())) {
-                        addUserImageButton.setVisibility(View.VISIBLE);
+                        uploadUserImageButton.setVisibility(View.VISIBLE);
+                        takeUserImageButton.setVisibility(View.VISIBLE);
                     } else {
-                        addUserImageButton.setVisibility(View.GONE);
+                        uploadUserImageButton.setVisibility(View.GONE);
+                        takeUserImageButton.setVisibility(View.GONE);
                     }
                 } else {
-                    addUserImageButton.setVisibility(View.GONE);
+                    uploadUserImageButton.setVisibility(View.GONE);
+                    takeUserImageButton.setVisibility(View.GONE);
                 }
             }
 
@@ -286,6 +292,9 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
                 break;
             case R.id.fab_add_user_image:
                 profileImagesFragment.uploadUserImage();
+                break;
+            case R.id.fab_take_user_image:
+                profileImagesFragment.takeUserImage();
                 break;
         }
     }
