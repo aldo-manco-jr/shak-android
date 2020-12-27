@@ -90,9 +90,7 @@ public class FaceRecognitionActivity extends AppCompatActivity implements View.O
             try {
                 Bitmap photoTaken = (Bitmap) data.getExtras().get("data");
                 this.photoTaken.setImageBitmap(photoTaken);
-
                 imageEncoded = bitmapToBase64(photoTaken);
-                Toast.makeText(getApplicationContext(), imageEncoded + "", Toast.LENGTH_LONG).show();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -109,24 +107,24 @@ public class FaceRecognitionActivity extends AppCompatActivity implements View.O
             // mettere nome funzione python al posto di "main", poi inserire i parametri con la virgola
             // accedere al risultato della funzione mediante "object.toString"
             // PyObject faceOwner = pyObject.callAttr("main");
-
             // faceOwner.toString()
-            loginFaceAuthenticaton("aldo");
+
+            loginFaceAuthenticaton();
         }
     }
 
-    private void loginFaceAuthenticaton(String username) {
+    private void loginFaceAuthenticaton() {
 
-         /*if (imageEncoded == null) {
+         if (imageEncoded == null) {
             Snackbar.make(getWindow().getDecorView().getRootView(), "Can't Login Without Taking Photo of Yourself.", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
             return;
         }
 
         JsonObject imageData = new JsonObject();
-        imageData.addProperty("image", "data:image/png;base64," + imageEncoded);*/
+        imageData.addProperty("image", "data:image/png;base64," + imageEncoded);
 
-        Call<LoginResponse> httpRequest = AccessActivity.getAuthenticationService().loginFaceAuthentication(username);
+        Call<LoginResponse> httpRequest = AccessActivity.getAuthenticationService().loginFaceAuthentication(imageData);
 
         httpRequest.enqueue(new Callback<LoginResponse>() {
             @Override
@@ -182,7 +180,7 @@ public class FaceRecognitionActivity extends AppCompatActivity implements View.O
      */
     private String bitmapToBase64(Bitmap bitmap) {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 90, byteArrayOutputStream);
         byte[] byteArray = byteArrayOutputStream.toByteArray();
         return Base64.encodeToString(byteArray, Base64.DEFAULT);
     }

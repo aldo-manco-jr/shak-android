@@ -186,7 +186,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="15dp"
-            android:layout_marginBottom="75dp"
+            android:layout_marginBottom="84dp"
             app:backgroundTint="@color/colorSHAK"
             android:clickable="true"
             android:visibility="gone"
