@@ -13,6 +13,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.Base64;
 import android.view.View;
@@ -126,9 +127,23 @@ public class FaceRecognitionActivity extends AppCompatActivity implements View.O
 
         Call<LoginResponse> httpRequest = AccessActivity.getAuthenticationService().loginFaceAuthentication(imageData);
 
+        final LoadingDialog loadingDialog = new LoadingDialog(FaceRecognitionActivity.this);
+        loadingDialog.startLoadingDialog();
+
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                loadingDialog.dismissLoadingDialog();
+            }
+        }, 10000);
+
         httpRequest.enqueue(new Callback<LoginResponse>() {
             @Override
             public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+
+                loadingDialog.dismissLoadingDialog();
+
                 if (response.isSuccessful()) {
                     assert response.body() != null : "body() non doveva essere null";
 
