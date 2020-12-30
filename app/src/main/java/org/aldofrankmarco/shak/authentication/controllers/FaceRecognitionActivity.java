@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
@@ -43,7 +44,9 @@ public class FaceRecognitionActivity extends AppCompatActivity implements View.O
     private Button openCameraButton;
     private Button faceAuthenticationButton;
 
-    private int TAKE_PHOTO = 100;
+    private Uri uri;
+    private final int SELECT_PHOTO = 1;
+    private final int TAKE_PHOTO = 100;
 
     private String imageEncoded;
 
@@ -84,10 +87,33 @@ public class FaceRecognitionActivity extends AppCompatActivity implements View.O
         faceAuthenticationButton.setOnClickListener(this);
     }
 
+    protected void uploadUserImage() {
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setType("image/*");
+        startActivityForResult(intent, SELECT_PHOTO);
+    }
+
+    protected void takeUserImage() {
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(intent, TAKE_PHOTO);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == TAKE_PHOTO) {
+
+        if (requestCode == SELECT_PHOTO && resultCode == RESULT_OK
+                && data != null && data.getData() != null) {
+            uri = data.getData();
+
+            try {
+                Bitmap photoTaken = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+                this.photoTaken.setImageBitmap(photoTaken);
+                imageEncoded = bitmapToBase64(photoTaken);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }else if(requestCode == TAKE_PHOTO){
             try {
                 Bitmap photoTaken = (Bitmap) data.getExtras().get("data");
                 this.photoTaken.setImageBitmap(photoTaken);
@@ -101,8 +127,8 @@ public class FaceRecognitionActivity extends AppCompatActivity implements View.O
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.open_camera_button) {
-            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            startActivityForResult(intent, TAKE_PHOTO);
+        uploadUserImage();
+        //takeUserImage();
         } else if (view.getId() == R.id.login_face_recognition_button) {
 
             // mettere nome funzione python al posto di "main", poi inserire i parametri con la virgola
@@ -136,7 +162,7 @@ public class FaceRecognitionActivity extends AppCompatActivity implements View.O
             public void run() {
                 loadingDialog.dismissLoadingDialog();
             }
-        }, 10000);
+        }, 30000);
 
         httpRequest.enqueue(new Callback<LoginResponse>() {
             @Override

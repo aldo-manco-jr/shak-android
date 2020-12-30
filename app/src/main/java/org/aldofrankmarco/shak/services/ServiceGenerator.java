@@ -1,5 +1,7 @@
 package org.aldofrankmarco.shak.services;
 
+import java.util.concurrent.TimeUnit;
+
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -39,14 +41,22 @@ public class ServiceGenerator {
                 httpClient.addInterceptor(interceptor);
 
                 // assign to built retrofit instance the http client with interceptor
-                builder.client(httpClient.build());
+                builder.client(httpClient
+                        .readTimeout(60, TimeUnit.SECONDS)
+                        .connectTimeout(60, TimeUnit.SECONDS)
+                        .writeTimeout(60, TimeUnit.SECONDS)
+                        .build());
 
                 // create the retrofit instance using the configured values in built retrofit instance
                 retrofit = builder.build();
             }
         }else {
             // aggiunta client in retrofit
-            builder.client(httpClient.build());
+            builder.client(httpClient
+                    .readTimeout(60, TimeUnit.SECONDS)
+                    .connectTimeout(60, TimeUnit.SECONDS)
+                    .writeTimeout(60, TimeUnit.SECONDS)
+                    .build());
 
             retrofit = builder.build();
         }
