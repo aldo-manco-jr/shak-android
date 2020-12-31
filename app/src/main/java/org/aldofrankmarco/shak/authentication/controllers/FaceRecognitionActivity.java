@@ -29,6 +29,7 @@ import com.google.gson.JsonObject;
 
 import org.aldofrankmarco.shak.R;
 import org.aldofrankmarco.shak.authentication.http.LoginResponse;
+import org.aldofrankmarco.shak.authentication.http.SignupResponse;
 import org.aldofrankmarco.shak.streams.controllers.LoggedUserActivity;
 
 import java.io.ByteArrayOutputStream;
@@ -63,6 +64,12 @@ public class FaceRecognitionActivity extends AppCompatActivity implements View.O
         photoTaken = findViewById(R.id.photo_taken);
         openCameraButton = findViewById(R.id.open_camera_button);
         faceAuthenticationButton = findViewById(R.id.login_face_recognition_button);
+
+        if (getIntent().getExtras().getString("type").equals("login")){
+            faceAuthenticationButton.setText("LOGIN");
+        }else if (getIntent().getExtras().getString("type").equals("signup")){
+            faceAuthenticationButton.setText("SIGNUP");
+        }
 
         sharedPreferences = getSharedPreferences(getString(R.string.sharedpreferences_authentication), Context.MODE_PRIVATE);
 
@@ -136,13 +143,20 @@ public class FaceRecognitionActivity extends AppCompatActivity implements View.O
             // PyObject faceOwner = pyObject.callAttr("main");
             // faceOwner.toString()
 
-            loginFaceAuthenticaton();
+            if (getIntent().getExtras().getString("type").equals("login")){
+                loginFaceAuthenticaton();
+            }else if (getIntent().getExtras().getString("type").equals("signup")){
+                signupFaceAuthentication(
+                        getIntent().getExtras().getString("username"),
+                        getIntent().getExtras().getString("email"),
+                        getIntent().getExtras().getString("password"));
+            }
         }
     }
 
     private void loginFaceAuthenticaton() {
 
-         if (imageEncoded == null) {
+        if (imageEncoded == null) {
             Snackbar.make(getWindow().getDecorView().getRootView(), "Can't Login Without Taking Photo of Yourself.", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
             return;
@@ -210,6 +224,84 @@ public class FaceRecognitionActivity extends AppCompatActivity implements View.O
 
             @Override
             public void onFailure(Call<LoginResponse> call, Throwable t) {
+                Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void signupFaceAuthentication(String username, String email, String password) {
+
+        if (imageEncoded == null) {
+            Snackbar.make(getWindow().getDecorView().getRootView(), "Can't Login Without Taking Photo of Yourself.", Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
+            return;
+        }
+
+        JsonObject userData = new JsonObject();
+        userData.addProperty("username", username);
+        userData.addProperty("email", email);
+        userData.addProperty("password", password);
+        userData.addProperty("image", "data:image/png;base64," + imageEncoded);
+
+        Call<SignupResponse> httpRequest = AccessActivity.getAuthenticationService().signupFaceAuthentication(userData);
+
+        final LoadingDialog loadingDialog = new LoadingDialog(FaceRecognitionActivity.this);
+        loadingDialog.startLoadingDialog();
+
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                loadingDialog.dismissLoadingDialog();
+            }
+        }, 30000);
+
+        httpRequest.enqueue(new Callback<SignupResponse>() {
+            @Override
+            public void onResponse(Call<SignupResponse> call, Response<SignupResponse> response) {
+
+                loadingDialog.dismissLoadingDialog();
+
+                if (response.isSuccessful()) {
+                    assert response.body() != null : "body() non doveva essere null";
+
+                    String token = response.body().getToken();
+
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString(getString(R.string.sharedpreferences_token), token);
+                    editor.apply();
+
+                    Intent intentLoggedUser = new Intent(FaceRecognitionActivity.this, LoggedUserActivity.class);
+                    intentLoggedUser.putExtra("authToken", token);
+                    intentLoggedUser.putExtra("username", response.body().getUserRegistered().getUsername());
+                    intentLoggedUser.putExtra("_id", response.body().getUserRegistered().getId());
+                    intentLoggedUser.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intentLoggedUser);
+
+                    Intent intent = new Intent(FaceRecognitionActivity.this, AccessActivity.class);
+                    stopService(intent);
+
+                    finishAffinity();
+                } else {
+
+                    if (response.code() == 404){
+                        new AlertDialog.Builder(getApplicationContext())
+                                .setIcon(android.R.drawable.stat_notify_error)
+                                .setTitle("User Not Found")
+                                .setMessage("Face in the photo taken does not correspond\nto any SHAK registered user.")
+                                .setPositiveButton("OK", null).show();
+                    }else{
+                        new AlertDialog.Builder(getApplicationContext())
+                                .setIcon(android.R.drawable.stat_notify_error)
+                                .setTitle("Server Error")
+                                .setMessage("Internal server error.")
+                                .setPositiveButton("OK", null).show();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SignupResponse> call, Throwable t) {
                 Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });

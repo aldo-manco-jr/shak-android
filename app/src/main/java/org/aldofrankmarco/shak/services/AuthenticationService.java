@@ -23,4 +23,7 @@ public interface AuthenticationService {
 
     @POST("auth/login/face-authentication")
     Call<LoginResponse> loginFaceAuthentication(@Body JsonObject imageData);
+
+    @POST("auth/signup/face-authentication")
+    Call<SignupResponse> signupFaceAuthentication(@Body JsonObject userData);
 }

@@ -110,6 +110,20 @@
             android:backgroundTint="@color/white"
             android:text="SIGN UP"
             android:textColor="@color/colorSHAK" />
+
+        <Button
+            android:id="@+id/signupFaceRecognitionButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:backgroundTint="@color/white"
+            android:drawableLeft="@drawable/ic_face_recognition_1_24"
+            android:drawableRight="@drawable/ic_face_recognition_2_24"
+            android:text="FACE RECOGNITION"
+            android:textColor="@color/colorSHAK" />
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

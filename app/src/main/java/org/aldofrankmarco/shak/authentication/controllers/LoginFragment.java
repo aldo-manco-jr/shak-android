@@ -271,6 +271,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
 
     private void faceRecognition(){
         Intent intent = new Intent(getActivity(), FaceRecognitionActivity.class);
+        intent.putExtra("type", "login");
         getActivity().startActivity(intent);
     }
 }

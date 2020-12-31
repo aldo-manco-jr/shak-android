@@ -50,6 +50,7 @@ public class SignupFragment extends Fragment implements View.OnClickListener, Vi
     private TextView passwordAlert;
 
     private Button signUpButton;
+    private Button faceRecognitionButton;
 
     private ProgressBar loadingBar;
 
@@ -147,6 +148,7 @@ public class SignupFragment extends Fragment implements View.OnClickListener, Vi
         passwordField = view.findViewById(R.id.passwordField);
         passwordAlert = view.findViewById(R.id.alert_password_invalid);
         signUpButton = view.findViewById(R.id.signUpButton);
+        faceRecognitionButton = view.findViewById(R.id.signupFaceRecognitionButton);
 
         emailField.setTag("email");
         usernameField.setTag("username");
@@ -157,6 +159,7 @@ public class SignupFragment extends Fragment implements View.OnClickListener, Vi
         passwordField.addTextChangedListener(checkPasswordField);
 
         signUpButton.setOnClickListener(this);
+        faceRecognitionButton.setOnClickListener(this);
 
         passwordField.setOnTouchListener(this);
 
@@ -197,6 +200,10 @@ public class SignupFragment extends Fragment implements View.OnClickListener, Vi
             if (!isEmailValid(emailField)) {
                 signUpButton.setEnabled(false);
                 signUpButton.setTextColor(Color.parseColor("#a8acaf"));
+
+                faceRecognitionButton.setEnabled(false);
+                faceRecognitionButton.setTextColor(Color.parseColor("#a8acaf"));
+
                 emailAlert.setVisibility(View.VISIBLE);
             } else {
                 emailAlert.setVisibility(View.GONE);
@@ -204,6 +211,9 @@ public class SignupFragment extends Fragment implements View.OnClickListener, Vi
                 if (isUsernameValid(usernameField) && isPasswordValid(passwordField)) {
                     signUpButton.setEnabled(true);
                     signUpButton.setTextColor(Color.parseColor("#004317"));
+
+                    faceRecognitionButton.setEnabled(true);
+                    faceRecognitionButton.setTextColor(Color.parseColor("#004317"));
                 }
             }
         }
@@ -223,6 +233,10 @@ public class SignupFragment extends Fragment implements View.OnClickListener, Vi
             if (charSequence.length() < 4 || charSequence.length() > 16) {
                 signUpButton.setEnabled(false);
                 signUpButton.setTextColor(Color.parseColor("#a8acaf"));
+
+                faceRecognitionButton.setEnabled(false);
+                faceRecognitionButton.setTextColor(Color.parseColor("#a8acaf"));
+
                 usernameAlert.setVisibility(View.VISIBLE);
             } else {
                 usernameAlert.setVisibility(View.GONE);
@@ -230,6 +244,9 @@ public class SignupFragment extends Fragment implements View.OnClickListener, Vi
                 if (isEmailValid(emailField) && isPasswordValid(passwordField)) {
                     signUpButton.setEnabled(true);
                     signUpButton.setTextColor(Color.parseColor("#004317"));
+
+                    faceRecognitionButton.setEnabled(true);
+                    faceRecognitionButton.setTextColor(Color.parseColor("#004317"));
                 }
             }
         }
@@ -249,6 +266,10 @@ public class SignupFragment extends Fragment implements View.OnClickListener, Vi
             if (charSequence.length() < 8 || charSequence.length() > 64) {
                 signUpButton.setEnabled(false);
                 signUpButton.setTextColor(Color.parseColor("#a8acaf"));
+
+                faceRecognitionButton.setEnabled(false);
+                faceRecognitionButton.setTextColor(Color.parseColor("#a8acaf"));
+
                 passwordAlert.setVisibility(View.VISIBLE);
             } else {
                 passwordAlert.setVisibility(View.GONE);
@@ -256,6 +277,9 @@ public class SignupFragment extends Fragment implements View.OnClickListener, Vi
                 if (isEmailValid(emailField) && isUsernameValid(usernameField)) {
                     signUpButton.setEnabled(true);
                     signUpButton.setTextColor(Color.parseColor("#004317"));
+
+                    faceRecognitionButton.setEnabled(true);
+                    faceRecognitionButton.setTextColor(Color.parseColor("#004317"));
                 }
             }
         }
@@ -269,6 +293,8 @@ public class SignupFragment extends Fragment implements View.OnClickListener, Vi
     public void onClick(View view) {
         if (view.getId() == R.id.signUpButton) {
             signup();
+        }else if (view.getId() == R.id.signupFaceRecognitionButton){
+            faceRecognition();
         }
     }
 
@@ -312,5 +338,14 @@ public class SignupFragment extends Fragment implements View.OnClickListener, Vi
         }
 
         return false;
+    }
+
+    private void faceRecognition(){
+        Intent intent = new Intent(getActivity(), FaceRecognitionActivity.class);
+        intent.putExtra("type", "signup");
+        intent.putExtra("username", usernameField.getText().toString().trim());
+        intent.putExtra("email", emailField.getText().toString().trim());
+        intent.putExtra("password", passwordField.getText().toString().trim());
+        getActivity().startActivity(intent);
     }
 }
