@@ -1,6 +1,7 @@
 package org.aldofrankmarco.shak.streams.controllers.posts;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,6 +39,7 @@ public class PostsListFragment extends Fragment {
     RecyclerView recyclerView;
 
     private PostsListAdapter adapter;
+    private PostsListAdapter adapterSearch;
 
     private View view;
 
@@ -83,6 +85,12 @@ public class PostsListFragment extends Fragment {
 
         if (this.adapter == null) {
             this.adapter = new PostsListAdapter(this, view);
+            this.adapter.isFiltered(false);
+        }
+
+        if (this.adapterSearch == null) {
+            this.adapterSearch = new PostsListAdapter(this, view);
+            this.adapterSearch.isFiltered(true);
         }
     }
 
@@ -148,7 +156,7 @@ public class PostsListFragment extends Fragment {
 
         recyclerView = view.findViewById(R.id.list_posts);
 
-        if (adapter.getListPosts().size() == 0){
+        if (adapter.getListPosts().size() == 0) {
             getAllPosts();
         }
     }
@@ -159,6 +167,14 @@ public class PostsListFragment extends Fragment {
         }
 
         return this.adapter.getListPosts();
+    }
+
+    private List<Post> getListPostsSearched() {
+        if (this.adapterSearch == null) {
+            this.adapterSearch = new PostsListAdapter(this, view);
+        }
+
+        return this.adapterSearch.getListPosts();
     }
 
     /**
@@ -182,10 +198,10 @@ public class PostsListFragment extends Fragment {
 */
             Call<GetPostsListResponse> httpRequest = null;
             List<Post> postList = null;
-            if  (this.adapter != null) {
+            if (this.adapter != null) {
                 postList = getListPosts();
             }
-            if (postList != null && postList.size() > 0){
+            if (postList != null && postList.size() > 0) {
                 // è necessario il post più vecchio per capire da quale post riprendere la ricerca
                 /*if (type.equals("streams")) {
                     lastPostDate =
@@ -231,8 +247,8 @@ public class PostsListFragment extends Fragment {
                                     favouritesFragment,
                                     response.body().getFavouritePosts()
                             );*/
-                        if (type.equals("streams")){
-                            if (adapter.getListPosts().size() == 0){
+                        if (type.equals("streams")) {
+                            if (adapter.getListPosts().size() == 0 || adapterSearch!=null || adapterSearch.getListPosts().size()!=0) {
                                 initializeRecyclerView(
                                         response.body().getStreamPosts()
                                 );
@@ -241,7 +257,7 @@ public class PostsListFragment extends Fragment {
                             }
                         } else {
                             // è il frammento dei preferiti
-                            if (adapter.getListPosts().size() == 0){
+                            if (adapter.getListPosts().size() == 0) {
                                 initializeRecyclerView(
                                         response.body().getFavouritePosts()
                                 );
@@ -271,10 +287,10 @@ public class PostsListFragment extends Fragment {
                     LoggedUserActivity.getLoggedUserActivity().getProfileFragments().getProfilePostsFragment(username);
 
             List<Post> postList = null;
-            if  (adapter != null) {
+            if (adapter != null) {
                 postList = getListPosts();
             }
-            if (postList != null && postList.size() > 0){
+            if (postList != null && postList.size() > 0) {
                 lastPostDate = getListPosts().get(getListPosts().size() - 1).getCreatedAt();
             } else {
                 lastPostDate = "1970-01-01'T'00:00:01.000'Z'";
@@ -309,6 +325,41 @@ public class PostsListFragment extends Fragment {
                     Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
                 }
             });
+        }
+    }
+
+    public void getAllPosts(String postContentFilter) {
+        if (getArguments() == null) {
+            return;
+        }
+
+        if (type.equals("streams") || type.equals("favourites")) {
+
+            Call<GetPostsListResponse> httpRequest = LoggedUserActivity.getStreamsService().getAllSearchedPosts(postContentFilter);
+
+            httpRequest.enqueue(new Callback<GetPostsListResponse>() {
+                @Override
+                public void onResponse(Call<GetPostsListResponse> call, Response<GetPostsListResponse> response) {
+                    if (response.isSuccessful()) {
+                        assert response.body() != null : "body() non doveva essere null";
+
+                        if (type.equals("streams")) {
+                            initializeRecyclerViewForSearched(response.body().getStreamPosts());
+                            //Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.body().getStreamPosts().size()+"", Toast.LENGTH_LONG).show();
+                        } else {
+                            initializeRecyclerViewForSearched(response.body().getFavouritePosts());
+                        }
+                    } else {
+                        Toast.makeText(getActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<GetPostsListResponse> call, Throwable t) {
+                    Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            });
+
         }
     }
 
@@ -357,8 +408,8 @@ public class PostsListFragment extends Fragment {
         });
     }
 
-    public void resetAdapter(){
-        while (adapter.getListPosts().size() != 0){
+    public void resetAdapter() {
+        while (adapter.getListPosts().size() != 0) {
             // viene rimosso il primo elemento fino a svuotare la lista
             adapter.getListPosts().remove(0);
         }
@@ -370,7 +421,7 @@ public class PostsListFragment extends Fragment {
      * Viene collegata la recycler view con l'adapter
      */
     protected void initializeRecyclerView(PostsListFragment postsListFragment, List<Post> listPosts) {
-        if (postsListFragment == null){
+        if (postsListFragment == null) {
             return;
         }
 
@@ -379,19 +430,29 @@ public class PostsListFragment extends Fragment {
             postsListFragment.adapter.addOldPosts(listPosts);
         }
 
-        RecyclerView recyclerView = view.findViewById(R.id.list_posts);
+        recyclerView = view.findViewById(R.id.list_posts);
         recyclerView.setAdapter(postsListFragment.adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
     protected void initializeRecyclerView(List<Post> listPosts) {
         //if (HomeFragment.getHomeFragment().getSearchField().getText().toString().trim().equals("") || HomeFragment.getHomeFragment().getSearchField() == null) {
-        if (this.adapter != null && listPosts != null) {
+        if (this.adapter != null && listPosts != null && this.adapter.getListPosts().size()==0) {
             this.adapter.addOldPosts(listPosts);
         }
 
-        RecyclerView recyclerView = this.view.findViewById(R.id.list_posts);
+        recyclerView = this.view.findViewById(R.id.list_posts);
         recyclerView.setAdapter(this.adapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+    }
+
+    protected void initializeRecyclerViewForSearched(List<Post> listPosts) {
+        if (listPosts!=null){
+            this.adapterSearch.setListPosts(listPosts);
+        }
+
+        recyclerView = this.view.findViewById(R.id.list_posts);
+        recyclerView.setAdapter(this.adapterSearch);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
@@ -432,14 +493,14 @@ public class PostsListFragment extends Fragment {
      *                     successivamente.
      */
     private void updateRecyclerView(PostsListFragment chosenFragment, List<Post> newListPosts) {
-        assert newListPosts != null: "newListPosts non poteva essere null";
+        assert newListPosts != null : "newListPosts non poteva essere null";
 
         if (newListPosts.size() > 0) {
             chosenFragment.adapter.addPosts(newListPosts);
             chosenFragment.adapterNotifyChange(chosenFragment, AdapterNotifyType.itemInserted);
 
             if (chosenFragment.type.equals("streams")
-                    && LoggedUserActivity.getLoggedUserActivity().checkStreamsProfileFragmentExist()){
+                    && LoggedUserActivity.getLoggedUserActivity().checkStreamsProfileFragmentExist()) {
                 // l'utente aveva già aperto il profilo e adesso và aggiornato
                 PostsListFragment profilePostsFragment =
                         LoggedUserActivity.getLoggedUserActivity()
@@ -464,6 +525,7 @@ public class PostsListFragment extends Fragment {
             adapterNotifyChange(this, AdapterNotifyType.dataSetChanged);
         }
     }
+
     /*
     private void updateOldPostRecyclerView(List<Post> newListPosts) {
         assert newListPosts != null && newListPosts.get(0) != null : "newListPost e il primo elemento" +
@@ -500,8 +562,10 @@ public class PostsListFragment extends Fragment {
     void adapterNotifyChange(PostsListFragment fragment, @NonNull AdapterNotifyType notifyType) {
         if (notifyType.equals(AdapterNotifyType.dataSetChanged)) {
             fragment.adapter.notifyDataSetChanged();
+            fragment.adapterSearch.notifyDataSetChanged();
         } else if (notifyType.equals(AdapterNotifyType.itemInserted)) {
             fragment.adapter.notifyItemInserted(0);
+            fragment.adapterSearch.notifyItemInserted(0);
         }
     }
 
@@ -525,6 +589,7 @@ public class PostsListFragment extends Fragment {
                 //listPosts.get(i).removeLikeFromArray(LoggedUserActivity.getUsernameLoggedUser());
 
                 streamsFragment.adapter.notifyItemChanged(i, listPosts.get(i));
+                streamsFragment.adapterSearch.notifyItemChanged(i, listPosts.get(i));
 
                 break;
             }
@@ -615,7 +680,7 @@ public class PostsListFragment extends Fragment {
                         }
 
                         boolean isExisting = LoggedUserActivity.getLoggedUserActivity().checkProfileFragmentExist();
-                        if (isExisting){
+                        if (isExisting) {
                             // occorre aggiornare anche profile
                             removePostFromSecondaryTab(
                                     LoggedUserActivity.getLoggedUserActivity()
@@ -664,6 +729,10 @@ public class PostsListFragment extends Fragment {
         if (postListFragment.getListPosts().remove(post)) {
             postListFragment.adapter.notifyItemRemoved(holder.getAdapterPosition());
         }
+
+        if (postListFragment.getListPostsSearched().remove(post)){
+            postListFragment.adapterSearch.notifyItemRemoved(holder.getAdapterPosition());
+        }
     }
 
     /**
@@ -678,6 +747,8 @@ public class PostsListFragment extends Fragment {
                 postsListFragment.getListPosts().remove(listPosts.get(i));
                 postsListFragment.adapter.notifyItemRemoved(i);
                 postsListFragment.adapter.notifyItemRangeChanged(i, listPosts.size());
+                postsListFragment.adapterSearch.notifyItemRemoved(i);
+                postsListFragment.adapterSearch.notifyItemRangeChanged(i, listPosts.size());
 
                 break;
             }
@@ -719,7 +790,7 @@ public class PostsListFragment extends Fragment {
         eraseSearch();
     }
 
-    public boolean incrementNumberOfTotalCommentsIfExist(Post post){
+    public boolean incrementNumberOfTotalCommentsIfExist(Post post) {
         List<Post> listPosts = this.getListPosts();
         for (int i = 0; i < listPosts.size(); i++) {
             if (listPosts.get(i).equals(post)) {
@@ -732,7 +803,7 @@ public class PostsListFragment extends Fragment {
         return false;
     }
 
-    public boolean decrementNumberOfTotalCommentsIfExist(Post post){
+    public boolean decrementNumberOfTotalCommentsIfExist(Post post) {
         List<Post> listPosts = this.getListPosts();
         for (int i = 0; i < listPosts.size(); i++) {
             if (listPosts.get(i).equals(post)) {

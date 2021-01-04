@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -86,6 +87,24 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         homeTabs.getTabAt(0).setIcon(R.drawable.ic_library_books_black_24dp);
         homeTabs.getTabAt(1).setIcon(R.drawable.ic_favorite_black_24dp);
 
+        homeTabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                if (tab.getPosition()==0){
+                    HomeFragment.getHomeFragment().getSearchField().setVisibility(View.VISIBLE);
+                }else if (tab.getPosition()==1){
+                    HomeFragment.getHomeFragment().getSearchField().setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) { }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) { }
+        });
+
         searchField = homeFragmentView.findViewById(R.id.searchField);
 
         HomeFragment.getHomeFragment().getSearchField().addTextChangedListener(getSearchedPosts);
@@ -105,33 +124,21 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     *  da un'altra lista che non sia listPosts, la quale invece deve rimanere invariata
     * */
     TextWatcher getSearchedPosts = new TextWatcher() {
-        @Override
-        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            if (!charSequence.toString().equals("")) {
 
-            }
-        }
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
+
         @Override
         public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-        }
-/*
-TODO
- non è corretto, lancia due volte getAllPosts durante il caricamento inziale, senza che l'utente
- faccia nulla, occorre rimediare
-        @Override
-        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            if (charSequence.toString().equals("") || charSequence.toString() == null) {
-                Log.v("bug", "111111");
+            if (charSequence.toString().trim().length()==0 || charSequence == null) {
                 HomeFragment.getHomeFragment().getStreamsFragment().getAllPosts();
             } else {
-                Log.v("bug", "222222");
                 HomeFragment.getHomeFragment().getStreamsFragment().getAllPosts(charSequence.toString());
             }
         }
-*/
+
         @Override
-        public void afterTextChanged(Editable editable) {
-        }
+        public void afterTextChanged(Editable editable) { }
     };
 
     @Override
