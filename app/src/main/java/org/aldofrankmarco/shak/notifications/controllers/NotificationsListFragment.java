@@ -68,7 +68,6 @@ public class NotificationsListFragment extends Fragment {
      */
     public void getAllNotifications() {
 
-
         Call<GetNotificationsListResponse> httpRequest = LoggedUserActivity.getNotificationsService().getAllNotifications();
 
         httpRequest.enqueue(new Callback<GetNotificationsListResponse>() {

@@ -39,7 +39,6 @@ public class PostsListFragment extends Fragment {
     RecyclerView recyclerView;
 
     private PostsListAdapter adapter;
-    private PostsListAdapter adapterSearch;
 
     private View view;
 
@@ -85,12 +84,6 @@ public class PostsListFragment extends Fragment {
 
         if (this.adapter == null) {
             this.adapter = new PostsListAdapter(this, view);
-            this.adapter.isFiltered(false);
-        }
-
-        if (this.adapterSearch == null) {
-            this.adapterSearch = new PostsListAdapter(this, view);
-            this.adapterSearch.isFiltered(true);
         }
     }
 
@@ -122,35 +115,22 @@ public class PostsListFragment extends Fragment {
                 assert (getArguments().getString("username") != null) : "Nel profilo doveva" +
                         "essere sempre specificato l'username nel bundle";
 
-                HomeFragment.getHomeFragment().getSearchField().setVisibility(View.GONE);
-
                 //TODO come faccio a riprendere l'user visualizzato?
                 initializeRecyclerView(
                         //LoggedUserActivity.getLoggedUserActivity().getProfilePostsFragment(username),
                         null
                 );
             } else if (type.equals("streams")) {
-                HomeFragment.getHomeFragment().getSearchField().setVisibility(View.VISIBLE);
-
                 LoggedUserActivity.getLoggedUserActivity().getStreamsFragment().initializeRecyclerView(
                         LoggedUserActivity.getLoggedUserActivity().getStreamsFragment(),
                         null);
             } else if (type.equals("favourites")) {
-                HomeFragment.getHomeFragment().getSearchField().setVisibility(View.VISIBLE);
-
                 LoggedUserActivity.getLoggedUserActivity().getFavouritesFragment().initializeRecyclerView(
                         LoggedUserActivity.getLoggedUserActivity().getFavouritesFragment(),
                         null);
 
                 //TODO NEL CASO IN CUI SI VOGLIANO CERCARE NUOVI POST ARRIVATI SENZA LE
                 // SOCKET => getAllNewPosts();
-            }
-        } else {
-            if (type.equals("profile")) {
-                // non ci sono altri frammenti simili in profile, può essere inizializzato direttamente
-                HomeFragment.getHomeFragment().getSearchField().setVisibility(View.GONE);
-            } else {
-                HomeFragment.getHomeFragment().getSearchField().setVisibility(View.VISIBLE);
             }
         }
 
@@ -167,14 +147,6 @@ public class PostsListFragment extends Fragment {
         }
 
         return this.adapter.getListPosts();
-    }
-
-    private List<Post> getListPostsSearched() {
-        if (this.adapterSearch == null) {
-            this.adapterSearch = new PostsListAdapter(this, view);
-        }
-
-        return this.adapterSearch.getListPosts();
     }
 
     /**
@@ -248,7 +220,7 @@ public class PostsListFragment extends Fragment {
                                     response.body().getFavouritePosts()
                             );*/
                         if (type.equals("streams")) {
-                            if (adapter.getListPosts().size() == 0 || adapterSearch!=null || adapterSearch.getListPosts().size()!=0) {
+                            if (adapter.getListPosts().size() == 0) {
                                 initializeRecyclerView(
                                         response.body().getStreamPosts()
                                 );
@@ -325,41 +297,6 @@ public class PostsListFragment extends Fragment {
                     Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
                 }
             });
-        }
-    }
-
-    public void getAllPosts(String postContentFilter) {
-        if (getArguments() == null) {
-            return;
-        }
-
-        if (type.equals("streams") || type.equals("favourites")) {
-
-            Call<GetPostsListResponse> httpRequest = LoggedUserActivity.getStreamsService().getAllSearchedPosts(postContentFilter);
-
-            httpRequest.enqueue(new Callback<GetPostsListResponse>() {
-                @Override
-                public void onResponse(Call<GetPostsListResponse> call, Response<GetPostsListResponse> response) {
-                    if (response.isSuccessful()) {
-                        assert response.body() != null : "body() non doveva essere null";
-
-                        if (type.equals("streams")) {
-                            initializeRecyclerViewForSearched(response.body().getStreamPosts());
-                            //Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.body().getStreamPosts().size()+"", Toast.LENGTH_LONG).show();
-                        } else {
-                            initializeRecyclerViewForSearched(response.body().getFavouritePosts());
-                        }
-                    } else {
-                        Toast.makeText(getActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<GetPostsListResponse> call, Throwable t) {
-                    Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
-                }
-            });
-
         }
     }
 
@@ -443,16 +380,6 @@ public class PostsListFragment extends Fragment {
 
         recyclerView = this.view.findViewById(R.id.list_posts);
         recyclerView.setAdapter(this.adapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-    }
-
-    protected void initializeRecyclerViewForSearched(List<Post> listPosts) {
-        if (listPosts!=null){
-            this.adapterSearch.setListPosts(listPosts);
-        }
-
-        recyclerView = this.view.findViewById(R.id.list_posts);
-        recyclerView.setAdapter(this.adapterSearch);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
@@ -562,10 +489,8 @@ public class PostsListFragment extends Fragment {
     void adapterNotifyChange(PostsListFragment fragment, @NonNull AdapterNotifyType notifyType) {
         if (notifyType.equals(AdapterNotifyType.dataSetChanged)) {
             fragment.adapter.notifyDataSetChanged();
-            fragment.adapterSearch.notifyDataSetChanged();
         } else if (notifyType.equals(AdapterNotifyType.itemInserted)) {
             fragment.adapter.notifyItemInserted(0);
-            fragment.adapterSearch.notifyItemInserted(0);
         }
     }
 
@@ -589,7 +514,6 @@ public class PostsListFragment extends Fragment {
                 //listPosts.get(i).removeLikeFromArray(LoggedUserActivity.getUsernameLoggedUser());
 
                 streamsFragment.adapter.notifyItemChanged(i, listPosts.get(i));
-                streamsFragment.adapterSearch.notifyItemChanged(i, listPosts.get(i));
 
                 break;
             }
@@ -729,10 +653,6 @@ public class PostsListFragment extends Fragment {
         if (postListFragment.getListPosts().remove(post)) {
             postListFragment.adapter.notifyItemRemoved(holder.getAdapterPosition());
         }
-
-        if (postListFragment.getListPostsSearched().remove(post)){
-            postListFragment.adapterSearch.notifyItemRemoved(holder.getAdapterPosition());
-        }
     }
 
     /**
@@ -747,8 +667,6 @@ public class PostsListFragment extends Fragment {
                 postsListFragment.getListPosts().remove(listPosts.get(i));
                 postsListFragment.adapter.notifyItemRemoved(i);
                 postsListFragment.adapter.notifyItemRangeChanged(i, listPosts.size());
-                postsListFragment.adapterSearch.notifyItemRemoved(i);
-                postsListFragment.adapterSearch.notifyItemRangeChanged(i, listPosts.size());
 
                 break;
             }
@@ -778,16 +696,9 @@ public class PostsListFragment extends Fragment {
         return false;
     }
 
-    public void eraseSearch() {
-        if (HomeFragment.getHomeFragment().getSearchField() != null) {
-            HomeFragment.getHomeFragment().getSearchField().setText("");
-        }
-    }
-
     @Override
     public void onResume() {
         super.onResume();
-        eraseSearch();
     }
 
     public boolean incrementNumberOfTotalCommentsIfExist(Post post) {

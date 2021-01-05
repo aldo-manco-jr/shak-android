@@ -75,8 +75,14 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
         holder.usernameText.setText(listUsers.get(position).getUsername());
         holder.emailText.setText(listUsers.get(position).getEmail());
 
-        if (user.getCity() != null && user.getCountry() != null) {
+        if (user.getCity() != null &&
+                user.getCountry() != null &&
+                user.getCity().trim().length() > 0 &&
+                user.getCountry().trim().length() > 0) {
+
             holder.locationText.setText("@" + user.getCity() + ", " + user.getCountry());
+        }else {
+            holder.locationText.setText("Unknown Location");
         }
 
         if (!user.getProfileImageVersion().isEmpty()) {
@@ -96,7 +102,7 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
             holder.imageProfile.setVisibility(View.GONE);
         }
 
-        if (!user.getUsername().equals(LoggedUserActivity.getUsernameLoggedUser())){
+        if (!user.getUsername().equals(LoggedUserActivity.getUsernameLoggedUser())) {
             isFollow(user, holder);
 
             holder.followButton.setOnClickListener(new View.OnClickListener() {
@@ -105,7 +111,7 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
                     followOrUnfollow(listUsers.get(position), holder);
                 }
             });
-        }else {
+        } else {
             holder.followButton.setVisibility(View.GONE);
             holder.loadingFollow.setVisibility(View.GONE);
         }
@@ -235,7 +241,7 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
         }
     }
 
-    List<User> getList(){
+    List<User> getList() {
         return this.listUsers;
     }
 }

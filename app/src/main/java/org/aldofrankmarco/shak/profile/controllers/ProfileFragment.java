@@ -490,7 +490,11 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
                     usernameTextView.setText(user.getUsername());
                     emailTextView.setText(user.getEmail());
 
-                    if (user.getCity() != null && user.getCountry() != null) {
+                    if (user.getCity() != null &&
+                            user.getCountry() != null &&
+                            user.getCity().trim().length()>0 &&
+                            user.getCountry().trim().length()>0) {
+
                         StringBuilder location = new StringBuilder();
                         location.append("@").append(user.getCity()).append(", ").append(user.getCountry());
 
@@ -521,8 +525,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
                                 }
                             });
                         } else {
-                            locationTextView.setVisibility(View.VISIBLE);
-                            locationTextView.setText("Unknown Location");
+                            locationTextView.setVisibility(View.GONE);
                         }
                     }
 

@@ -50,8 +50,6 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
     private List<Post> listPosts;
     private PostsListFragment fatherListFragment;
 
-    private boolean isFiltered = false;
-
     private final String basicUrlImage = "http://res.cloudinary.com/dfn8llckr/image/upload/v";
     // quantità massima di post estratti dal database per volta
     private final int maximumNumberOfExtractableElements = 5;
@@ -59,10 +57,6 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
     public PostsListAdapter(PostsListFragment fatherListFragment, View view) {
         this.fatherListFragment = fatherListFragment;
         this.listPosts = new ArrayList<>();
-    }
-
-    public void isFiltered(boolean filtered) {
-        isFiltered = filtered;
     }
 
     public List<Post> getListPosts() {
@@ -95,7 +89,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
         final Post post = this.listPosts.get(position);
         final User user = post.getUserId();
 
-        if ((!allOldPostsAreLoaded) && this.listPosts.get(this.listPosts.size() - 1).equals(post) && !isFiltered){
+        if ((!allOldPostsAreLoaded) && this.listPosts.get(this.listPosts.size() - 1).equals(post)){
             // quando viene creato se è l'ultimo elemento e se non è stato rimosso il
 //TODO, OCCORRE FERMARLO SE I RISULTATI AGGIUNTI SONO DA AGGIUNGERE SONO 0, NON CI SONO MESSAGGI,
             // QUINID NON OCCORRE CHIAMARE PIù
@@ -158,7 +152,6 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
                         .getProfileFragments();
                 ProfileFragment userInformationProfile = profileFragment
                         .newInstanceUserViewInformation(holder.usernameText.getText().toString().trim());
-                fatherListFragment.eraseSearch();
                 LoggedUserActivity.getLoggedUserActivity().changeFragment(userInformationProfile);
             }
         });
@@ -170,7 +163,6 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
                         .getProfileFragments();
                 ProfileFragment userInformationProfile = profileFragment
                         .newInstanceUserViewInformation(holder.usernameText.getText().toString().trim());
-                fatherListFragment.eraseSearch();
                 LoggedUserActivity.getLoggedUserActivity().changeFragment(userInformationProfile);
             }
         });
@@ -205,7 +197,6 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
         holder.commentButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                fatherListFragment.eraseSearch();
                 LoggedUserActivity.getLoggedUserActivity().changeFragment(LoggedUserActivity.getLoggedUserActivity().getCommentsListFragment(post));
             }
         });
@@ -312,10 +303,6 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
                 this.listPosts.add(newListPosts.get(i));
             }
         }
-    }
-
-    public void setListPosts(List<Post> listPosts) {
-        this.listPosts = listPosts;
     }
 
     /**

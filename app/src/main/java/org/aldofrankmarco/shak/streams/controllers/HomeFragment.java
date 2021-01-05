@@ -36,7 +36,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     private ViewPager viewPager;
 
     private TabLayout homeTabs;
-    private EditText searchField;
 
     private PostsListFragment streamsFragment;
     private PostsListFragment favouritesFragment;
@@ -52,10 +51,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-    }
-
-    public EditText getSearchField() {
-        return searchField;
     }
 
     @Nullable
@@ -86,70 +81,15 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         homeTabs.getTabAt(0).setIcon(R.drawable.ic_library_books_black_24dp);
         homeTabs.getTabAt(1).setIcon(R.drawable.ic_favorite_black_24dp);
 
-        homeTabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                if (tab.getPosition()==0){
-                    searchField.setVisibility(View.VISIBLE);
-                }else if (tab.getPosition()==1){
-                    searchField.setVisibility(View.GONE);
-                }
-            }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) { }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) { }
-        });
-
-        searchField = homeFragmentView.findViewById(R.id.searchField);
-
-        searchField.addTextChangedListener(getSearchedPosts);
-
         fab.setOnClickListener(this);
 
         return homeFragmentView;
     }
 
-    boolean flag = false;
-
-    /*
-    * TODO Se vuoi effettuare una ricerca devi stampare i risultati in una lista diversa e mostrare
-    *  quella e quando la lista si resetta (campo vuoto) mostri nuovamente la lista originaria),
-    *  non puoi fare la chiamata continuamente a getAllPost quando non è più attiva la ricerca, perchè
-    *  stò inserendo un limite dimensionale ai risultati trovati e con il tuo approccio cancelli tutto
-    *  quello che è stato stampato in precedenza. Occorre quindi visualizzare i rusultati prendendoli
-    *  da un'altra lista che non sia listPosts, la quale invece deve rimanere invariata
-    * */
-    TextWatcher getSearchedPosts = new TextWatcher() {
-
-        @Override
-        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
-
-        @Override
-        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            if (charSequence.toString().trim().length()==0 && flag==true) {
-                getStreamsFragment().getAllPosts();
-                flag=false;
-                Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), "ww", Toast.LENGTH_LONG).show();
-            } else if(charSequence.toString().trim().length()>0){
-                getStreamsFragment().getAllPosts(charSequence.toString());
-                flag=true;
-            }
-        }
-
-        @Override
-        public void afterTextChanged(Editable editable) { }
-    };
-
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.fab_switch_to_post_form) {
             // viene mostrata la form di inserimento del nuovo post
-            LoggedUserActivity.getLoggedUserActivity().getStreamsFragment().eraseSearch();
-            LoggedUserActivity.getLoggedUserActivity().getFavouritesFragment().eraseSearch();
             FragmentTransaction transactionsManager = getFragmentManager().beginTransaction();
             transactionsManager
                     .replace(R.id.home_fragment, new PostFormFragment())

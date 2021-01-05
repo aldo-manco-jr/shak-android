@@ -165,8 +165,6 @@ public class NotificationsListAdapter extends RecyclerView.Adapter<Notifications
                     holder.notifyContent.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            //ProfileFragment profileFragment = ProfileFragment.newInstance(senderUsername);
-                            //LoggedUserActivity.getLoggedUserActivity().changeFragment(profileFragment);
                             ProfileFragment profileFragment = LoggedUserActivity.getLoggedUserActivity()
                                     .getProfileFragments();
                             ProfileFragment userInformationProfile = profileFragment
@@ -174,8 +172,6 @@ public class NotificationsListAdapter extends RecyclerView.Adapter<Notifications
                             LoggedUserActivity.getLoggedUserActivity().changeFragment(userInformationProfile);
                         }
                     });
-                } else {
-                    Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                 }
             }
 
@@ -217,7 +213,6 @@ public class NotificationsListAdapter extends RecyclerView.Adapter<Notifications
                 if (response.isSuccessful()) {
                     notificationsListFragment.removeUserNotification(notificationsListFragment, notification, fragmentView, recyclerView, holder);
                 } else {
-                    //Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), notification.getNotificationId() + "", Toast.LENGTH_LONG).show();
                     Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), response.code() + " " + response.message(), Toast.LENGTH_LONG).show();
                 }
             }
