@@ -91,9 +91,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 if (tab.getPosition()==0){
-                    HomeFragment.getHomeFragment().getSearchField().setVisibility(View.VISIBLE);
+                    searchField.setVisibility(View.VISIBLE);
                 }else if (tab.getPosition()==1){
-                    HomeFragment.getHomeFragment().getSearchField().setVisibility(View.GONE);
+                    searchField.setVisibility(View.GONE);
                 }
             }
 
