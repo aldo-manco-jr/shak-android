@@ -44,4 +44,7 @@ public interface UsersService {
 
     @POST("auth/change-password")
     Call<Object> changePassword(@Body ChangePasswordRequest changePasswordRequest);
+
+    @DELETE("auth/delete")
+    Call<Object> deleteUser();
 }

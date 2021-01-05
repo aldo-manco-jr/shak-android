@@ -38,7 +38,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     private TabLayout homeTabs;
     private EditText searchField;
 
-    private PostFormFragment postFormFragment;
     private PostsListFragment streamsFragment;
     private PostsListFragment favouritesFragment;
 
@@ -107,13 +106,14 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
         searchField = homeFragmentView.findViewById(R.id.searchField);
 
-        HomeFragment.getHomeFragment().getSearchField().addTextChangedListener(getSearchedPosts);
+        searchField.addTextChangedListener(getSearchedPosts);
 
         fab.setOnClickListener(this);
 
         return homeFragmentView;
     }
 
+    boolean flag = false;
 
     /*
     * TODO Se vuoi effettuare una ricerca devi stampare i risultati in una lista diversa e mostrare
@@ -130,10 +130,13 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
         @Override
         public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            if (charSequence.toString().trim().length()==0 || charSequence == null) {
-                HomeFragment.getHomeFragment().getStreamsFragment().getAllPosts();
-            } else {
-                HomeFragment.getHomeFragment().getStreamsFragment().getAllPosts(charSequence.toString());
+            if (charSequence.toString().trim().length()==0 && flag==true) {
+                getStreamsFragment().getAllPosts();
+                flag=false;
+                Toast.makeText(LoggedUserActivity.getLoggedUserActivity(), "ww", Toast.LENGTH_LONG).show();
+            } else if(charSequence.toString().trim().length()>0){
+                getStreamsFragment().getAllPosts(charSequence.toString());
+                flag=true;
             }
         }
 
