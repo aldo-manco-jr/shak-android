@@ -294,7 +294,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, O
                 profileImagesFragment.uploadUserImage();
                 break;
             case R.id.fab_take_user_image:
-                profileImagesFragment.takeUserImage();
+                profileImagesFragment.dispatchTakePictureIntent();
                 break;
         }
     }

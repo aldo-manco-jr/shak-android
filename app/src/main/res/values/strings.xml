@@ -1,9 +1,60 @@
 <resources>
-    <string name="title_activity_maps">Map</string>
+    <string name="app_name">SHAK</string>
+    <string name="base_url_localhost">http://10.0.2.2:3000/</string>
+    <string name="base_url_localhost_api">http://10.0.2.2:3000/api/shak</string>
+    <string name="title_connection_problems">Connection problems</string>
+    <string name="title_activity_logged_user">LoggedUserActivity</string>
+    <string name="title_send_mail">SendMail</string>
 
-    <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
-    <string name="next">Next</string>
-    <string name="previous">Previous</string>
+    <string name="sharedpreferences_authentication">authentication</string>
+    <string name="sharedpreferences_token">authToken</string>
+
+    <string name="title_access">Informativa dell\'Utente</string>
+    <string name="title_home">Home</string>
+    <string name="title_profile">Profile</string>
+    <string name="title_users">Users</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="title_chat">Chat</string>
+    <string name="title_settings">Settings</string>
+
+    <string name="title_back">Back</string>
+
+    <string name="title_streams_tab">Streams</string>
+    <string name="title_favourites_tab">Favourites</string>
+    <string name="title_users_list">Users List</string>
+    <string name="title_notifications_list">Notifications List</string>
+
+    <string name="auth_login">Already registered? Log in now.</string>
+    <string name="auth_signup">Not registered yet? Sign up now.</string>
+    <string name="password_changed">Password is changed</string>
+    <string name="password_changed_error">Insert valid passwords</string>
+
+    <string name="connection_problems">You have some connection problems!</string>
+    <string name="try_connect_again">Try connect again!</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_maps2">Map</string>
+    <string name="title_activity_scrolling">ScrollingActivity</string>
+
+    <string name="action_settings">Settings</string>
+
+    <string name="application_permission_information">
+        "Questa Applicazione richiede permessi specifici"
+        " sugli smartphone dei propri Utenti.\n\n"
+        "Tipologie di Dati raccolti\n\n"
+        "Fra i Dati Personali raccolti da questa Applicazione, in modo autonomo"
+        " o tramite terze parti, ci sono: "
+        "Permesso Camera;"
+        " Permesso Localizzazione approssimativa (continua);"
+        " Cookie;"
+        " Dati di utilizzo;"
+        " email;"
+        " password;"
+        " Essendo essi necessari al diretto funzionamento dell'app"
+        " e non per essere usati per alcun trattamento dei dati"
+        " (come la profilazione e marketing), per poter proseguire"
+        " con il corretto funzionamento dell'app si bisogna di un vostro "
+        " consenso.\n"
+        "Grazie"</string>
 </resources>

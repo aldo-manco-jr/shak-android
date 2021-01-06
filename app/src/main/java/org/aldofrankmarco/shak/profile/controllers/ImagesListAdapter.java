@@ -46,10 +46,10 @@ public class ImagesListAdapter extends RecyclerView.Adapter<ImagesListAdapter.Im
 
     @NonNull
     @Override
-    public ImagesListAdapter.ImageItemHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ImageItemHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.layout_item_image, parent, false);
-        ImagesListAdapter.ImageItemHolder viewHolder = new ImagesListAdapter.ImageItemHolder(itemView);
+        ImageItemHolder viewHolder = new ImageItemHolder(itemView);
 
         return viewHolder;
     }
@@ -59,7 +59,7 @@ public class ImagesListAdapter extends RecyclerView.Adapter<ImagesListAdapter.Im
      * processato e aggiunto alla lista.
      */
     @Override
-    public void onBindViewHolder(@NonNull final ImagesListAdapter.ImageItemHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull final ImageItemHolder holder, final int position) {
         final Image image = listImages.get(position);
 
         final String urlImage = this.basicUrlImage + image.getImageVersion() + "/"
@@ -108,7 +108,7 @@ public class ImagesListAdapter extends RecyclerView.Adapter<ImagesListAdapter.Im
         return listImages.size();
     }
 
-    private void setAsDefaultImage(String imageVersion, String imageId, final ImagesListAdapter.ImageItemHolder holder) {
+    private void setAsDefaultImage(String imageVersion, String imageId, final ImageItemHolder holder) {
         Call<ImagesResponse> httpRequest = LoggedUserActivity.getImagesService().setUserProfilePhoto(imageId, imageVersion);
 
         httpRequest.enqueue(new Callback<ImagesResponse>() {
@@ -131,7 +131,7 @@ public class ImagesListAdapter extends RecyclerView.Adapter<ImagesListAdapter.Im
         });
     }
 
-    private void setAsCoverImage(String imageVersion, String imageId, final ImagesListAdapter.ImageItemHolder holder) {
+    private void setAsCoverImage(String imageVersion, String imageId, final ImageItemHolder holder) {
         Call<ImagesResponse> httpRequest = LoggedUserActivity.getImagesService().setUserCoverPhoto(imageId, imageVersion);
 
         httpRequest.enqueue(new Callback<ImagesResponse>() {

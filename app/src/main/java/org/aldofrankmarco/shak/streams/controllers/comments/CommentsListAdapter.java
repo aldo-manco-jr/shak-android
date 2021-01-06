@@ -55,11 +55,11 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
 
     @NonNull
     @Override
-    public CommentsListAdapter.CommentItemHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public CommentItemHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.layout_item_comment, parent, false);
 
-        CommentsListAdapter.CommentItemHolder viewHolder = new CommentsListAdapter.CommentItemHolder(itemView);
+        CommentItemHolder viewHolder = new CommentItemHolder(itemView);
         return viewHolder;
     }
 
@@ -68,7 +68,7 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
      * processato e aggiunto alla lista.
      */
     @Override
-    public void onBindViewHolder(@NonNull final CommentsListAdapter.CommentItemHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull final CommentItemHolder holder, final int position) {
 
         final Comment comment = listComments.get(position);
 

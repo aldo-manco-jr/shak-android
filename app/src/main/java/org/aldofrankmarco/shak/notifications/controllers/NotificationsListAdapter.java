@@ -53,10 +53,10 @@ public class NotificationsListAdapter extends RecyclerView.Adapter<Notifications
 
     @NonNull
     @Override
-    public NotificationsListAdapter.NotifyItemHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public NotifyItemHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.layout_item_notification, parent, false);
-        NotificationsListAdapter.NotifyItemHolder viewHolder = new NotificationsListAdapter.NotifyItemHolder(itemView);
+        NotifyItemHolder viewHolder = new NotifyItemHolder(itemView);
 
         return viewHolder;
     }
@@ -67,7 +67,7 @@ public class NotificationsListAdapter extends RecyclerView.Adapter<Notifications
      */
 
     @Override
-    public void onBindViewHolder(@NonNull final NotificationsListAdapter.NotifyItemHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull final NotifyItemHolder holder, final int position) {
 
         final Notification notification = listUserNotification.get(position);
         final String senderUsername = notification.getSenderUsername();

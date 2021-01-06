@@ -1,5 +1,6 @@
 package org.aldofrankmarco.shak.profile.controllers;
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.ProxyInfo;
@@ -30,11 +31,14 @@ import org.aldofrankmarco.shak.profile.http.GetImagesListResponse;
 import org.aldofrankmarco.shak.streams.controllers.LoggedUserActivity;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import static android.app.Activity.RESULT_OK;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -52,8 +56,7 @@ public class ImagesListFragment extends Fragment {
     private String imageEncoded;
 
     private Uri uri;
-    private final int SELECT_PHOTO = 1;
-    private final int TAKE_PHOTO = 100;
+    static final int REQUEST_IMAGE_CAPTURE = 1;
 
     private ImagesListAdapter adapter;
     private RecyclerView recyclerView;
@@ -107,12 +110,14 @@ public class ImagesListFragment extends Fragment {
     protected void uploadUserImage() {
         Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setType("image/*");
-        startActivityForResult(intent, SELECT_PHOTO);
+        startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
     }
 
-    protected void takeUserImage() {
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        startActivityForResult(intent, TAKE_PHOTO);
+    protected void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        try {
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+        } catch (ActivityNotFoundException ignored) {}
     }
 
     /**
@@ -131,6 +136,28 @@ public class ImagesListFragment extends Fragment {
      * anche mostrate eventuali azioni eseguibili sulle immagini
      */
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = null;
+
+            if (extras != null){
+                imageBitmap = (Bitmap) extras.get("data");
+            } else {
+                uri = data.getData();
+
+                try {
+                    imageBitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), uri);
+                } catch (IOException ignored) {}
+            }
+
+            assert imageBitmap != null: "imageBitmap non poteva essere null";
+
+            imageEncoded = bitmapToBase64(imageBitmap);
+            addUserImage(imageEncoded);
+        }
+    }
+/*    @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
@@ -155,7 +182,7 @@ public class ImagesListFragment extends Fragment {
             }
         }
     }
-
+*/
     private void addUserImage(String imageEncoded) {
 
         if (imageEncoded == null) {

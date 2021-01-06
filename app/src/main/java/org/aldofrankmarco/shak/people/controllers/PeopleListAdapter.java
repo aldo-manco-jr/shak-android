@@ -47,10 +47,10 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Us
 
     @NonNull
     @Override
-    public PeopleListAdapter.UserItemHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public UserItemHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.layout_item_user, parent, false);
-        PeopleListAdapter.UserItemHolder viewHolder = new PeopleListAdapter.UserItemHolder(itemView);
+        UserItemHolder viewHolder = new UserItemHolder(itemView);
 
         return viewHolder;
     }
