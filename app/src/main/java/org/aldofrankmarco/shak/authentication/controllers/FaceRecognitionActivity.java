@@ -22,8 +22,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.chaquo.python.PyObject;
-import com.chaquo.python.Python;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.JsonObject;
 
@@ -51,8 +49,8 @@ public class FaceRecognitionActivity extends AppCompatActivity implements View.O
 
     private String imageEncoded;
 
-    private Python py;
-    private PyObject pyObject;
+//    private Python py;
+//    private PyObject pyObject;
 
     private SharedPreferences sharedPreferences;
 
