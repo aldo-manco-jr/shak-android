@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
@@ -131,8 +132,11 @@ public class LoggedUserActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        streamsService = streamsService = ServiceGenerator.createService(StreamsService.class, getToken());
+        usersService = ServiceGenerator.createService(UsersService.class, getToken());
         sharedPreferences = getSharedPreferences(getString(R.string.sharedpreferences_authentication), Context.MODE_PRIVATE);
         homeFragment = (HomeFragment) createNewInstanceIfNecessary(homeFragment, FragmentsIdentifier.home);
+
         changeFragment(homeFragment);
     }
 
@@ -306,23 +310,14 @@ public class LoggedUserActivity extends AppCompatActivity {
     }
 
     public static StreamsService getStreamsService() {
-
-        if (streamsService == null) {
-            streamsService = ServiceGenerator.createService(StreamsService.class, getToken());
-        }
         return streamsService;
     }
 
     public static UsersService getUsersService() {
-
-        if (usersService == null) {
-            usersService = ServiceGenerator.createService(UsersService.class, getToken());
-        }
         return usersService;
     }
 
     public static ImagesService getImagesService() {
-
         if (imagesService == null) {
             imagesService = ServiceGenerator.createService(ImagesService.class, getToken());
         }
@@ -338,15 +333,15 @@ public class LoggedUserActivity extends AppCompatActivity {
     }
 
     public static String getToken() {
-        return LoggedUserActivity.token;
+        return token;
     }
 
     public static String getUsernameLoggedUser() {
-        return LoggedUserActivity.usernameLoggedUser;
+        return usernameLoggedUser;
     }
 
     public static String getIdLoggedUser() {
-        return LoggedUserActivity.idLoggedUser;
+        return idLoggedUser;
     }
 
     @Override
@@ -450,22 +445,15 @@ public class LoggedUserActivity extends AppCompatActivity {
 
     public PostsListFragment getStreamsFragment() {
         if (streamsFragment == null) {
-            streamsFragment = PostsListFragment.newInstance("streams");
+            streamsFragment = PostsListFragment.newInstance("streams", usernameLoggedUser);
         }
-        /* else if (streamsFragment.get){
-
-        }/*streamsFragment.getAllPosts();
-        djdjdjd
-    qui vanno messi se maggiore di 0, o un check oppure divetto in get allPosts, che se non è a 0
-    salta il comando, quindi verrebbe chiamato solo se maggiore di 0,
-        aggiungere un ritorno dimensioni adapter)*/
 
         return streamsFragment;
     }
 
     public PostsListFragment getFavouritesFragment() {
         if (favouritesFragment == null) {
-            favouritesFragment = PostsListFragment.newInstance("favourites");
+            favouritesFragment = PostsListFragment.newInstance("favourites", usernameLoggedUser);
         }
 
         return favouritesFragment;

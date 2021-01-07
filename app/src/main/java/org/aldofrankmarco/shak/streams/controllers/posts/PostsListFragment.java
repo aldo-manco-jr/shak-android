@@ -112,25 +112,17 @@ public class PostsListFragment extends Fragment {
         if (isNotEmptyList) {
             // la clase era già stata istanziata, deve essere ricostrutita la "view"
             if (type.equals("profile")) {
-                assert (getArguments().getString("username") != null) : "Nel profilo doveva" +
+                assert username != null : "Nel profilo doveva" +
                         "essere sempre specificato l'username nel bundle";
 
                 //TODO come faccio a riprendere l'user visualizzato?
                 initializeRecyclerView(
-                        //LoggedUserActivity.getLoggedUserActivity().getProfilePostsFragment(username),
                         null
                 );
-            } else if (type.equals("streams")) {
-                LoggedUserActivity.getLoggedUserActivity().getStreamsFragment().initializeRecyclerView(
-                        LoggedUserActivity.getLoggedUserActivity().getStreamsFragment(),
+            } else if (type.equals("streams") || type.equals("favourites")) {
+                initializeRecyclerView(
+                        this,
                         null);
-            } else if (type.equals("favourites")) {
-                LoggedUserActivity.getLoggedUserActivity().getFavouritesFragment().initializeRecyclerView(
-                        LoggedUserActivity.getLoggedUserActivity().getFavouritesFragment(),
-                        null);
-
-                //TODO NEL CASO IN CUI SI VOGLIANO CERCARE NUOVI POST ARRIVATI SENZA LE
-                // SOCKET => getAllNewPosts();
             }
         }
 

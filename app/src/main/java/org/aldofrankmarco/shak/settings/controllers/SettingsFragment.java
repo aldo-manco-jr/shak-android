@@ -25,6 +25,7 @@ import org.aldofrankmarco.shak.R;
 import org.aldofrankmarco.shak.authentication.controllers.AccessActivity;
 import org.aldofrankmarco.shak.authentication.controllers.MainActivity;
 import org.aldofrankmarco.shak.authentication.http.LoginResponse;
+import org.aldofrankmarco.shak.streams.controllers.HomeFragment;
 import org.aldofrankmarco.shak.streams.controllers.LoggedUserActivity;
 
 import retrofit2.Call;
@@ -85,18 +86,16 @@ public class SettingsFragment extends Fragment {
 
                 } else if (position == 3) {
 
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.remove(getString(R.string.sharedpreferences_token));
-                    editor.apply();
-
+                    sharedPreferences.edit().remove(getString(R.string.sharedpreferences_token)).apply();
                     LoggedUserActivity.getSocket().disconnect();
+                    LoggedUserActivity.getLoggedUserActivity().resetHomeFragment();
+
+                    Intent oldLoggedUser = new Intent(getActivity(), LoggedUserActivity.class);
+                    getActivity().stopService(oldLoggedUser);
 
                     Intent intent = new Intent(getActivity(), MainActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
-
-                    Intent oldIntent = new Intent(getActivity(), LoggedUserActivity.class);
-                    getActivity().stopService(oldIntent);
 
                     ActivityCompat.finishAffinity(getActivity());
                 } else if (position == 4) {
@@ -180,7 +179,8 @@ public class SettingsFragment extends Fragment {
         @Override
         public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
 
-            LayoutInflater layoutInflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater layoutInflater =
+                    (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View row = layoutInflater.inflate(R.layout.settingrow, parent, false);
             ImageView images = row.findViewById(R.id.img);
             TextView myTitle = row.findViewById(R.id.txtv1);

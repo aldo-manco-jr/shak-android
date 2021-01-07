@@ -3,6 +3,7 @@ package org.aldofrankmarco.shak.streams.controllers;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -68,8 +69,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         homeTabs = homeFragmentView.findViewById(R.id.home_tabs);
         FloatingActionButton fab = homeFragmentView.findViewById(R.id.fab_switch_to_post_form);
 
-        streamsFragment = getStreamsFragment();
-        favouritesFragment = getFavouritesFragment();
+        streamsFragment = LoggedUserActivity.getLoggedUserActivity().getStreamsFragment();
+        favouritesFragment = LoggedUserActivity.getLoggedUserActivity().getFavouritesFragment();
 
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getChildFragmentManager(), 0);
         viewPagerAdapter.addFragment(getStreamsFragment(), "Streams");
@@ -102,11 +103,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     }
 
     public PostsListFragment getStreamsFragment() {
-        return LoggedUserActivity.getLoggedUserActivity().getStreamsFragment();
+        return streamsFragment;
     }
 
     public PostsListFragment getFavouritesFragment() {
-        return LoggedUserActivity.getLoggedUserActivity().getFavouritesFragment();
+        return favouritesFragment;
     }
 
     private class ViewPagerAdapter extends FragmentPagerAdapter {

@@ -223,7 +223,6 @@ public class PostFormFragment extends Fragment implements View.OnClickListener, 
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), uri);
                 imageEncoded = bitmapToBase64(bitmap);
 
-
                 ConstraintLayout.LayoutParams layoutParams =
                         (ConstraintLayout.LayoutParams) postContentField.getLayoutParams();
                 layoutParams.height = fragmentHeight - spaceOccupiedByTheImage;
