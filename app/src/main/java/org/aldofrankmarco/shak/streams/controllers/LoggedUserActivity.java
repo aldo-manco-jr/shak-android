@@ -1,9 +1,15 @@
 package org.aldofrankmarco.shak.streams.controllers;
 
 import android.annotation.SuppressLint;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.net.ConnectivityManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -11,6 +17,8 @@ import android.view.MenuItem;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
@@ -21,6 +29,7 @@ import com.github.nkzawa.socketio.client.Socket;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import org.aldofrankmarco.shak.R;
+import org.aldofrankmarco.shak.models.Notification;
 import org.aldofrankmarco.shak.models.Post;
 import org.aldofrankmarco.shak.notifications.controllers.NotificationsListFragment;
 import org.aldofrankmarco.shak.people.controllers.PeopleListFragment;
@@ -72,6 +81,12 @@ public class LoggedUserActivity extends AppCompatActivity {
     private SharedPreferences sharedPreferences;
 
     private static LoggedUserActivity loggedUserActivity;
+
+    private static final String NOTIFICATION_CHANNEL_ID = "SHAK Notification Manager ID";
+    private static final String NOTIFICATION_CHANNEL_NAME = "SHAK Notification Manager Title";
+    private static final String NOTIFICATION_CHANNEL_DESCRIPTION = "SHAK Notification Manager Description";
+
+    private ConnectionLostReceiver connectionLostReceiver = new ConnectionLostReceiver();
 
     private static StreamsService streamsService;
     private static UsersService usersService;
@@ -134,6 +149,28 @@ public class LoggedUserActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+
+            NotificationChannel channel = new NotificationChannel(
+                NOTIFICATION_CHANNEL_ID,
+                    NOTIFICATION_CHANNEL_NAME,
+                    NotificationManager.IMPORTANCE_HIGH);
+            channel.setDescription(NOTIFICATION_CHANNEL_DESCRIPTION);
+
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+
+            NotificationCompat.Builder notification = new NotificationCompat.Builder(LoggedUserActivity.getLoggedUserActivity(), NOTIFICATION_CHANNEL_ID)
+                    .setSmallIcon(R.drawable.ic_baseline_insert_photo_24)
+                    .setContentTitle("Login Successful")
+                    .setContentText("Welcome " + LoggedUserActivity.getUsernameLoggedUser() + "!")
+                    .setPriority(NotificationCompat.PRIORITY_LOW)
+                    .setAutoCancel(true);
+
+            NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(LoggedUserActivity.getLoggedUserActivity());
+            notificationManagerCompat.notify(1, notification.build());
+        }
+
         streamsService = streamsService = ServiceGenerator.createService(StreamsService.class, getToken());
         usersService = ServiceGenerator.createService(UsersService.class, getToken());
         sharedPreferences = getSharedPreferences(getString(R.string.sharedpreferences_authentication), Context.MODE_PRIVATE);
@@ -169,6 +206,16 @@ public class LoggedUserActivity extends AppCompatActivity {
                     public void run() {
                         // quando un post viene pubblicato la socket avvisa del necessario aggiornmento
                         getStreamsFragment().getAllNewPosts();
+
+                        NotificationCompat.Builder notification = new NotificationCompat.Builder(LoggedUserActivity.getLoggedUserActivity())
+                                .setSmallIcon(R.drawable.ic_baseline_insert_photo_24)
+                                .setContentTitle("title")
+                                .setContentText("description")
+                                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                                .setAutoCancel(true);
+
+                        NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(LoggedUserActivity.getLoggedUserActivity());
+                        notificationManagerCompat.notify(1, notification.build());
                     }
                 });
             }
@@ -502,5 +549,25 @@ public class LoggedUserActivity extends AppCompatActivity {
         }
         // l'applicazione è stata ripresa, non è più in pausa
         isOnPause = false;
+    }
+
+    public static String getNotificationChannelId() {
+        return NOTIFICATION_CHANNEL_ID;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(Intent.ACTION_AIRPLANE_MODE_CHANGED);
+        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        this.registerReceiver(connectionLostReceiver, intentFilter);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        this.unregisterReceiver(connectionLostReceiver);
     }
 }

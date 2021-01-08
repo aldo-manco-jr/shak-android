@@ -1,5 +1,9 @@
 package org.aldofrankmarco.shak.streams.controllers.posts;
 
+import android.app.NotificationChannel;
+import android.app.PendingIntent;
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,11 +13,14 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.aldofrankmarco.shak.R;
+import org.aldofrankmarco.shak.models.Notification;
 import org.aldofrankmarco.shak.models.Post;
 import org.aldofrankmarco.shak.streams.controllers.AdapterNotifyType;
 import org.aldofrankmarco.shak.streams.controllers.HomeFragment;
@@ -418,7 +425,7 @@ public class PostsListFragment extends Fragment {
             int oldListPostSize = chosenFragment.getListPosts().size();
             chosenFragment.adapter.addPosts(newListPosts);
             int totalItemsInserted = (chosenFragment.getListPosts().size() - oldListPostSize);
-            chosenFragment.adapterNotifyChange(chosenFragment, AdapterNotifyType.itemInserted, totalItemsInserted);
+            chosenFragment.adapterNotifyChange(chosenFragment, AdapterNotifyType.itemInserted, totalItemsInserted, newListPosts);
 
             if (chosenFragment.type.equals("streams")
                     && LoggedUserActivity.getLoggedUserActivity().checkStreamsProfileFragmentExist()) {
@@ -486,18 +493,44 @@ public class PostsListFragment extends Fragment {
         } else if (notifyType.equals(AdapterNotifyType.itemInserted)) {
             fragment.adapter.notifyItemInserted(0);
             Toast.makeText(getContext(), R.string.new_messages_added, Toast.LENGTH_LONG).show();
+
+            displayNotification(
+                    R.drawable.ic_baseline_insert_photo_24,
+                    fragment.adapter.getListPosts().get(fragment.adapter.getListPosts().size()-1).getUsernamePublisher(),
+                    fragment.adapter.getListPosts().get(fragment.adapter.getListPosts().size()-1).getPostContent());
         }
     }
 
     void adapterNotifyChange(PostsListFragment fragment,
                              @NonNull AdapterNotifyType notifyType,
-                             int totalItemsInserted) {
+                             int totalItemsInserted,
+                             List<Post> listPosts) {
         if (notifyType.equals(AdapterNotifyType.dataSetChanged)) {
             fragment.adapter.notifyDataSetChanged();
         } else if (notifyType.equals(AdapterNotifyType.itemInserted)) {
             fragment.adapter.notifyItemRangeInserted(0, totalItemsInserted);
             Toast.makeText(getContext(), R.string.new_messages_added, Toast.LENGTH_LONG).show();
+
+            if (!listPosts.get(0).getUsernamePublisher().equals(LoggedUserActivity.getUsernameLoggedUser())){
+                displayNotification(
+                        R.drawable.ic_post_added_24,
+                        listPosts.get(0).getUsernamePublisher(),
+                        listPosts.get(0).getPostContent());
+            }
         }
+    }
+
+    private void displayNotification(int iconId, String title, String description){
+
+        NotificationCompat.Builder notification = new NotificationCompat.Builder(LoggedUserActivity.getLoggedUserActivity(), LoggedUserActivity.getNotificationChannelId())
+                .setSmallIcon(iconId)
+                .setContentTitle(title)
+                .setContentText(description)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setAutoCancel(true);
+
+        NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(LoggedUserActivity.getLoggedUserActivity());
+        notificationManagerCompat.notify(1, notification.build());
     }
 
     void pushOnFavoritesList(Post post) {
