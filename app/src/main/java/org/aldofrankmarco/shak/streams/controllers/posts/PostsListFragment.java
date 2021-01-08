@@ -415,8 +415,10 @@ public class PostsListFragment extends Fragment {
         assert newListPosts != null : "newListPosts non poteva essere null";
 
         if (newListPosts.size() > 0) {
+            int oldListPostSize = chosenFragment.getListPosts().size();
             chosenFragment.adapter.addPosts(newListPosts);
-            chosenFragment.adapterNotifyChange(chosenFragment, AdapterNotifyType.itemInserted);
+            int totalItemsInserted = (chosenFragment.getListPosts().size() - oldListPostSize);
+            chosenFragment.adapterNotifyChange(chosenFragment, AdapterNotifyType.itemInserted, totalItemsInserted);
 
             if (chosenFragment.type.equals("streams")
                     && LoggedUserActivity.getLoggedUserActivity().checkStreamsProfileFragmentExist()) {
@@ -483,6 +485,18 @@ public class PostsListFragment extends Fragment {
             fragment.adapter.notifyDataSetChanged();
         } else if (notifyType.equals(AdapterNotifyType.itemInserted)) {
             fragment.adapter.notifyItemInserted(0);
+            Toast.makeText(getContext(), R.string.new_messages_added, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    void adapterNotifyChange(PostsListFragment fragment,
+                             @NonNull AdapterNotifyType notifyType,
+                             int totalItemsInserted) {
+        if (notifyType.equals(AdapterNotifyType.dataSetChanged)) {
+            fragment.adapter.notifyDataSetChanged();
+        } else if (notifyType.equals(AdapterNotifyType.itemInserted)) {
+            fragment.adapter.notifyItemRangeInserted(0, totalItemsInserted);
+            Toast.makeText(getContext(), R.string.new_messages_added, Toast.LENGTH_LONG).show();
         }
     }
 

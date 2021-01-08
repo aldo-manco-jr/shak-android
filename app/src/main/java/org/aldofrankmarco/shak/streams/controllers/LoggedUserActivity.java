@@ -54,6 +54,8 @@ public class LoggedUserActivity extends AppCompatActivity {
     private static String usernameLoggedUser;
     private static String idLoggedUser;
 
+    private boolean isOnPause = false;
+
     private HomeFragment homeFragment = null;
     private ProfileFragment profileFragment = null;
     private PeopleListFragment peopleFragment = null;
@@ -493,5 +495,24 @@ public class LoggedUserActivity extends AppCompatActivity {
 
     public void resetHomeFragment() {
         homeFragment.resetAll();
+    }
+
+    @Override
+    protected void onPause(){
+        super.onPause();
+        //will be executed onResume
+        isOnPause = true;
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        //will be executed onResume
+        if (isOnPause) {
+            // occorre verificare se mentre l'applicazione era in pausa sono stati ricevuti dei messaggi
+            getStreamsFragment().getAllNewPosts();
+        }
+        // l'applicazione è stata ripresa, non è più in pausa
+        isOnPause = false;
     }
 }
