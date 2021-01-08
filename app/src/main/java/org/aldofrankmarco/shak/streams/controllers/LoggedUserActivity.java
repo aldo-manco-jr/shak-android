@@ -348,21 +348,9 @@ public class LoggedUserActivity extends AppCompatActivity {
 
     @Override
     public void onDestroy() {
-        /*homeFragment = null;
-        profileFragment = null;
-        peopleFragment = null;
-        notificationsFragment = null;
-        settingsFragment = null;
-
-        streamsService = null;
-        imagesService = null;
-        usersService = null;
-        notificationsService = null;*/
-
+        super.onDestroy();
         socket.disconnect();
         //socket.off("disconnect");
-
-        super.onDestroy();
     }
 
     @Override
