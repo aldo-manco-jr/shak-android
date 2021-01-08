@@ -108,14 +108,20 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
         Date date = null;
         try {
             date = localTimeToUtc(post.getCreatedAt());
-        } catch (ParseException ignored) {
-        }
+        } catch (ParseException ignored) { }
 
         PrettyTime formattedDateTime = new PrettyTime();
         holder.datePostText.setText(formattedDateTime.format(date));
 
-        if (user.getCity() != null && user.getCountry() != null) {
+        if (user.getCity() != null &&
+                user.getCountry() != null &&
+                user.getCity().trim().length()>0 &&
+                user.getCountry().trim().length()>0) {
+
             holder.locationText.setText("@" + user.getCity() + ", " + user.getCountry());
+            holder.locationText.setVisibility(View.VISIBLE);
+        } else {
+            holder.locationText.setVisibility(View.GONE);
         }
 
         if (!post.getImageVersion().isEmpty()) {
